@@ -1,97 +1,25 @@
-#include <windows.h>
+#include <GLFW/glfw3.h>
 
-LRESULT CALLBACK MainWindowCallback(
-	HWND Window, 
-	UINT Message, 
-	WPARAM WParam, 
-	LPARAM LParam
-){
-	LRESULT Result = 0;
+int main() {
+    if (!glfwInit()) {
+        return -1;
+    }
 
-	switch (Message)
-	{
-		case WM_SIZE:
-			OutputDebugString("WM_SIZE\n");
-			break;
-		case WM_DESTROY:
-			OutputDebugString("WM_destroy\n");
-			break;
-		case WM_CLOSE:
-			OutputDebugString("WM_close\n");
-			break;
-		case WM_ACTIVATE:
-			OutputDebugString("WM_activate\n");
-			break;
-		case WM_PAINT: {
-			
-			PAINTSTRUCT Paint;
-			HDC DeviceContext = BeginPaint(Window, &Paint);
-			int X = Paint.rcPaint.left;
-			int Y = Paint.rcPaint.top;
-			int Height = Paint.rcPaint.bottom - Paint.rcPaint.top;
-			int Width = Paint.rcPaint.right - Paint.rcPaint.left;
-			PatBlt(DeviceContext, X, Y, Width, Height, WHITENESS);
-			EndPaint(Window, &Paint);
+    GLFWwindow* window = glfwCreateWindow(800, 600, "OpenGL Window", NULL, NULL);
+    if (!window) {
+        glfwTerminate();
+        return -1;
+    }
 
-		} break;
-		default:
-			//OutputDebugString("default\n");
-			Result = DefWindowProc(Window, Message, WParam, LParam);
-			break;
-	}
+    glfwMakeContextCurrent(window);
 
-	return Result;
-}
+    while (!glfwWindowShouldClose(window)) {
+        glClear(GL_COLOR_BUFFER_BIT);
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
 
-int CALLBACK WinMain(
-	HINSTANCE Instance,
-	HINSTANCE PrevInstance,
-	LPSTR     CommandLine,
-	int       ShowCode
-) {
-	WNDCLASS WindowClass = {};
-	
-	WindowClass.style = CS_OWNDC|CS_HREDRAW|CS_VREDRAW;
-	WindowClass.lpfnWndProc = MainWindowCallback;
-	WindowClass.hInstance = Instance;
-	//WindowClass.hIcon;
-	WindowClass.lpszClassName = "GewulnWindowClass";
-	
-
-	if (RegisterClass(&WindowClass)) {
-		HWND WindowHandle = CreateWindowEx(
-			0,
-			WindowClass.lpszClassName,
-			"Gewuln",
-			WS_OVERLAPPEDWINDOW|WS_VISIBLE,
-			CW_USEDEFAULT,
-			CW_USEDEFAULT,
-			CW_USEDEFAULT,
-			CW_USEDEFAULT,
-			0,
-			0,
-			Instance,
-			0
-		);
-
-		if (WindowHandle) {
-			for (;;) {
-				MSG Message;
-				BOOL MessageResult = GetMessage(&Message, 0, 0, 0);
-				if (MessageResult > 0) {
-					TranslateMessage(&Message);
-					DispatchMessage(&Message);
-				}
-				else {
-					break;
-				}
-			}
-		}
-		else {
-		}
-	}
-	else {
-	}
-
-	return 0;
+    glfwDestroyWindow(window);
+    glfwTerminate();
+    return 0;
 }

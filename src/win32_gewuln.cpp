@@ -6,8 +6,11 @@
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 
+GLenum glCheckError_(const char *file, int line);
+#define glCheckError() glCheckError_(__FILE__, __LINE__)
 void single_triangle(GLFWwindow * window, unsigned int shaderProgram);
 void two_triangles_EBO(GLFWwindow * window, unsigned int shaderProgram);
+void two_triangles_no_EBO(GLFWwindow * window, unsigned int shaderProgram);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -99,7 +102,8 @@ int main()
     glDeleteShader(fragmentShader);
 
     // single_triangle(window, shaderProgram);
-    two_triangles_EBO(window, shaderProgram);
+    // two_triangles_EBO(window, shaderProgram);
+    two_triangles_no_EBO(window, shaderProgram);
 
     glDeleteProgram(shaderProgram);
 
@@ -112,7 +116,6 @@ int main()
 void single_triangle(GLFWwindow * window, unsigned int shaderProgram)
 {
     // set up vertex data (and buffer(s)) and configure vertex attributes
-    // ------------------------------------------------------------------
     float vertices[] = {
         -0.5f, -0.5f, 0.0f, // left  
          0.5f, -0.5f, 0.0f, // right 
@@ -235,15 +238,12 @@ void two_triangles_EBO(GLFWwindow * window, unsigned int shaderProgram)
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // render loop
-    // -----------
     while (!glfwWindowShouldClose(window))
     {
         // input
-        // -----
         processInput(window);
 
         // render
-        // ------
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -259,19 +259,113 @@ void two_triangles_EBO(GLFWwindow * window, unsigned int shaderProgram)
         // glBindVertexArray(0); // no need to unbind it every time 
  
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-        // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
     // optional: de-allocate all resources once they've outlived their purpose:
-    // ------------------------------------------------------------------------
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
 }
 
+void two_triangles_no_EBO(GLFWwindow * window, unsigned int shaderProgram)
+{
+    /*
+       1         2
+        *       *
+
+            +
+
+        *       *
+       0         3
+    */
+
+    float vertices1[] = {
+        -0.5f, -0.5f, 0.0f,  // left bot
+        -0.5f,  0.5f, 0.0f,  // left top
+         0.5f,  0.5f, 0.0f,  // right top 
+    }; 
+
+    float vertices2[] = {
+         0.5f,  0.5f, 0.0f,  // right top 
+         0.5f, -0.5f, 0.0f,  // right bot
+        -0.5f, -0.5f, 0.0f,  // left bot
+    };
+
+    unsigned int VBO1;
+    {
+        glGenBuffers(1, &VBO1);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO1);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices1), vertices1, GL_STATIC_DRAW);
+    }
+
+    unsigned int VAO1;
+    {   
+        glGenVertexArrays(1, &VAO1);
+        glBindVertexArray(VAO1);
+        glEnableVertexAttribArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO1);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    }
+
+    unsigned int VBO2;
+    {
+        glGenBuffers(2, &VBO2);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO2);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices2), vertices2, GL_STATIC_DRAW);
+    }
+
+    unsigned int VAO2;
+    {   
+        glGenVertexArrays(2, &VAO2);
+        glBindVertexArray(VAO2);
+        glEnableVertexAttribArray(0); // should be not zero?
+        glBindBuffer(GL_ARRAY_BUFFER, VBO2);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0); // should be not zero?
+    }
+
+    // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
+    glBindBuffer(GL_ARRAY_BUFFER, 0); 
+
+    // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
+    // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
+    glBindVertexArray(0); 
+
+    // uncomment this call to draw in wireframe polygons.
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+    // render loop
+    while (!glfwWindowShouldClose(window))
+    {
+        // input
+        processInput(window);
+
+        // render
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        // draw our first triangle
+        glUseProgram(shaderProgram);
+        
+        glBindVertexArray(VAO1);
+        glDrawArrays(GL_TRIANGLES, 0, 6);    
+
+        glBindVertexArray(VAO2);
+        glDrawArrays(GL_TRIANGLES, 0, 6);    
+        
+        // glBindVertexArray(0); // no need to unbind it every time 
+ 
+        // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+
+    // optional: de-allocate all resources once they've outlived their purpose:
+    glDeleteVertexArrays(1, &VAO1); glDeleteVertexArrays(2, &VAO2);
+    glDeleteBuffers(1, &VBO1);      glDeleteBuffers(2, &VBO2);
+}
+
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
-// ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow *window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -279,10 +373,31 @@ void processInput(GLFWwindow *window)
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
-// ---------------------------------------------------------------------------------------------
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     // make sure the viewport matches the new window dimensions; note that width and 
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
+}
+
+GLenum glCheckError_(const char *file, int line)
+{
+    GLenum errorCode;
+    while ((errorCode = glGetError()) != GL_NO_ERROR)
+    {
+        std::string error;
+        switch (errorCode)
+        {
+            case GL_INVALID_ENUM: error         = "INVALID_ENUM"; break;
+            case GL_INVALID_VALUE: error        = "INVALID_VALUE"; break;
+            case GL_INVALID_OPERATION: error    = "INVALID_OPERATION"; break;
+            // case GL_STACK_OVERFLOW: error    = "STACK_OVERFLOW"; break;
+            // case GL_STACK_UNDERFLOW: error   = "STACK_UNDERFLOW"; break;
+            case GL_OUT_OF_MEMORY: error        = "OUT_OF_MEMORY"; break;
+            case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
+        }
+        std::cout << "--!!--" << error << " | " << file << " (" << line << ")" <<
+        std::endl;
+    }
+    return errorCode;
 }

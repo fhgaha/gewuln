@@ -1,2 +1,3 @@
 - "Cant find glfw3.dll" error at runtime. Had to copy that file from "glfw-3.4.bin.WIN32\lib-static-ucrt" to build folder manually according to glfw docs.
 
+- Mesh generator: https://huggingface.co/tencent/Hunyuan3D-2

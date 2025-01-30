@@ -1,13 +1,16 @@
 @echo off
 
+set third_party_path=D:\MyProjects\cpp\third_party
+set glad_c_path=%third_party_path%\glad\src\glad.c
+
 pushd build
 
 call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
 
-cl -Zi /EHsc ../src/win32_gewuln.cpp ..\src\glad.c ^
-/I"D:\MyProjects\cpp\third_party\glfw-3.4.bin.WIN64\include" ^
-/I"D:\MyProjects\cpp\third_party\glad\include" ^
-/DGLFW_STATIC /link /LIBPATH:"D:\MyProjects\cpp\third_party\glfw-3.4.bin.WIN64\lib-vc2019" glfw3dll.lib ^
+cl -Zi /EHsc ../src/win32_gewuln.cpp %glad_c_path% ^
+/I"%~dp0..\third_party\glfw-3.4.bin.WIN64\include" ^
+/I"%~dp0..\third_party\glad\include" ^
+/DGLFW_STATIC /link /LIBPATH:"%~dp0..\third_party\glfw-3.4.bin.WIN64\lib-vc2019" glfw3dll.lib ^
 /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.16299.0\um\x64" OpenGL32.lib
 
 popd

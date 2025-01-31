@@ -1,3 +1,10 @@
 - "Cant find glfw3.dll" error at runtime. Had to copy that file from "glfw-3.4.bin.WIN32\lib-static-ucrt" to build folder manually according to glfw docs.
 
 - Mesh generator: https://huggingface.co/tencent/Hunyuan3D-2
+
+
+1. just walk forward on the solid grouhnd. That's it. This is the end. Or is it? Edning 1/4.
+2. walk on a jelly ground. you are able to jump now. jump with ability of jumping downwards to boost you height jump. That's it. This is the end. Or is it? Edning 2/4.
+3. You are on ice now. You jump, bump dowwards. Break the ice. Get frozed in the cold water. That's it. This is the end. Or is it? Edning 3/n.
+4. you are on the boat now in the middle of the ocean. That's it. This is the end. Or is it? Edning 4/n..
+5. no, really this is it for now. thanks for playing.

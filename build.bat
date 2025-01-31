@@ -7,7 +7,7 @@ pushd build
 
 call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
 
-cl -Zi /EHsc ../src/win32_gewuln.cpp %glad_c_path% ^
+cl -Zi /std:c++20 /EHsc ../src/win64_gewuln.cpp %glad_c_path% ^
 /I"%~dp0..\third_party\glfw-3.4.bin.WIN64\include" ^
 /I"%~dp0..\third_party\glad\include" ^
 /DGLFW_STATIC /link /LIBPATH:"%~dp0..\third_party\glfw-3.4.bin.WIN64\lib-vc2019" glfw3dll.lib ^

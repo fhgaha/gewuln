@@ -85,17 +85,11 @@ int main()
         return -1;
     }
 
-    // Read shader files using std::filesystem::path
-    std::string vertexShaderSourceNotC = readFile("src/shaders/vertex.vert");
-    std::string fragmentShaderSourceNotC = readFile("src/shaders/fragment.frag");
+    std::string vertexShaderSourceStr = readFile("src/shaders/vertex.vert");
+    std::string fragmentShaderSourceStr = readFile("src/shaders/fragment.frag");
 
-    // Use std::string_view for efficient string handling
-    std::string_view vertexShaderSv(vertexShaderSourceNotC);
-    std::string_view fragmentShaderSv(fragmentShaderSourceNotC);
-
-    // Convert to C-style strings (required by OpenGL)
-    const char* vertexShaderSource = vertexShaderSv.data();
-    const char* fragmentShaderSource = fragmentShaderSv.data();
+    const char* vertexShaderSource = vertexShaderSourceStr.c_str();
+    const char* fragmentShaderSource = fragmentShaderSourceStr.data();
 
     // build and compile our shader program
     // ------------------------------------
@@ -140,9 +134,9 @@ int main()
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     float vertices[] = {
-        -0.5f, -0.5f, 0.0f, // left  
-         0.5f, -0.5f, 0.0f, // right 
-         0.0f,  0.5f, 0.0f  // top   
+         0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // right 
+        -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // left  
+         0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f// top   
     }; 
 
     unsigned int VBO, VAO;
@@ -154,8 +148,15 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
+    // position attrbute
+    int aPosIdx = 0;
+    glVertexAttribPointer(aPosIdx, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(aPosIdx);
+
+    // color attribute
+    int aColorIdx = 1;
+    glVertexAttribPointer(aColorIdx, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(aColorIdx);
 
     // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0); 
@@ -173,35 +174,37 @@ int main()
     while (!glfwWindowShouldClose(window))
     {
         // input
-        // -----
         processInput(window);
 
         // render
-        // ------
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // draw our first triangle
+    
+        // draw 
         glUseProgram(shaderProgram);
-        glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
+        
+        // use uniform to change color cyclicly
+        float timeValue = glfwGetTime();
+        float greenValue = sin(timeValue)/2.0f + 0.5f;  // to change in 0 - 1 range
+        int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+
+        glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         // glBindVertexArray(0); // no need to unbind it every time 
  
-        // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-        // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
     // optional: de-allocate all resources once they've outlived their purpose:
-    // ------------------------------------------------------------------------
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
 
     glDeleteProgram(shaderProgram);
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
-    // ------------------------------------------------------------------
     glfwTerminate();
     return 0;
 }

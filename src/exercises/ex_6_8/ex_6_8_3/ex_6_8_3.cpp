@@ -16,7 +16,7 @@ const unsigned int SCR_HEIGHT = 600;
 
 int main()
 {
-    std::cout << "hello from ex_6_8_2.cpp" << std::endl;
+    std::cout << "hello from ex 6.8.3" << std::endl;
 
     // glfw: initialize and configure
     // ------------------------------
@@ -45,13 +45,13 @@ int main()
         return -1;
     }
 
-    Shader ourShader("src/shaders/offset.vert", "src/shaders/fragment.frag");
+    Shader ourShader("src/shaders/output.vert", "src/shaders/fragment.frag");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     float vertices[] = {
-         0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // right 
-        -0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // left  
-         0.0f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f  // bot   
+         0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // right 
+        -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // left  
+         0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f  // top   
     }; 
 
     unsigned int VBO, VAO;
@@ -94,7 +94,7 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         ourShader.use();
-        ourShader.setFloat("offset", 0.5f);
+        // ourShader.setFloat("someUniform", 1.0f);
 
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);

@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <gewuln/shader.h>
+#include <stb/stb_image.h>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -44,6 +45,25 @@ int main()
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
+
+
+    int width, height, nrChannels;
+    unsigned char * data = stbi_load(
+        "../img/container.jpg", 
+        &width, 
+        &height, 
+        &nrChannels, 
+        0
+    );
+
+    std::cout << width << ", " << height << ", " << nrChannels << std::endl;
+
+    // unsigned int texture;
+    // glGenTextures(1, &texture);
+
+
+
+
 
     Shader ourShader("src/shaders/vertex.vert", "src/shaders/fragment.frag");
 

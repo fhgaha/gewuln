@@ -47,55 +47,93 @@ int main()
     }
 
 
+    //texture
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    // set the texture wrapping/filtering options (on currently bound texture)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // load and generate texture
     int width, height, nrChannels;
+
     unsigned char * data = stbi_load(
-        "../img/container.jpg", 
-        &width, 
-        &height, 
-        &nrChannels, 
-        0
-    );
-
-    std::cout << width << ", " << height << ", " << nrChannels << std::endl;
-
-    // unsigned int texture;
-    // glGenTextures(1, &texture);
-
-
-
-
-
-    Shader ourShader("src/shaders/vertex.vert", "src/shaders/fragment.frag");
-
-    // set up vertex data (and buffer(s)) and configure vertex attributes
+        "img/container.jpg", &width, &height, &nrChannels, 0);
+    
+    if (data) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    } else {
+        std::cout << "Failed to load texture" << std::endl;        
+    }
+    
+    stbi_image_free(data);    
+    
+    
+    Shader ourShader("src/shaders/tex/vertex.vert", "src/shaders/tex/fragment.frag");
+    
     float vertices[] = {
-         0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // right 
-        -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // left  
-         0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f  // top   
-    }; 
+        /*
+                    |vertex 1                 ||vertex 2                 |
+                    |x, y, z | r, g, b | s, t ||x, y, z | r, g, b | s, t |
+            bytes:  0  4  8  12 16 20  24 28  32
+        position:   _____stride: 32B___________
+                    offset: 0
+        color:                _____stride: 32B___________
+                    offset:12B          
+        texture:                        _____stride: 32B___________
+                    _____offset:24B_____ 
+        */
+        
+         // positions       // colors         // texture coords
+         0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // top right
+         0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // bottom right
+        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
+        -0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f  // top left
+    };
+    unsigned int indices[] = {  // note that we start from 0!
+        0, 1, 3,  // first Triangle
+        1, 2, 3   // second Triangle
+    };
 
-    unsigned int VBO, VAO;
+    unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
-    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
+    glGenBuffers(1, &EBO);
+    
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
+    
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices, GL_STATIC_DRAW);
+    
     // position attrbute
     int aPosIdx = 0;
-    glVertexAttribPointer(aPosIdx, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glVertexAttribPointer(aPosIdx, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(aPosIdx);
 
     // color attribute
     int aColorIdx = 1;
-    glVertexAttribPointer(aColorIdx, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(aColorIdx, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(aColorIdx);
+    
+    // texture attribute
+    int aTexCoordIdx = 2;
+    glVertexAttribPointer(aTexCoordIdx, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(aTexCoordIdx);
 
     // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0); 
+    
+    // remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
+    // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
     // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
     glBindVertexArray(0); 
 
@@ -117,7 +155,8 @@ int main()
         // ourShader.setFloat("someUniform", 1.0f);
 
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        // glDrawArrays(GL_TRIANGLES, 0, 6);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         // glBindVertexArray(0); // no need to unbind it every time 
  
         glfwSwapBuffers(window);
@@ -127,6 +166,7 @@ int main()
     // optional: de-allocate all resources once they've outlived their purpose:
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     glfwTerminate();

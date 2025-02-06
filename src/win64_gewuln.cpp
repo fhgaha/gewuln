@@ -160,13 +160,6 @@ int main()
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 
-    // glm
-    // scale -> rotate -> translate. with matrises multiplications it should be reversed for maths reasons.
-    // Because we pass the matrix to each of GLM’s functions, GLM automatically multiples the matrices together, 
-    // resulting in a transformation matrix that combines all the transformations.
-    glm::mat4 trans = glm::mat4(1.0f);
-    trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
-    trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
     
     
     // render loop
@@ -184,14 +177,35 @@ int main()
         ourShader.setInt("texture1", 0);
         ourShader.setInt("texture2", 1);
         
+
+        // glm
+        // scale -> rotate -> translate. with matrises multiplications it should be reversed for maths reasons.
+        // Because we pass the matrix to each of GLM’s functions, GLM automatically multiples the matrices together, 
+        // resulting in a transformation matrix that combines all the transformations.
+        glm::mat4 trans = glm::mat4(1.0f);
+        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0, 0.0, 1.0));
+        trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+        // trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+        
         unsigned int transformLoc = glGetUniformLocation(ourShader.ID, "transform");
         glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
-    
+        
 
         glBindVertexArray(VAO);
         // glDrawArrays(GL_TRIANGLES, 0, 6);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         // glBindVertexArray(0); // no need to unbind it every time 
+        
+        
+        //second container        
+        glm::mat4 trans2(1.0f);
+        trans2 = glm::translate(trans2, glm::vec3(-0.5f, 0.5f, 0.0f));
+        float scale_val = (float)sin( glfwGetTime());
+        // std::cout << scale_val << std::endl;
+        trans2 = glm::scale(trans2, glm::vec3(scale_val, scale_val, 1.0f));
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans2));        
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        
  
         glfwSwapBuffers(window);
         glfwPollEvents();

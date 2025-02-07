@@ -124,6 +124,19 @@ int main()
         -0.5f, 0.5f, -0.5f, 0.0f, 1.0f
     };
     
+    glm::vec3 cubePositions[] = {
+        glm::vec3( 0.0f, 0.0f, 0.0f),
+        glm::vec3( 2.0f, 5.0f, -15.0f),
+        glm::vec3(-1.5f, -2.2f, -2.5f),
+        glm::vec3(-3.8f, -2.0f, -12.3f),
+        glm::vec3( 2.4f, -0.4f, -3.5f),
+        glm::vec3(-1.7f, 3.0f, -7.5f),
+        glm::vec3( 1.3f, -2.0f, -2.5f),
+        glm::vec3( 1.5f, 2.0f, -2.5f),
+        glm::vec3( 1.5f, 0.2f, -1.5f),
+        glm::vec3(-1.3f, 1.0f, -1.5f)
+    };
+
 
     unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
@@ -205,7 +218,7 @@ int main()
     glfwSwapInterval(1);    //limits FPS to monitor's refresh rate
     glEnable(GL_DEPTH_TEST);
 
-    
+
     // render loop
     while (!glfwWindowShouldClose(window))
     {
@@ -214,26 +227,20 @@ int main()
 
         // render
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT 
+            | GL_DEPTH_BUFFER_BIT
+        );
 
         ourShader.use();
         ourShader.setInt("texture1", 0);
         // ourShader.setInt("texture2", 1);
         
         
-        // scale -> rotate -> translate. with matrises multiplications it should be reversed.
-        glm::mat4 trans = glm::mat4(1.0f);
-        trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-        trans = glm::rotate(trans, glm::radians(0.0f), glm::vec3(0.0, 0.0, 1.0));
-        // trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0, 0.0, 1.0));
-        // trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
-        
-        
+        // scale -> rotate -> translate. with matrises multiplications it should be reversed. model mat is doing that.
         //Vclip = Mprojection * Mview * Mmodel * Vlocal
-        glm::mat4 model(1.0f);
-        // rotating around X axis
-        // model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+        // glm::mat4 model(1.0f);
+        // // model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f)); // rotating around X axis
+        // model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
         
         glm::mat4 view(1.0f);
         // move cam backwards from the origin a little bit, i.e. the whole scene forward
@@ -241,17 +248,27 @@ int main()
         
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f/600.0f, 0.1f, 100.0f);
         
-        
-        glUniformMatrix4fv(glGetUniformLocation(ourShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(model));
-        glUniformMatrix4fv(glGetUniformLocation(ourShader.ID, "view"), 1, GL_FALSE, glm::value_ptr(view));
-        glUniformMatrix4fv(glGetUniformLocation(ourShader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-    
-
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        for (uint32_t i = 0; i < 10; i++)
+        {
+            glm::mat4 model(1.0f);
+            model = glm::translate(model, cubePositions[i]);
+            
+            model = glm::rotate(model, (float)glfwGetTime() *  glm::radians(20.0f * (i + 1)), glm::vec3(1.0f, 0.3f, 0.5f));
+            // model = glm::scale(...)
+            
+            glUniformMatrix4fv(glGetUniformLocation(ourShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(model));
+            glUniformMatrix4fv(glGetUniformLocation(ourShader.ID, "view"), 1, GL_FALSE, glm::value_ptr(view));
+            glUniformMatrix4fv(glGetUniformLocation(ourShader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+            
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+
+
+        // glBindVertexArray(VAO);
+        // glDrawArrays(GL_TRIANGLES, 0, 36);
         // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         // glBindVertexArray(0); // no need to unbind it every time 
-        
         
         // //second container        
         // glm::mat4 trans2(1.0f);
@@ -261,7 +278,7 @@ int main()
         // trans2 = glm::scale(trans2, glm::vec3(scale_val, scale_val, 1.0f));
         // glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans2));        
         // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        
+                
  
         glfwSwapBuffers(window);
         glfwPollEvents();

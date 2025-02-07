@@ -160,6 +160,25 @@ int main()
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 
+    // scale -> rotate -> translate. with matrises multiplications it should be reversed.
+    glm::mat4 trans = glm::mat4(1.0f);
+    trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+    trans = glm::rotate(trans, glm::radians(0.0f), glm::vec3(0.0, 0.0, 1.0));
+    // trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0, 0.0, 1.0));
+    // trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+    
+    
+    //Vclip = Mprojection * Mview * Mmodel * Vlocal
+    glm::mat4 model(1.0f);
+    // rotating around X axis
+    model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    
+    glm::mat4 view(1.0f);
+    // move cam backwards from the origin a little bit, i.e. the whole scene forward
+    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+    
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f/600.0f, 0.1f, 100.0f);
+    
     
     
     // render loop
@@ -177,19 +196,11 @@ int main()
         ourShader.setInt("texture1", 0);
         ourShader.setInt("texture2", 1);
         
-
-        // glm
-        // scale -> rotate -> translate. with matrises multiplications it should be reversed for maths reasons.
-        // Because we pass the matrix to each of GLM’s functions, GLM automatically multiples the matrices together, 
-        // resulting in a transformation matrix that combines all the transformations.
-        glm::mat4 trans = glm::mat4(1.0f);
-        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0, 0.0, 1.0));
-        trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-        // trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
         
-        unsigned int transformLoc = glGetUniformLocation(ourShader.ID, "transform");
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
-        
+        glUniformMatrix4fv(glGetUniformLocation(ourShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(glGetUniformLocation(ourShader.ID, "view"), 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(glGetUniformLocation(ourShader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+    
 
         glBindVertexArray(VAO);
         // glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -197,14 +208,14 @@ int main()
         // glBindVertexArray(0); // no need to unbind it every time 
         
         
-        //second container        
-        glm::mat4 trans2(1.0f);
-        trans2 = glm::translate(trans2, glm::vec3(-0.5f, 0.5f, 0.0f));
-        float scale_val = (float)sin( glfwGetTime());
-        // std::cout << scale_val << std::endl;
-        trans2 = glm::scale(trans2, glm::vec3(scale_val, scale_val, 1.0f));
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans2));        
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        // //second container        
+        // glm::mat4 trans2(1.0f);
+        // trans2 = glm::translate(trans2, glm::vec3(-0.5f, 0.5f, 0.0f));
+        // float scale_val = (float)sin( glfwGetTime());
+        // // std::cout << scale_val << std::endl;
+        // trans2 = glm::scale(trans2, glm::vec3(scale_val, scale_val, 1.0f));
+        // glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans2));        
+        // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         
  
         glfwSwapBuffers(window);

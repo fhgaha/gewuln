@@ -49,7 +49,7 @@ int main()
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
-    
+        
     
     Shader ourShader("src/shaders/tex/vertex.vert", "src/shaders/tex/fragment.frag");
     
@@ -201,12 +201,12 @@ int main()
     stbi_image_free(data);  
 
   
-    // uncomment this call to draw in wireframe polygons.
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // wireframe
+    glfwSwapInterval(1);    //limits FPS to monitor's refresh rate
+    glEnable(GL_DEPTH_TEST);
+
     
     // render loop
-    // -----------
     while (!glfwWindowShouldClose(window))
     {
         // input
@@ -214,7 +214,7 @@ int main()
 
         // render
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
         ourShader.use();
         ourShader.setInt("texture1", 0);

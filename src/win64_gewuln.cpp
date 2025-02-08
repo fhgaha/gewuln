@@ -10,7 +10,8 @@
 #include <glm/gtc/type_ptr.hpp>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow *window);
+void processInput(GLFWwindow* window);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
 GLenum glCheckError_(const char *file, int line);
 #define glCheckError() glCheckError_(__FILE__, __LINE__)
@@ -19,19 +20,33 @@ GLenum glCheckError_(const char *file, int line);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
+
+glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f, 0.0f);
+   
+float deltaTime = 0.0f; // Time between current frame and last frame
+float lastFrame = 0.0f; // Time of last frame
+
+float lastX = 400, lastY = 300;
+bool firstMouse = true;
+
+// pitch - тангаж - rotation around Ox
+// yaw   - курс   - rotation around Oy
+// roll  - крен   - rotation around Oz
+float pitch, yaw, roll;
+
 int main()
 {
     std::cout << "Started main program" << std::endl;
     
     // glfw: initialize and configure
-    // ------------------------------
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // glfw window creation
-    // --------------------
     GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "gewuln", NULL, NULL);
     if (window == NULL)
     {
@@ -41,15 +56,16 @@ int main()
     }
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSwapInterval(1);    //limits FPS to monitor's refresh rate
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetCursorPosCallback(window, mouse_callback);
 
     // glad: load all OpenGL function pointers
-    // ---------------------------------------
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
-        
     
     Shader ourShader("src/shaders/tex/vertex.vert", "src/shaders/tex/fragment.frag");
     
@@ -215,24 +231,26 @@ int main()
 
   
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // wireframe
-    glfwSwapInterval(1);    //limits FPS to monitor's refresh rate
     glEnable(GL_DEPTH_TEST);
-
-
-    //camera
-    glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-    glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-    glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget); // substraction order is switched here, dir points to +z
-    glm::vec3 up_world = glm::vec3(0.0f, 1.0f, 0.0f);
-    glm::vec3 cameraRight = glm::normalize(glm::cross(up_world, cameraDirection));
-    glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
     
+    
+    //camera
+    // glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+    // glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+    // glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget); // substraction order is switched here, dir points to +z
+    // glm::vec3 up_world = glm::vec3(0.0f, 1.0f, 0.0f);
+    // glm::vec3 cameraRight = glm::normalize(glm::cross(up_world, cameraDirection));
+    // glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
     
     
 
     // render loop
     while (!glfwWindowShouldClose(window))
     {
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+        
         // input
         processInput(window);
 
@@ -246,7 +264,7 @@ int main()
         ourShader.setInt("texture1", 0);
         // ourShader.setInt("texture2", 1);
         
-        
+                
         // scale -> rotate -> translate. with matrises multiplications it should be reversed. model mat is doing that.
         //Vclip = Mprojection * Mview * Mmodel * Vlocal
         // glm::mat4 model(1.0f);
@@ -254,14 +272,17 @@ int main()
         // model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
         
         
-        const float radius = 10.0f;
-        float camX = radius * sin(glfwGetTime());
-        float camZ = radius * cos(glfwGetTime());
-        glm::mat4 view(1.0f);
+        //rotate cam around the scene origin
+        // const float radius = 10.0f;
+        // float camX = radius * sin(glfwGetTime());
+        // float camZ = radius * cos(glfwGetTime());
+        // glm::mat4 view(1.0f);
         // move cam backwards from the origin a little bit, i.e. the whole scene forward
         // view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-        view = glm::lookAt(glm::vec3(camX, 0, camZ), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+        // view = glm::lookAt(glm::vec3(camX, 0, camZ), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
         
+        glm::mat4 view(1.0f);
+        view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
         
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f/600.0f, 0.1f, 100.0f);
         
@@ -316,6 +337,17 @@ void processInput(GLFWwindow *window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+    
+    //movement    
+    const float cameraSpeed = 2.5f * deltaTime; // adjust accordingly
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        cameraPos += cameraSpeed * cameraFront;
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        cameraPos -= cameraSpeed * cameraFront;
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -346,4 +378,47 @@ GLenum glCheckError_(const char *file, int line)
         std::endl;
     }
     return errorCode;
+}
+
+void mouse_callback(GLFWwindow * window, double xpos, double ypos)
+{
+    if (firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+    
+    float xoffset = xpos - lastX;
+    float yoffset = ypos - lastY;
+    lastX = xpos;
+    lastY = ypos;
+    
+    float sensitivity = 0.1f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+    
+    //yaw pitch should be here?
+    yaw   += xoffset;
+    pitch += yoffset;
+    
+    if (pitch > 89.0f) {
+        pitch = 89.0f;
+    }
+    if (pitch < -89.0f) {
+        pitch = -89.0f;
+    }
+    
+    // mouse input
+    glm::vec3 direction;
+    // direction.x = cos(glm::radians(yaw));
+    // direction.y = sin(glm::radians(-pitch));   
+    // direction.z = sin(glm::radians(yaw));
+    // why should it be like that??:
+    // we multiply cos(yaw) * cos(pitch) just to make it depend on pitch??
+    direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    direction.y = sin(glm::radians(-pitch));
+    direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+
+    cameraFront = glm::normalize(direction);
 }

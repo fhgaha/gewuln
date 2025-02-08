@@ -219,6 +219,17 @@ int main()
     glEnable(GL_DEPTH_TEST);
 
 
+    //camera
+    glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+    glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget); // substraction order is switched here, dir points to +z
+    glm::vec3 up_world = glm::vec3(0.0f, 1.0f, 0.0f);
+    glm::vec3 cameraRight = glm::normalize(glm::cross(up_world, cameraDirection));
+    glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
+    
+    
+    
+
     // render loop
     while (!glfwWindowShouldClose(window))
     {
@@ -242,9 +253,15 @@ int main()
         // // model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f)); // rotating around X axis
         // model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
         
+        
+        const float radius = 10.0f;
+        float camX = radius * sin(glfwGetTime());
+        float camZ = radius * cos(glfwGetTime());
         glm::mat4 view(1.0f);
         // move cam backwards from the origin a little bit, i.e. the whole scene forward
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        // view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        view = glm::lookAt(glm::vec3(camX, 0, camZ), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+        
         
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f/600.0f, 0.1f, 100.0f);
         

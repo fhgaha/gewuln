@@ -31,10 +31,9 @@ float lastFrame = 0.0f; // Time of last frame
 float lastX = 400, lastY = 300;
 bool firstMouse = true;
 
-// pitch - тангаж - rotation around Ox
-// yaw   - курс   - rotation around Oy
-// roll  - крен   - rotation around Oz
-float pitch, yaw, roll;
+float pitch = 0.0f; // тангаж - rotation around Ox          
+float yaw = -90.0f; // курс   - rotation around Oy           
+float roll;         // крен   - rotation around Oz  
 
 int main()
 {
@@ -66,6 +65,9 @@ int main()
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // wireframe
+    glEnable(GL_DEPTH_TEST);
+
     
     Shader ourShader("src/shaders/tex/vertex.vert", "src/shaders/tex/fragment.frag");
     
@@ -203,8 +205,7 @@ int main()
     // load and generate texture
     stbi_set_flip_vertically_on_load(true);
     int width, height, nrChannels;
-    unsigned char * data = stbi_load(
-        "img/container.jpg", &width, &height, &nrChannels, 0);
+    unsigned char * data = stbi_load("img/container.jpg", &width, &height, &nrChannels, 0);
     if (data) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
@@ -219,8 +220,7 @@ int main()
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, texture2);
     
-    data = stbi_load(
-        "img/awesomeface.png", &width, &height, &nrChannels, 0);
+    data = stbi_load("img/awesomeface.png", &width, &height, &nrChannels, 0);
     if (data) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
@@ -229,21 +229,7 @@ int main()
     }
     stbi_image_free(data);  
 
-  
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // wireframe
-    glEnable(GL_DEPTH_TEST);
     
-    
-    //camera
-    // glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-    // glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-    // glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget); // substraction order is switched here, dir points to +z
-    // glm::vec3 up_world = glm::vec3(0.0f, 1.0f, 0.0f);
-    // glm::vec3 cameraRight = glm::normalize(glm::cross(up_world, cameraDirection));
-    // glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
-    
-    
-
     // render loop
     while (!glfwWindowShouldClose(window))
     {
@@ -414,11 +400,11 @@ void mouse_callback(GLFWwindow * window, double xpos, double ypos)
     // direction.x = cos(glm::radians(yaw));
     // direction.y = sin(glm::radians(-pitch));   
     // direction.z = sin(glm::radians(yaw));
+    
     // why should it be like that??:
     // we multiply cos(yaw) * cos(pitch) just to make it depend on pitch??
     direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
     direction.y = sin(glm::radians(-pitch));
     direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-
     cameraFront = glm::normalize(direction);
 }

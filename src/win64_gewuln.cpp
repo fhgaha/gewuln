@@ -12,6 +12,7 @@
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
 GLenum glCheckError_(const char *file, int line);
 #define glCheckError() glCheckError_(__FILE__, __LINE__)
@@ -20,20 +21,21 @@ GLenum glCheckError_(const char *file, int line);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-
+// camera
 glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f, 3.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f, 0.0f);
-   
+
+bool firstMouse = true;
+float pitch = 0.0f; // тангаж - rotation around Ox          
+float yaw = -90.0f; // курс   - rotation around Oy // value 0 would look to +x, have to rotate a bit
+float roll;         // крен   - rotation around Oz  
+float lastX = 400, lastY = 300;
+float fov = 45.0f;
+
+// timing
 float deltaTime = 0.0f; // Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
-
-float lastX = 400, lastY = 300;
-bool firstMouse = true;
-
-float pitch = 0.0f; // тангаж - rotation around Ox          
-float yaw = -90.0f; // курс   - rotation around Oy           
-float roll;         // крен   - rotation around Oz  
 
 int main()
 {
@@ -58,6 +60,7 @@ int main()
     glfwSwapInterval(1);    //limits FPS to monitor's refresh rate
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
 
     // glad: load all OpenGL function pointers
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -270,7 +273,8 @@ int main()
         glm::mat4 view(1.0f);
         view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
         
-        glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f/600.0f, 0.1f, 100.0f);
+        // glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f/600.0f, 0.1f, 100.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(fov), 800.0f/600.0f, 0.1f, 100.0f);
         
         glBindVertexArray(VAO);
         for (uint32_t i = 0; i < 10; i++)
@@ -407,4 +411,13 @@ void mouse_callback(GLFWwindow * window, double xpos, double ypos)
     direction.y = sin(glm::radians(-pitch));
     direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
     cameraFront = glm::normalize(direction);
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    fov -= (float)yoffset;
+    if (fov < 1.0f)
+    fov = 1.0f;
+    if (fov > 45.0f)
+    fov = 45.0f;
 }

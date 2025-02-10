@@ -1,13 +1,15 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
-#include <iostream>
-#include <gewuln/shader.h>
 #include <stb/stb_image.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+#include <gewuln/shader_m.h>
+#include <gewuln/camera.h>
+
+#include <iostream>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -21,17 +23,10 @@ GLenum glCheckError_(const char *file, int line);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-// camera
-glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f, 3.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f, 0.0f);
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
 bool firstMouse = true;
-float pitch = 0.0f; // тангаж - rotation around Ox          
-float yaw = -90.0f; // курс   - rotation around Oy // value 0 would look to +x, have to rotate a bit
-float roll;         // крен   - rotation around Oz  
 float lastX = 400, lastY = 300;
-float fov = 45.0f;
 
 // timing
 float deltaTime = 0.0f; // Time between current frame and last frame
@@ -232,6 +227,10 @@ int main()
     }
     stbi_image_free(data);  
 
+
+    ourShader.use();
+    ourShader.setInt("texture1", 0);
+    // ourShader.setInt("texture2", 1);
     
     // render loop
     while (!glfwWindowShouldClose(window))
@@ -245,68 +244,32 @@ int main()
 
         // render
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT 
+        glClear(
+              GL_COLOR_BUFFER_BIT 
             | GL_DEPTH_BUFFER_BIT
         );
 
-        ourShader.use();
-        ourShader.setInt("texture1", 0);
-        // ourShader.setInt("texture2", 1);
-        
-                
         // scale -> rotate -> translate. with matrises multiplications it should be reversed. model mat is doing that.
         //Vclip = Mprojection * Mview * Mmodel * Vlocal
-        // glm::mat4 model(1.0f);
-        // // model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f)); // rotating around X axis
-        // model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
         
+        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), 800.0f/600.0f, 0.1f, 100.0f);
+        ourShader.setMat4("projection", projection);
         
-        //rotate cam around the scene origin
-        // const float radius = 10.0f;
-        // float camX = radius * sin(glfwGetTime());
-        // float camZ = radius * cos(glfwGetTime());
-        // glm::mat4 view(1.0f);
-        // move cam backwards from the origin a little bit, i.e. the whole scene forward
-        // view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-        // view = glm::lookAt(glm::vec3(camX, 0, camZ), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
-        
-        glm::mat4 view(1.0f);
-        view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-        
-        // glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f/600.0f, 0.1f, 100.0f);
-        glm::mat4 projection = glm::perspective(glm::radians(fov), 800.0f/600.0f, 0.1f, 100.0f);
+        glm::mat4 view = camera.GetViewMatrix();
+        ourShader.setMat4("view", view);
         
         glBindVertexArray(VAO);
         for (uint32_t i = 0; i < 10; i++)
         {
             glm::mat4 model(1.0f);
             model = glm::translate(model, cubePositions[i]);
-            
-            model = glm::rotate(model, (float)glfwGetTime() *  glm::radians(20.0f * (i + 1)), glm::vec3(1.0f, 0.3f, 0.5f));
+            float some_angle = 20.0f * (i + 1);
+            model = glm::rotate(model, (float)glfwGetTime() *  glm::radians(some_angle), glm::vec3(1.0f, 0.3f, 0.5f));
             // model = glm::scale(...)
-            
-            glUniformMatrix4fv(glGetUniformLocation(ourShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(model));
-            glUniformMatrix4fv(glGetUniformLocation(ourShader.ID, "view"), 1, GL_FALSE, glm::value_ptr(view));
-            glUniformMatrix4fv(glGetUniformLocation(ourShader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+            ourShader.setMat4("model", model);
             
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
-
-
-        // glBindVertexArray(VAO);
-        // glDrawArrays(GL_TRIANGLES, 0, 36);
-        // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        // glBindVertexArray(0); // no need to unbind it every time 
-        
-        // //second container        
-        // glm::mat4 trans2(1.0f);
-        // trans2 = glm::translate(trans2, glm::vec3(-0.5f, 0.5f, 0.0f));
-        // float scale_val = (float)sin( glfwGetTime());
-        // // std::cout << scale_val << std::endl;
-        // trans2 = glm::scale(trans2, glm::vec3(scale_val, scale_val, 1.0f));
-        // glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans2));        
-        // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-                
  
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -328,16 +291,14 @@ void processInput(GLFWwindow *window)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
     
-    //movement    
-    const float cameraSpeed = 2.5f * deltaTime; // adjust accordingly
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        cameraPos += cameraSpeed * cameraFront;
+        camera.ProcessKeyboard(FORWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        cameraPos -= cameraSpeed * cameraFront;
+        camera.ProcessKeyboard(BACKWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+        camera.ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+        camera.ProcessKeyboard(RIGHT, deltaTime);
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -359,8 +320,8 @@ GLenum glCheckError_(const char *file, int line)
             case GL_INVALID_ENUM: error         = "INVALID_ENUM"; break;
             case GL_INVALID_VALUE: error        = "INVALID_VALUE"; break;
             case GL_INVALID_OPERATION: error    = "INVALID_OPERATION"; break;
-            // case GL_STACK_OVERFLOW: error    = "STACK_OVERFLOW"; break;
-            // case GL_STACK_UNDERFLOW: error   = "STACK_UNDERFLOW"; break;
+            // case GL_STACK_OVERFLOW: error    = "STACK_OVERFLOW"; break;  //not working
+            // case GL_STACK_UNDERFLOW: error   = "STACK_UNDERFLOW"; break; //not working
             case GL_OUT_OF_MEMORY: error        = "OUT_OF_MEMORY"; break;
             case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
         }
@@ -388,36 +349,10 @@ void mouse_callback(GLFWwindow * window, double xpos, double ypos)
     xoffset *= sensitivity;
     yoffset *= sensitivity;
     
-    //yaw pitch should be here?
-    yaw   += xoffset;
-    pitch += yoffset;
-    
-    if (pitch > 89.0f) {
-        pitch = 89.0f;
-    }
-    if (pitch < -89.0f) {
-        pitch = -89.0f;
-    }
-    
-    // mouse input
-    glm::vec3 direction;
-    // direction.x = cos(glm::radians(yaw));
-    // direction.y = sin(glm::radians(-pitch));   
-    // direction.z = sin(glm::radians(yaw));
-    
-    // why should it be like that??:
-    // we multiply cos(yaw) * cos(pitch) just to make it depend on pitch??
-    direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-    direction.y = sin(glm::radians(-pitch));
-    direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-    cameraFront = glm::normalize(direction);
+    camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    fov -= (float)yoffset;
-    if (fov < 1.0f)
-    fov = 1.0f;
-    if (fov > 45.0f)
-    fov = 45.0f;
+    camera.ProcessMouseScroll(static_cast<float>(yoffset));
 }

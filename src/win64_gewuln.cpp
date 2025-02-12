@@ -7,7 +7,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <gewuln/shader_m.h>
+#include <gewuln/shader.h>
 #include <gewuln/camera.h>
 
 #include <iostream>

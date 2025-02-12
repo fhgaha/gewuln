@@ -8,8 +8,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <gewuln/shader.h>
-#include <gewuln/texture.cpp>
-#include <gewuln/vertex.cpp>
+#include <gewuln/texture.h>
+#include <gewuln/vertex.h>
 
 #include <string>
 #include <vector>

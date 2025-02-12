@@ -1,7 +1,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stb/stb_image.h>
-#include <assimp/aabb.h>    //test
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -9,6 +8,7 @@
 
 #include <gewuln/shader.h>
 #include <gewuln/camera.h>
+#include <gewuln/model.h>
 
 #include <iostream>
 
@@ -233,6 +233,10 @@ int main()
     ourShader.setInt("texture1", 0);
     // ourShader.setInt("texture2", 1);
     
+    std::string p = "D:/MyProjects/cpp/gewuln/assets/models/backpack/backpack.obj";
+    Model ourModel(p);
+    
+    
     // render loop
     while (!glfwWindowShouldClose(window))
     {
@@ -271,6 +275,8 @@ int main()
             
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
+ 
+        ourModel.Draw(ourShader);
  
         glfwSwapBuffers(window);
         glfwPollEvents();

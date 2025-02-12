@@ -15,7 +15,10 @@ cl -Zi /std:c++20 /EHsc ../src/win64_gewuln.cpp ^
 /I../includes ^
 /I"%~dp0..\third_party\glfw-3.4.bin.WIN64\include" ^
 /I"%~dp0..\third_party\glad\include" ^
-/DGLFW_STATIC /link /LIBPATH:"%~dp0..\third_party\glfw-3.4.bin.WIN64\lib-vc2019" glfw3dll.lib ^
+/DGLFW_STATIC ^
+/link ^
+/LIBPATH:"%~dp0..\third_party\glfw-3.4.bin.WIN64\lib-vc2019" glfw3dll.lib ^
+/LIBPATH:"D:\MyProjects\cpp\third_party\assimp\assimp-5.4.3\lib\Debug" assimp-vc142-mtd.lib ^
 /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.16299.0\um\x64" OpenGL32.lib
 
 popd

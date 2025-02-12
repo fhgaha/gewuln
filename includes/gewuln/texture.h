@@ -8,8 +8,8 @@ class Texture
 {
 public:
 	unsigned int id;
-	//"texture_diffuse" or "texture_specular"
-	std::string type;
+	std::string type; //"texture_diffuse" or "texture_specular"
+	std::string path; // store path of texture to compare with other textures
 };
 
 #endif

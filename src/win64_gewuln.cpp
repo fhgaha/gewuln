@@ -64,7 +64,7 @@ int main()
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // wireframe
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // wireframe
     glEnable(GL_DEPTH_TEST);
     
     { // process alpha channel of textures
@@ -76,7 +76,9 @@ int main()
     
     Shader ourShader("src/shaders/tex/vertex.vert", "src/shaders/tex/fragment.frag");
     auto obj_path = 
-        "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/mona.obj";
+        "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf/mona.gltf";
+        // "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/glb/mona.glb";
+        // "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/obj/mona.obj";
         // "D:/MyProjects/cpp/gewuln/assets/models/backpack/backpack.obj"
     Model ourModel(obj_path);
     

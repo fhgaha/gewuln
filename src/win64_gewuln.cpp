@@ -68,10 +68,14 @@ int main()
     glEnable(GL_DEPTH_TEST);
 
     // load and generate texture
-    stbi_set_flip_vertically_on_load(true);
+    // stbi_set_flip_vertically_on_load(true);
     
     Shader ourShader("src/shaders/tex/vertex.vert", "src/shaders/tex/fragment.frag");
-    Model ourModel("D:/MyProjects/cpp/gewuln/assets/models/backpack/backpack.obj");
+    auto obj_path = 
+    "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/mona.obj";
+    // "D:/MyProjects/cpp/gewuln/assets/models/backpack/backpack.obj"
+    Model ourModel(obj_path);
+    
     
     // render loop
     while (!glfwWindowShouldClose(window))
@@ -103,8 +107,7 @@ int main()
         
         glm::mat4 model(1.0f);
         model = glm::translate(model, glm::vec3(0, 0, 0));
-        // float some_angle = 20.0f * (i + 1);
-        // model = glm::rotate(model, (float)glfwGetTime() *  glm::radians(some_angle), glm::vec3(1.0f, 0.3f, 0.5f));
+        // model = glm::rotate(model, (float)glfwGetTime() *  glm::radians(20.0f), glm::vec3(1.0f, 0.3f, 0.5f));
         model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
 
         ourShader.setMat4("model", model);

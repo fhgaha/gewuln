@@ -9,7 +9,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.500000
 d 1.000000
 illum 2
-map_Kd MonaSax_Body_B_01.jpg
+map_Kd MonaSax_Body_B_01.png
 
 newmtl Eyes.001
 Ns 15.625000
@@ -19,7 +19,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.500000
 d 1.000000
 illum 2
-map_Kd MonaSax_Face.jpg
+map_Kd MonaSax_Face.png
 
 newmtl Face.001
 Ns 15.625000
@@ -29,7 +29,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.500000
 d 1.000000
 illum 2
-map_Kd MonaSax_Face.jpg
+map_Kd MonaSax_Face.png
 
 newmtl Hands.001
 Ns 15.625000
@@ -39,7 +39,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.500000
 d 1.000000
 illum 2
-map_Kd Hand_Female_Glove.jpg
+map_Kd Hand_Female_Glove.png
 
 newmtl Legs_Texture.001
 Ns 62.500000
@@ -49,7 +49,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.500000
 d 1.000000
 illum 2
-map_Kd MonaSax_Legs_A_01.jpg
+map_Kd MonaSax_Legs_A_01.png
 
 newmtl Skin.001
 Ns 62.500000
@@ -59,7 +59,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.500000
 d 1.000000
 illum 2
-map_Kd MonaSax_Body_B_01.jpg
+map_Kd MonaSax_Body_B_01.png
 
 newmtl eyelash.001
 Ns 62.500000
@@ -68,5 +68,5 @@ Ks 0.898039 0.898039 0.898039
 Ke 0.000000 0.000000 0.000000
 Ni 1.500000
 illum 2
-map_Kd Eyelash_Female_01.jpg
-map_d Eyelash_Female_01.jpg
+map_Kd Eyelash_Female_01.png
+map_d Eyelash_Female_01.png

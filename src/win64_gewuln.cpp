@@ -66,16 +66,19 @@ int main()
     }
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // wireframe
     glEnable(GL_DEPTH_TEST);
+    
+    { // process alpha channel of textures
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
 
-    // load and generate texture
     // stbi_set_flip_vertically_on_load(true);
     
     Shader ourShader("src/shaders/tex/vertex.vert", "src/shaders/tex/fragment.frag");
     auto obj_path = 
-    "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/mona.obj";
-    // "D:/MyProjects/cpp/gewuln/assets/models/backpack/backpack.obj"
+        "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/mona.obj";
+        // "D:/MyProjects/cpp/gewuln/assets/models/backpack/backpack.obj"
     Model ourModel(obj_path);
-    
     
     // render loop
     while (!glfwWindowShouldClose(window))

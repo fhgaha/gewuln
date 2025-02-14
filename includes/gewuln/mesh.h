@@ -7,11 +7,23 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <gewuln/shader.h>
-#include <gewuln/texture.h>
-#include <gewuln/vertex.h>
 
 #include <string>
 #include <vector>
+
+struct Vertex
+{
+	glm::vec3 Position;
+	glm::vec3 Normal;
+	glm::vec2 TexCoords;	
+};
+
+struct Texture
+{
+	unsigned int id;
+	std::string type; //"texture_diffuse" or "texture_specular"
+	std::string path; // store path of texture to compare with other textures
+};
 
 class Mesh
 {

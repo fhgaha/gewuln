@@ -77,9 +77,6 @@ int main()
     Shader ourShader("src/shaders/tex/vertex.vert", "src/shaders/tex/fragment.frag");
     auto obj_path = 
         "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf/mona.gltf";
-        // "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/glb/mona.glb";
-        // "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/obj/mona.obj";
-        // "D:/MyProjects/cpp/gewuln/assets/models/backpack/backpack.obj"
     Model ourModel(obj_path);
     
     // render loop

@@ -78,9 +78,9 @@ int main()
     
     Shader ourShader("src/shaders/tex/vertex.vert", "src/shaders/tex/fragment.frag");
     auto obj_path = 
-        // "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf/mona.gltf";
+        "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf/mona.gltf";
         // "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/dae/mona.dae";
-        "D:/MyProjects/cpp/gewuln/assets/models/vampire/dancing_vampire.dae";
+        // "D:/MyProjects/cpp/gewuln/assets/models/vampire/dancing_vampire.dae";
     Model ourModel(obj_path);
     Animation danceAnimation(obj_path, &ourModel);
     Animator animator(&danceAnimation);
@@ -122,7 +122,6 @@ int main()
         model = glm::translate(model, glm::vec3(0, 0, 0));
         // model = glm::rotate(model, (float)glfwGetTime() *  glm::radians(20.0f), glm::vec3(1.0f, 0.3f, 0.5f));
         model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-        // model = glm::scale(model, glm::vec3(.5f, .5f, .5f));
 
         ourShader.setMat4("model", model);
         ourModel.Draw(ourShader);

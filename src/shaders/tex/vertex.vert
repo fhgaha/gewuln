@@ -40,8 +40,7 @@ out vec2 TexCoords;
 void main()
 {
     vec4 totalPosition = vec4(0.0f);
-   //  for(int i = 0 ; i < MAX_BONE_INFLUENCE ; i++)
-    for(int i = 0 ; i < 4 ; i++)
+    for(int i = 0 ; i < MAX_BONE_INFLUENCE ; i++)
     {
         if(boneIds[i] == -1) 
             continue;
@@ -55,7 +54,6 @@ void main()
       //   vec3 localNormal = mat3(finalBonesMatrices[boneIds[i]]) * aNormal;
     }
 		
-    mat4 viewModel = view * model;
-    gl_Position =  projection * viewModel * totalPosition;
+    gl_Position =  projection * view * model * totalPosition;
     TexCoords = aTexCoords;
 }

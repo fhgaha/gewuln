@@ -22,21 +22,8 @@ class Animation
 public:
 	Animation() = default;
 
-	Animation(const std::string& animationPath, Model* model)
+	Animation(const aiAnimation* animation, const aiScene* scene, Model* model)
 	{
-		Assimp::Importer importer;
-		const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate);
-		assert(scene && scene->mRootNode);
-		// if (!scene->mAnimations || scene->mNumAnimations == 0) {
-		if (!scene->HasAnimations()) {
-			std::cerr << "ERROR: No animations found in file: " << animationPath << std::endl;
-			return;	//??
-    	}
-		// aiString anim_name = scene->mAnimations[0]->mName;
-		// std::cout << "This animation has name: " << anim_name.C_Str() << std::endl;
-		
-		//should be loop for all animations
-		auto animation = scene->mAnimations[0];
 		m_Duration = animation->mDuration;
 		m_TicksPerSecond = animation->mTicksPerSecond;
 		aiMatrix4x4 globalTransformation = scene->mRootNode->mTransformation;

@@ -11,12 +11,30 @@
 class Animator
 {
 public:
-	std::vector<Animation> animations;
-
-	Animator(Animation* animation)
+	std::unordered_map<std::string, Animation> animations;
+	
+	Animator(){};
+	
+	Animator(const std::string& animationPath, Model* model): animations()
 	{
+		Assimp::Importer importer;
+		const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate);
+		assert(scene && scene->mRootNode);
+		// if (!scene->mAnimations || scene->mNumAnimations == 0) {
+		if (!scene->HasAnimations()) {
+			std::cerr << "ERROR: No animations found in file: " << animationPath << std::endl;
+			return;	//??
+    	}
+		
+		for (unsigned int i = 0; i < scene->mNumAnimations; i++)
+		{
+			auto anim_name = scene->mAnimations[i]->mName.C_Str();
+			auto animation = Animation(scene->mAnimations[i], scene, model);
+			animations[anim_name] = animation;
+		}
+		
 		m_CurrentTime = 0.0;
-		m_CurrentAnimation = animation;
+		m_CurrentAnimation = &animations["idle"];
 
 		m_FinalBoneMatrices.reserve(100);
 
@@ -34,10 +52,10 @@ public:
 			CalculateBoneTransform(&m_CurrentAnimation->GetRootNode(), glm::mat4(1.0f));
 		}
 	}
-
-	void PlayAnimation(Animation* pAnimation)
+	
+	void PlayAnimation(std::string anim_name)
 	{
-		m_CurrentAnimation = pAnimation;
+		m_CurrentAnimation = &animations[anim_name];
 		m_CurrentTime = 0.0f;
 	}
 

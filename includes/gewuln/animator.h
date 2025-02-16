@@ -55,7 +55,20 @@ public:
 	
 	void PlayAnimation(std::string anim_name)
 	{
-		m_CurrentAnimation = &animations[anim_name];
+		Animation* try_play;
+		try{
+			try_play = &animations.at(anim_name);
+		}
+		catch(const std::exception& e){
+			std::cerr << "\nNo such animation as \"" << anim_name <<"\"\n";
+			return;
+		}
+		
+		if (m_CurrentAnimation == try_play) {
+			return;
+		}
+		
+		m_CurrentAnimation = try_play;
 		m_CurrentTime = 0.0f;
 	}
 

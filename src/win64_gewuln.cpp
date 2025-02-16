@@ -59,7 +59,7 @@ int main()
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSwapInterval(1);    //limits FPS to monitor's refresh rate
 
     // glad: load all OpenGL function pointers
@@ -155,12 +155,15 @@ void processInput(GLFWwindow *window)
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(RIGHT, deltaTime);
         
+    // animations
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
         animator.PlayAnimation("idle");
     if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
         animator.PlayAnimation("walk");
     if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
         animator.PlayAnimation("interact");
+    if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+        animator.PlayAnimation("eating ass");
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes

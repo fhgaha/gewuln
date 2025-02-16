@@ -27,10 +27,15 @@ public:
 		Assimp::Importer importer;
 		const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate);
 		assert(scene && scene->mRootNode);
-		if (!scene->mAnimations || scene->mNumAnimations == 0) {
+		// if (!scene->mAnimations || scene->mNumAnimations == 0) {
+		if (!scene->HasAnimations()) {
 			std::cerr << "ERROR: No animations found in file: " << animationPath << std::endl;
 			return;	//??
     	}
+		// aiString anim_name = scene->mAnimations[0]->mName;
+		// std::cout << "This animation has name: " << anim_name.C_Str() << std::endl;
+		
+		//should be loop for all animations
 		auto animation = scene->mAnimations[0];
 		m_Duration = animation->mDuration;
 		m_TicksPerSecond = animation->mTicksPerSecond;
@@ -62,6 +67,28 @@ public:
 	inline const std::map<std::string,BoneInfo>& GetBoneIDMap() { return m_BoneInfoMap;	}
 
 private:
+	float m_Duration;
+	int m_TicksPerSecond;
+	std::vector<Bone> m_Bones;
+	AssimpNodeData m_RootNode;
+	std::map<std::string, BoneInfo> m_BoneInfoMap;
+
+	void ReadHierarchyData(AssimpNodeData& dest, const aiNode* src)
+	{
+		assert(src);
+
+		dest.name = src->mName.data;
+		dest.transformation = AssimpGLMHelpers::ConvertMatrixToGLMFormat(src->mTransformation);
+		dest.childrenCount = src->mNumChildren;
+
+		for (int i = 0; i < src->mNumChildren; i++)
+		{
+			AssimpNodeData newData;
+			ReadHierarchyData(newData, src->mChildren[i]);
+			dest.children.push_back(newData);
+		}
+	}
+
 	void ReadMissingBones(const aiAnimation* animation, Model& model)
 	{
 		int size = animation->mNumChannels;
@@ -92,25 +119,4 @@ private:
 		m_BoneInfoMap = boneInfoMap;
 	}
 
-	void ReadHierarchyData(AssimpNodeData& dest, const aiNode* src)
-	{
-		assert(src);
-
-		dest.name = src->mName.data;
-		dest.transformation = AssimpGLMHelpers::ConvertMatrixToGLMFormat(src->mTransformation);
-		dest.childrenCount = src->mNumChildren;
-
-		for (int i = 0; i < src->mNumChildren; i++)
-		{
-			AssimpNodeData newData;
-			ReadHierarchyData(newData, src->mChildren[i]);
-			dest.children.push_back(newData);
-		}
-	}
-
-	float m_Duration;
-	int m_TicksPerSecond;
-	std::vector<Bone> m_Bones;
-	AssimpNodeData m_RootNode;
-	std::map<std::string, BoneInfo> m_BoneInfoMap;
 };

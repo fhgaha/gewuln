@@ -11,6 +11,8 @@
 class Animator
 {
 public:
+	std::vector<Animation> animations;
+
 	Animator(Animation* animation)
 	{
 		m_CurrentTime = 0.0;

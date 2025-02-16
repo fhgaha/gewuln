@@ -77,14 +77,16 @@ int main()
     // stbi_set_flip_vertically_on_load(true);
     
     Shader ourShader("src/shaders/tex/vertex.vert", "src/shaders/tex/fragment.frag");
+
+    // animations
     auto obj_path = 
         "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf/mona.gltf";
         // "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/dae/mona.dae";
         // "D:/MyProjects/cpp/gewuln/assets/models/vampire/dancing_vampire.dae";
     Model ourModel(obj_path);
-    Animation danceAnimation(obj_path, &ourModel);
-    Animator animator(&danceAnimation);
-
+    Animation idle(obj_path, &ourModel);
+    Animator animator(&idle);
+    
     // render loop
     while (!glfwWindowShouldClose(window))
     {

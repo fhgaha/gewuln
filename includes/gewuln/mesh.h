@@ -1,5 +1,6 @@
 #ifndef MESH_H
 #define MESH_H
+#define MAX_BONE_INFLUENCE 4
 
 #include <glad/glad.h>
 
@@ -16,6 +17,12 @@ struct Vertex
 	glm::vec3 Position;
 	glm::vec3 Normal;
 	glm::vec2 TexCoords;	
+
+	//below is for animation	
+	glm::vec3 Tangent;
+	glm::vec3 Bitangent;
+	int m_BoneIDs[MAX_BONE_INFLUENCE]; //bone indexes which will influence this vertex
+	float m_Weights[MAX_BONE_INFLUENCE]; //weights from each bone
 };
 
 struct Texture
@@ -23,6 +30,12 @@ struct Texture
 	unsigned int id;
 	std::string type; //"texture_diffuse" or "texture_specular"
 	std::string path; // store path of texture to compare with other textures
+};
+
+struct BoneInfo
+{
+    int id; /*id is index in finalBoneMatrices*/
+    glm::mat4 offset; /*offset matrix transforms vertex from model space to bone space*/
 };
 
 class Mesh
@@ -86,6 +99,7 @@ private:
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 		
+		//these will be used in vertex shader
 		// vertex positions
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
@@ -97,6 +111,14 @@ private:
 		// vertex texture coords
 		glEnableVertexAttribArray(2);
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Vertex::TexCoords));
+		
+		// ids
+		glEnableVertexAttribArray(3);
+		glVertexAttribIPointer(3, 4, GL_INT, sizeof(Vertex), (void*)offsetof(Vertex, Vertex::m_BoneIDs));
+		
+        // weights
+        glEnableVertexAttribArray(4);
+        glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, m_Weights));   
 		
 		glBindVertexArray(0);
 	}

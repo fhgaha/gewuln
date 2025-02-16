@@ -11,6 +11,8 @@
 #include <gewuln/model.h>
 
 #include <iostream>
+#include <gewuln/animation.h>
+#include <gewuln/animator.h>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -76,9 +78,13 @@ int main()
     
     Shader ourShader("src/shaders/tex/vertex.vert", "src/shaders/tex/fragment.frag");
     auto obj_path = 
-        "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf/mona.gltf";
+        // "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf/mona.gltf";
+        // "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/dae/mona.dae";
+        "D:/MyProjects/cpp/gewuln/assets/models/vampire/dancing_vampire.dae";
     Model ourModel(obj_path);
-    
+    Animation danceAnimation(obj_path, &ourModel);
+    Animator animator(&danceAnimation);
+
     // render loop
     while (!glfwWindowShouldClose(window))
     {
@@ -88,6 +94,7 @@ int main()
         
         // input
         processInput(window);
+        animator.UpdateAnimation(deltaTime);
 
         // render
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -107,17 +114,24 @@ int main()
         glm::mat4 view = camera.GetViewMatrix();
         ourShader.setMat4("view", view);
         
+        auto transforms = animator.GetFinalBoneMatrices();
+        for (int i = 0; i < transforms.size(); ++i)
+            ourShader.setMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
+        
         glm::mat4 model(1.0f);
         model = glm::translate(model, glm::vec3(0, 0, 0));
         // model = glm::rotate(model, (float)glfwGetTime() *  glm::radians(20.0f), glm::vec3(1.0f, 0.3f, 0.5f));
         model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+        // model = glm::scale(model, glm::vec3(.5f, .5f, .5f));
 
         ourShader.setMat4("model", model);
         ourModel.Draw(ourShader);
  
+        glCheckError();
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
+    
 
     glfwTerminate();
     return 0;

@@ -23,8 +23,8 @@ GLenum glCheckError_(const char *file, int line);
 #define glCheckError() glCheckError_(__FILE__, __LINE__)
 
 // settings
-const unsigned int SCR_WIDTH = 1600;
-const unsigned int SCR_HEIGHT = 900;
+const unsigned int SCR_WIDTH  = 800;
+const unsigned int SCR_HEIGHT = 600;
 
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
@@ -59,7 +59,7 @@ int main()
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
-    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSwapInterval(1);    //limits FPS to monitor's refresh rate
 
     // glad: load all OpenGL function pointers
@@ -109,7 +109,7 @@ int main()
         ourShader.use();
 
         // scale -> rotate -> translate. with matrises multiplications it should be reversed. model mat is doing that.
-        //Vclip = Mprojection * Mview * Mmodel * Vlocal
+        // Vclip = Mprojection * Mview * Mmodel * Vlocal
         
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH/(float)SCR_HEIGHT, 0.1f, 100.0f);
         ourShader.setMat4("projection", projection);
@@ -119,8 +119,9 @@ int main()
 
         // animation stuff
         auto transforms = animator.GetFinalBoneMatrices();
-        for (int i = 0; i < transforms.size(); ++i)
+        for (int i = 0; i < transforms.size(); ++i) {
             ourShader.setMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
+        }
         
         glm::mat4 model(1.0f);
         model = glm::translate(model, glm::vec3(0, 0, 0));
@@ -134,18 +135,17 @@ int main()
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-    
 
     glfwTerminate();
     return 0;
 }
 
-// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 void processInput(GLFWwindow *window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-    
+
+    // cam movement    
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         camera.ProcessKeyboard(FORWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -154,7 +154,7 @@ void processInput(GLFWwindow *window)
         camera.ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(RIGHT, deltaTime);
-        
+    
     // animations
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
         animator.PlayAnimation("idle");
@@ -162,8 +162,6 @@ void processInput(GLFWwindow *window)
         animator.PlayAnimation("walk");
     if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
         animator.PlayAnimation("interact");
-    if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
-        animator.PlayAnimation("eating ass");
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -182,16 +180,15 @@ GLenum glCheckError_(const char *file, int line)
         std::string error;
         switch (errorCode)
         {
-            case GL_INVALID_ENUM: error         = "INVALID_ENUM"; break;
-            case GL_INVALID_VALUE: error        = "INVALID_VALUE"; break;
-            case GL_INVALID_OPERATION: error    = "INVALID_OPERATION"; break;
-            // case GL_STACK_OVERFLOW: error    = "STACK_OVERFLOW"; break;  //not working
-            // case GL_STACK_UNDERFLOW: error   = "STACK_UNDERFLOW"; break; //not working
-            case GL_OUT_OF_MEMORY: error        = "OUT_OF_MEMORY"; break;
+            case GL_INVALID_ENUM:         error = "INVALID_ENUM"; break;
+            case GL_INVALID_VALUE:        error = "INVALID_VALUE"; break;
+            case GL_INVALID_OPERATION:    error = "INVALID_OPERATION"; break;
+            // case GL_STACK_OVERFLOW:    error = "STACK_OVERFLOW"; break;  //not working
+            // case GL_STACK_UNDERFLOW:   error = "STACK_UNDERFLOW"; break; //not working
+            case GL_OUT_OF_MEMORY:        error = "OUT_OF_MEMORY"; break;
             case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
         }
-        std::cout << "--!!--" << error << " | " << file << " (" << line << ")" <<
-        std::endl;
+        std::cout << "--!!--" << error << " | " << file << " (" << line << ")" << std::endl;
     }
     return errorCode;
 }

@@ -35,7 +35,7 @@ float lastX = SCR_WIDTH/2.0f, lastY = SCR_HEIGHT/2.0f;
 float deltaTime = 0.0f; // Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
 
-Animator animator;
+Animator mona_animator;
 
 int main()
 {
@@ -81,12 +81,14 @@ int main()
     Shader ourShader("src/shaders/tex/vertex.vert", "src/shaders/tex/fragment.frag");
 
     // animations
-    auto obj_path = 
+    auto mona_path = 
         "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf/mona.gltf";
         // "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/dae/mona.dae";
         // "D:/MyProjects/cpp/gewuln/assets/models/vampire/dancing_vampire.dae";
-    Model ourModel(obj_path);
-    animator = Animator(obj_path, &ourModel);
+    Model mona(mona_path);
+    mona_animator = Animator(mona_path, &mona);
+    
+    Model room("D:/MyProjects/cpp/gewuln/assets/models/room/gltf/room.gltf");
     
     // render loop
     while (!glfwWindowShouldClose(window))
@@ -97,7 +99,7 @@ int main()
         
         // input
         processInput(window);
-        animator.UpdateAnimation(deltaTime);
+        mona_animator.UpdateAnimation(deltaTime);
 
         // render
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -118,7 +120,7 @@ int main()
         ourShader.setMat4("view", view);
 
         // animation stuff
-        auto transforms = animator.GetFinalBoneMatrices();
+        auto transforms = mona_animator.GetFinalBoneMatrices();
         for (int i = 0; i < transforms.size(); ++i) {
             ourShader.setMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
         }
@@ -129,7 +131,9 @@ int main()
         model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
 
         ourShader.setMat4("model", model);
-        ourModel.Draw(ourShader);
+        
+        mona.Draw(ourShader);
+        room.Draw(ourShader);
  
         glCheckError();
         glfwSwapBuffers(window);
@@ -157,11 +161,11 @@ void processInput(GLFWwindow *window)
     
     // animations
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-        animator.PlayAnimation("idle");
+        mona_animator.PlayAnimation("idle");
     if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-        animator.PlayAnimation("walk");
+        mona_animator.PlayAnimation("walk");
     if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
-        animator.PlayAnimation("interact");
+        mona_animator.PlayAnimation("interact");
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes

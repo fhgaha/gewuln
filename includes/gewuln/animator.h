@@ -24,26 +24,31 @@ public:
 		if (!scene->HasAnimations()) {
 			std::cerr << "ERROR: No animations found in file: " << animationPath << std::endl;
 			return;	//??
-    	}
-		
-		for (unsigned int i = 0; i < scene->mNumAnimations; i++)
-		{
-			auto anim_name = scene->mAnimations[i]->mName.C_Str();
-			auto animation = Animation(scene->mAnimations[i], scene, model);
-			animations[anim_name] = animation;
+    	} else {
+			
+			// import animations
+			for (unsigned int i = 0; i < scene->mNumAnimations; i++)
+			{
+				auto anim_name = scene->mAnimations[i]->mName.C_Str();
+				auto animation = Animation(scene->mAnimations[i], scene, model);
+				animations[anim_name] = animation;
+			}
+			
+			m_CurrentTime = 0.0;
+			m_CurrentAnimation = &animations["idle"];
+
+			m_FinalBoneMatrices.reserve(100);
+
+			for (int i = 0; i < 100; i++)
+				m_FinalBoneMatrices.push_back(glm::mat4(1.0f));
+			
 		}
-		
-		m_CurrentTime = 0.0;
-		m_CurrentAnimation = &animations["idle"];
-
-		m_FinalBoneMatrices.reserve(100);
-
-		for (int i = 0; i < 100; i++)
-			m_FinalBoneMatrices.push_back(glm::mat4(1.0f));
 	}
 
 	void UpdateAnimation(float dt)
 	{
+		if (!check_has_animations()) return;
+		
 		m_DeltaTime = dt;
 		if (m_CurrentAnimation)
 		{
@@ -55,6 +60,8 @@ public:
 	
 	void PlayAnimation(std::string anim_name)
 	{
+		if (!check_has_animations()) return;
+		
 		Animation* try_play;
 		try{
 			try_play = &animations.at(anim_name);
@@ -106,5 +113,13 @@ private:
 	Animation* m_CurrentAnimation;
 	float m_CurrentTime;
 	float m_DeltaTime;
+	
+	bool check_has_animations() {
+		if (animations.empty()) {
+			std::cerr << "ERROR: can't animate a model with no animations!" << std::endl;
+			return false;
+		}
 
+		return true;
+	}
 };

@@ -4,6 +4,8 @@
 
 set third_party_path=D:\MyProjects\cpp\third_party
 set glad_c_path=%third_party_path%\glad\src\glad.c
+set sources=../includes/gewuln/resource_manager.cpp ../includes/gewuln/texture.cpp ../includes/gewuln/shader.cpp
+set objects=resource_manager.obj texture.obj shader.obj
 
 pushd build
 
@@ -12,6 +14,7 @@ call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary
 cl -Zi /std:c++20 /EHsc ../src/win64_gewuln.cpp ^
 %glad_c_path% ^
 ../includes/stb/stb_image_impl.cpp ^
+%sources% ^
 /I../includes ^
 /I"%~dp0..\third_party\glfw-3.4.bin.WIN64\include" ^
 /I"%~dp0..\third_party\glad\include" ^

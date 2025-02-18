@@ -6,13 +6,16 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <gewuln/shader.cpp>
+#include <gewuln/shader.h>
 #include <gewuln/camera.h>
 #include <gewuln/model.h>
 
 #include <iostream>
 #include <gewuln/animation.h>
 #include <gewuln/animator.h>
+#include <gewuln/resource_manager.h>
+// #include <gewuln/texture.cpp>
+
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -79,42 +82,11 @@ int main()
     // stbi_set_flip_vertically_on_load(true);
     
 
-    std::string vertexCode;
-    std::string fragmentCode;
-    std::ifstream vShaderFile;
-    std::ifstream fShaderFile;
-    std::ifstream gShaderFile;
-    // ensure ifstream objects can throw exceptions:
-    vShaderFile.exceptions (std::ifstream::failbit | std::ifstream::badbit);
-    fShaderFile.exceptions (std::ifstream::failbit | std::ifstream::badbit);
-    try 
-    {
-        // open files
-        vShaderFile.open("src/shaders/tex/vertex.vert");
-        fShaderFile.open("src/shaders/tex/fragment.frag");
-        std::stringstream vShaderStream, fShaderStream;
-        // read file's buffer contents into streams
-        vShaderStream << vShaderFile.rdbuf();
-        fShaderStream << fShaderFile.rdbuf();		
-        // close file handlers
-        vShaderFile.close();
-        fShaderFile.close();
-        // convert stream into string
-        vertexCode = vShaderStream.str();
-        fragmentCode = fShaderStream.str();			
-        // if geometry shader path is present, also load a geometry shader
-    }
-    catch (std::ifstream::failure& e)
-    {
-        std::cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: " << e.what() << std::endl;
-    }
-    const char* vShaderCode = vertexCode.c_str();
-    const char * fShaderCode = fragmentCode.c_str();
+    Shader ourShader = ResourceManager::LoadShader(
+        "src/shaders/tex/vertex.vert", 
+        "src/shaders/tex/fragment.frag", 
+        nullptr, "test");
     
-    
-    Shader ourShader;
-    ourShader.Compile(vShaderCode, fShaderCode);
-
     // animations
     auto mona_path = 
         "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf/mona.gltf";

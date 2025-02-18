@@ -3,7 +3,7 @@
 .vscode/
 
 # Ignore build directory
-# build/
+build/
 
 # Ignore user-specific files
 *.user

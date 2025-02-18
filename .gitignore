@@ -1,6 +1,9 @@
-# Ignore Visual Studio and Visual Studio Code folders
+# Ignore editor specific folders
 .vs/
 .vscode/
+.lapce/
+.focus/
+
 
 # Ignore build directory
 build/

@@ -2,9 +2,9 @@
 #include <stb/stb_image.h> 
 #include <iostream> 
 
-Model::Model(){}
+Model::Model(): animated(false){}
 
-Model::Model(const aiScene *scene, std::string directory)
+Model::Model(const aiScene *scene, std::string directory, bool animated) : animated(animated)
 {
 	this->directory = directory;
 	processNode(scene->mRootNode, scene);
@@ -18,7 +18,8 @@ void Model::Draw(Shader &shader)
 }
 
 std::map<std::string, BoneInfo>& Model::GetBoneInfoMap() { return m_BoneInfoMap; }
-int& Model::GetBoneCount() { return m_BoneCounter; } 
+int& Model::GetBoneCount() { return m_BoneCounter; }
+bool Model::IsAnimated() const {return animated;}
 
 void Model::processNode(aiNode *node, const aiScene *scene)
 {
@@ -33,15 +34,6 @@ void Model::processNode(aiNode *node, const aiScene *scene)
 	for(unsigned int i = 0; i < node->mNumChildren; i++)
 	{
 		processNode(node->mChildren[i], scene);
-	}
-}
-
-void Model::setVertexBoneDataToDefault(Vertex& vertex)
-{
-	for (int i = 0; i < MAX_BONE_INFLUENCE; i++)
-	{
-		vertex.m_BoneIDs[i] = -1;
-		vertex.m_Weights[i] = 0.0f;
 	}
 }
 
@@ -102,7 +94,16 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
 	
 	extractBoneWeightForVertices(vertices,mesh,scene);
 	
-	return Mesh(vertices, indices, textures);
+	return Mesh(vertices, indices, textures, animated);
+}
+
+void Model::setVertexBoneDataToDefault(Vertex& vertex)
+{
+	for (int i = 0; i < MAX_BONE_INFLUENCE; i++)
+	{
+		vertex.boneIDs[i] = -1;
+		vertex.weights[i] = 0.0f;
+	}
 }
 
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName)
@@ -127,7 +128,6 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
 		}
 		if (!skip)
 		{
-			//TODO: this is probably stupid. Should use texture2d instead of texture
 			std::string filename = std::string(str.C_Str());
 			Texture2D tex = ResourceManager::LoadTexture((directory + '/' + filename).c_str(), true, filename);
 			
@@ -140,19 +140,6 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
 		}
 	}
 	return textures;
-}
-
-void Model::setVertexBoneData(Vertex& vertex, int boneID, float weight)
-{
-	for (int i = 0; i < MAX_BONE_INFLUENCE; ++i)
-	{
-		if (vertex.m_BoneIDs[i] < 0)
-		{
-			vertex.m_Weights[i] = weight;
-			vertex.m_BoneIDs[i] = boneID;
-			break;
-		}
-	}
 }
 
 void Model::extractBoneWeightForVertices(std::vector<Vertex>& vertices, aiMesh* mesh, const aiScene* scene)
@@ -185,6 +172,19 @@ void Model::extractBoneWeightForVertices(std::vector<Vertex>& vertices, aiMesh* 
 			float weight = weights[weightIndex].mWeight;
 			assert(vertexId <= vertices.size());
 			setVertexBoneData(vertices[vertexId], boneID, weight);
+		}
+	}
+}
+
+
+void Model::setVertexBoneData(Vertex& vertex, int boneID, float weight)
+{
+	for (int i = 0; i < MAX_BONE_INFLUENCE; ++i) {
+		if (vertex.boneIDs[i] < 0) 
+		{
+			vertex.weights[i] = weight;
+			vertex.boneIDs[i] = boneID;
+			break;
 		}
 	}
 }

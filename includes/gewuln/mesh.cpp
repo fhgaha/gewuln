@@ -4,14 +4,18 @@
 Mesh::Mesh(
 	std::vector<Vertex>   vertices, 
 	std::vector<unsigned int> indices,
-	std::vector<Texture>  textures
+	std::vector<Texture>  textures,
+	bool animated
 ){
 	this->vertices = vertices;
 	this->indices  = indices;
 	this->textures = textures;
-	
+	this->animated = animated;
+		
 	setupMesh();
 }
+
+bool Mesh::IsAnimated() const {	return animated; }
 
 void Mesh::Draw(Shader &shader){
 	unsigned int diffuseNr = 1;
@@ -63,14 +67,16 @@ void Mesh::setupMesh() {
 	// vertex texture coords
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Vertex::TexCoords));
-	
-	// ids
-	glEnableVertexAttribArray(3);
-	glVertexAttribIPointer(3, 4, GL_INT, sizeof(Vertex), (void*)offsetof(Vertex, Vertex::m_BoneIDs));
-	
-	// weights
-	glEnableVertexAttribArray(4);
-	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, m_Weights));   
+
+	if (animated){		
+		// ids
+		glEnableVertexAttribArray(3);
+		glVertexAttribIPointer(3, 4, GL_INT, sizeof(Vertex), (void*)offsetof(Vertex, Vertex::boneIDs));
+		
+		// weights
+		glEnableVertexAttribArray(4);
+		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Vertex::weights));   
+	}
 	
 	glBindVertexArray(0);
 }

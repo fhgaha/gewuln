@@ -19,8 +19,8 @@ struct Vertex
 	glm::vec2 TexCoords;	
 
 	//below is for animation	
-	int m_BoneIDs[MAX_BONE_INFLUENCE]; //bone indexes which will influence this vertex
-	float m_Weights[MAX_BONE_INFLUENCE]; //weights from each bone
+	int boneIDs[MAX_BONE_INFLUENCE]; //bone indexes which will influence this vertex
+	float weights[MAX_BONE_INFLUENCE]; //weights from each bone
 };
 
 struct Texture
@@ -42,16 +42,19 @@ public:
 	std::vector<Vertex>   vertices;
 	std::vector<unsigned int> indices;
 	std::vector<Texture>  textures;
+	bool IsAnimated() const;
 
 	Mesh(
 		std::vector<Vertex>   vertices, 
 		std::vector<unsigned int> indices,
-		std::vector<Texture>  textures
+		std::vector<Texture>  textures,
+		bool animated
 	);
 	
 	void Draw(Shader &shader);
 
 private:
+	bool animated;
 	// render data	
 	unsigned int VAO, VBO, EBO;
 	

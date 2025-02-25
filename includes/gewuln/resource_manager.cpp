@@ -40,7 +40,7 @@ Texture2D ResourceManager::GetTexture(std::string name)
 
 Model ResourceManager::LoadModel(const char * file, bool animated, std::string name)
 {
-    Models[name] = loadModelFromFile(file);
+    Models[name] = loadModelFromFile(file, animated);
     return Models[name];
 }
 
@@ -117,7 +117,8 @@ Texture2D ResourceManager::loadTextureFromFile(const char *file, bool alpha)
     texture.Filter_Min = GL_LINEAR_MIPMAP_LINEAR;
     // load image
     int width, height, nrChannels;
-    unsigned char* data = stbi_load(file, &width, &height, &nrChannels, 0);
+    unsigned char* data = stbi_load(
+        file, &width, &height, &nrChannels, 0);
     // now generate texture
     texture.Generate(width, height, data);
     // and finally free image data
@@ -125,7 +126,7 @@ Texture2D ResourceManager::loadTextureFromFile(const char *file, bool alpha)
     return texture;
 }
 
-Model ResourceManager::loadModelFromFile(const char * file)
+Model ResourceManager::loadModelFromFile(const char * file, bool animated)
 {
     Assimp::Importer import;
     const aiScene *scene = import.ReadFile(file, aiProcess_Triangulate |	aiProcess_FlipUVs);
@@ -137,5 +138,6 @@ Model ResourceManager::loadModelFromFile(const char * file)
     }
     std::string fileStr(file);
     std::string directory = fileStr.substr(0, fileStr.find_last_of('/'));
-    return Model(scene, directory);
+    
+    return Model(scene, directory, animated);
 }

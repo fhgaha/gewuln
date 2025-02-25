@@ -29,11 +29,12 @@ class Model
 {
 public:
 	Model();
-	Model(const aiScene *scene, std::string directory);
+	Model(const aiScene *scene, std::string directory, bool animated);
 
 	void Draw(Shader &shader);
 	std::map<std::string, BoneInfo>& GetBoneInfoMap();
     int& GetBoneCount();
+	bool IsAnimated() const;
 	
 private:
 	// model data
@@ -43,6 +44,7 @@ private:
 	
 	std::map<std::string, BoneInfo> m_BoneInfoMap; //
     int m_BoneCounter = 0;
+	bool animated;
 	
 	void processNode(aiNode *node, const aiScene *scene);
 	void setVertexBoneDataToDefault(Vertex& vertex);

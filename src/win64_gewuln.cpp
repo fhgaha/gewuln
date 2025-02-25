@@ -82,19 +82,21 @@ int main()
     // stbi_set_flip_vertically_on_load(true);
     
 
-    Shader ourShader = ResourceManager::LoadShader(
+    Shader shader = ResourceManager::LoadShader(
         "src/shaders/tex/vertex.vert", 
         "src/shaders/tex/fragment.frag", 
         nullptr, "test");
     
     // animations
-    auto mona_path = 
-        "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf/mona.gltf";
-        // "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/dae/mona.dae";
-        // "D:/MyProjects/cpp/gewuln/assets/models/vampire/dancing_vampire.dae";
-    // Model mona(mona_path);
+    auto mona_path = "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf/mona.gltf";
     Model mona = ResourceManager::LoadModel(mona_path, true, "mona_model");
     mona_animator = Animator(mona_path, &mona);
+    
+    Model room = ResourceManager::LoadModel(
+        "D:/MyProjects/cpp/gewuln/assets/models/room/gltf/room.gltf", 
+        false, 
+        "room"
+    );
     
     // render loop
     while (!glfwWindowShouldClose(window))
@@ -114,22 +116,22 @@ int main()
             | GL_DEPTH_BUFFER_BIT
         );
 
-        ourShader.Use();
+        shader.Use();
 
         // scale -> rotate -> translate. with matrises multiplications it should be reversed. model mat is doing that.
         // Vclip = Mprojection * Mview * Mmodel * Vlocal
         
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH/(float)SCR_HEIGHT, 0.1f, 100.0f);
-        ourShader.SetMatrix4("projection", projection);
+        shader.SetMatrix4("projection", projection);
         
         glm::mat4 view = camera.GetViewMatrix();
-        ourShader.SetMatrix4("view", view);
+        shader.SetMatrix4("view", view);
 
         // animation stuff
         auto transforms = mona_animator.GetFinalBoneMatrices();
         for (int i = 0; i < transforms.size(); ++i) {
             auto name = "finalBonesMatrices[" + std::to_string(i) + "]";
-            ourShader.SetMatrix4(name.c_str(), transforms[i]);
+            shader.SetMatrix4(name.c_str(), transforms[i]);
         }
         
         glm::mat4 model(1.0f);
@@ -137,9 +139,11 @@ int main()
         // model = glm::rotate(model, (float)glfwGetTime() *  glm::radians(20.0f), glm::vec3(1.0f, 0.3f, 0.5f));
         model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
 
-        ourShader.SetMatrix4("model", model);
+        shader.SetMatrix4("model", model);
         
-        mona.Draw(ourShader);
+        mona.Draw(shader);
+        
+        room.Draw(shader);
  
         glCheckError();
         glfwSwapBuffers(window);

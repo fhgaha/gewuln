@@ -5,10 +5,15 @@
 #include <fstream>
 
 #include <stb/stb_image.h>
+#include "model.h"
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 // Instantiate static variables
 std::map<std::string, Texture2D>    ResourceManager::Textures;
 std::map<std::string, Shader>       ResourceManager::Shaders;
+std::map<std::string, Model>        ResourceManager::Models;
 
 
 Shader ResourceManager::LoadShader(const char *vShaderFile, const char *fShaderFile, const char *gShaderFile, std::string name)
@@ -33,6 +38,17 @@ Texture2D ResourceManager::GetTexture(std::string name)
     return Textures[name];
 }
 
+Model ResourceManager::LoadModel(const char * file, bool animated, std::string name)
+{
+    Models[name] = loadModelFromFile(file);
+    return Models[name];
+}
+
+Model ResourceManager::GetModel(std::string name)
+{
+    return Models[name];
+}
+
 void ResourceManager::Clear()
 {
     // (properly) delete all shaders	
@@ -41,6 +57,8 @@ void ResourceManager::Clear()
     // (properly) delete all textures
     for (auto iter : Textures)
         glDeleteTextures(1, &iter.second.ID);
+    
+    //TODO: theres no glDeleteModels!! what should i do??
 }
 
 Shader ResourceManager::loadShaderFromFile(const char *vShaderFile, const char *fShaderFile, const char *gShaderFile)
@@ -96,6 +114,7 @@ Texture2D ResourceManager::loadTextureFromFile(const char *file, bool alpha)
         texture.Internal_Format = GL_RGBA;
         texture.Image_Format = GL_RGBA;
     }
+    texture.Filter_Min = GL_LINEAR_MIPMAP_LINEAR;
     // load image
     int width, height, nrChannels;
     unsigned char* data = stbi_load(file, &width, &height, &nrChannels, 0);
@@ -104,4 +123,19 @@ Texture2D ResourceManager::loadTextureFromFile(const char *file, bool alpha)
     // and finally free image data
     stbi_image_free(data);
     return texture;
+}
+
+Model ResourceManager::loadModelFromFile(const char * file)
+{
+    Assimp::Importer import;
+    const aiScene *scene = import.ReadFile(file, aiProcess_Triangulate |	aiProcess_FlipUVs);
+    bool error = !scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode;
+    if(error)
+    {
+        std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
+        std::runtime_error("ERROR::ASSIMP::" + std::string(import.GetErrorString()));
+    }
+    std::string fileStr(file);
+    std::string directory = fileStr.substr(0, fileStr.find_last_of('/'));
+    return Model(scene, directory);
 }

@@ -92,7 +92,8 @@ int main()
         "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf/mona.gltf";
         // "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/dae/mona.dae";
         // "D:/MyProjects/cpp/gewuln/assets/models/vampire/dancing_vampire.dae";
-    Model mona(mona_path);
+    // Model mona(mona_path);
+    Model mona = ResourceManager::LoadModel(mona_path, true, "mona_model");
     mona_animator = Animator(mona_path, &mona);
     
     // render loop

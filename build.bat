@@ -4,8 +4,7 @@
 
 set third_party_path=D:\MyProjects\cpp\third_party
 set glad_c_path=%third_party_path%\glad\src\glad.c
-set sources=../includes/gewuln/resource_manager.cpp ../includes/gewuln/texture.cpp ../includes/gewuln/shader.cpp
-set objects=resource_manager.obj texture.obj shader.obj
+set sources=../includes/gewuln/texture.cpp ../includes/gewuln/shader.cpp  ../includes/gewuln/mesh.cpp ../includes/gewuln/model.cpp ../includes/gewuln/resource_manager.cpp
 
 pushd build
 

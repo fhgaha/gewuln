@@ -50,7 +50,6 @@ private:
 	std::vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName);
 	void setVertexBoneData(Vertex& vertex, int boneID, float weight);
     void extractBoneWeightForVertices(std::vector<Vertex>& vertices, aiMesh* mesh, const aiScene* scene);
-	unsigned int textureFromFile(const char *path, const std::string &directory, bool gamma);
 };
 
 #endif

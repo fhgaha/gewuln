@@ -127,8 +127,12 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
 		}
 		if (!skip)
 		{
+			//TODO: this is probably stupid. Should use texture2d instead of texture
+			std::string filename = std::string(str.C_Str());
+			Texture2D tex = ResourceManager::LoadTexture((directory + '/' + filename).c_str(), true, filename);
+			
 			Texture texture;
-			texture.id = textureFromFile(str.C_Str(), directory, false);
+			texture.id = tex.ID;
 			texture.type = typeName;
 			texture.path = str.C_Str();
 			textures.push_back(texture); 
@@ -183,13 +187,4 @@ void Model::extractBoneWeightForVertices(std::vector<Vertex>& vertices, aiMesh* 
 			setVertexBoneData(vertices[vertexId], boneID, weight);
 		}
 	}
-}
-
-unsigned int Model::textureFromFile(const char *path, const std::string &directory, bool gamma)
-{
-    std::string filename = std::string(path);
-    filename = directory + '/' + filename;
-	
-	Texture2D tex = ResourceManager::LoadTexture(filename.c_str(), true, filename);
-	return tex.ID;
 }

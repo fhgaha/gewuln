@@ -83,8 +83,8 @@ int main()
     
 
     Shader shader = ResourceManager::LoadShader(
-        "D:/MyProjects/cpp/gewuln/src/shaders/tex/vertex.vert", 
-        "D:/MyProjects/cpp/gewuln/src/shaders/tex/fragment.frag", 
+        "D:/MyProjects/cpp/gewuln/src/shaders/vertex.vert", 
+        "D:/MyProjects/cpp/gewuln/src/shaders/fragment.frag", 
         nullptr, "test");
     
     // animations
@@ -98,6 +98,7 @@ int main()
         false, 
         "floor"
     );
+    
     
     // render loop
     while (!glfwWindowShouldClose(window))
@@ -118,33 +119,54 @@ int main()
         );
 
         shader.Use();
-
-        // scale -> rotate -> translate. with matrises multiplications it should be reversed. model mat is doing that.
-        // Vclip = Mprojection * Mview * Mmodel * Vlocal
         
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH/(float)SCR_HEIGHT, 0.1f, 100.0f);
-        shader.SetMatrix4("projection", projection);
-        
-        glm::mat4 view = camera.GetViewMatrix();
-        shader.SetMatrix4("view", view);
+        //mona
+        {
+            // scale -> rotate -> translate. with matrises multiplications it should be reversed. model mat is doing that.
+            // Vclip = Mprojection * Mview * Mmodel * Vlocal
+            
+            glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH/(float)SCR_HEIGHT, 0.1f, 100.0f);
+            shader.SetMatrix4("projection", projection);
+            
+            glm::mat4 view = camera.GetViewMatrix();
+            shader.SetMatrix4("view", view);
 
-        // animation stuff
-        auto transforms = mona_animator.GetFinalBoneMatrices();
-        for (int i = 0; i < transforms.size(); ++i) {
-            auto name = "finalBonesMatrices[" + std::to_string(i) + "]";
-            shader.SetMatrix4(name.c_str(), transforms[i]);
+            // animation stuff
+            auto transforms = mona_animator.GetFinalBoneMatrices();
+            for (int i = 0; i < transforms.size(); ++i) {
+                auto name = "finalBonesMatrices[" + std::to_string(i) + "]";
+                shader.SetMatrix4(name.c_str(), transforms[i]);
+            }
+            
+            glm::mat4 model(1.0f);
+            model = glm::translate(model, glm::vec3(0, 0, 0));
+            // model = glm::rotate(model, (float)glfwGetTime() *  glm::radians(20.0f), glm::vec3(1.0f, 0.3f, 0.5f));
+            model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+            
+            shader.SetMatrix4("model", model);
+            
+            mona.Draw(shader);
         }
         
-        glm::mat4 model(1.0f);
-        model = glm::translate(model, glm::vec3(0, 0, 0));
-        // model = glm::rotate(model, (float)glfwGetTime() *  glm::radians(20.0f), glm::vec3(1.0f, 0.3f, 0.5f));
-        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+        // floor
+        {
+            glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH/(float)SCR_HEIGHT, 0.1f, 100.0f);
+            shader.SetMatrix4("projection", projection);
+            
+            glm::mat4 view = camera.GetViewMatrix();
+            shader.SetMatrix4("view", view);
 
-        shader.SetMatrix4("model", model);
-        
-        mona.Draw(shader);
-        
-        floor.Draw(shader);
+            // we ignore finalBonesMatrices here
+            
+            glm::mat4 model(1.0f);
+            model = glm::translate(model, glm::vec3(0, -1.0f, 0));
+            // model = glm::rotate(model, (float)glfwGetTime() *  glm::radians(20.0f), glm::vec3(1.0f, 0.3f, 0.5f));
+            model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+            
+            shader.SetMatrix4("model", model);
+            
+            floor.Draw(shader);
+        }
  
         glCheckError();
         glfwSwapBuffers(window);

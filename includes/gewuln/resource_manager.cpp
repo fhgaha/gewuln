@@ -109,16 +109,30 @@ Texture2D ResourceManager::loadTextureFromFile(const char *file, bool alpha)
 {
     // create texture object
     Texture2D texture;
-    if (alpha)
-    {
-        texture.Internal_Format = GL_RGBA;
-        texture.Image_Format = GL_RGBA;
-    }
+    // if (alpha)
+    // {
+    //     texture.Internal_Format = GL_RGBA;
+    //     texture.Image_Format = GL_RGBA;
+    // }
     texture.Filter_Min = GL_LINEAR_MIPMAP_LINEAR;
     // load image
     int width, height, nrChannels;
-    unsigned char* data = stbi_load(
-        file, &width, &height, &nrChannels, 0);
+    unsigned char* data = stbi_load(file, &width, &height, &nrChannels, 0);
+    
+    switch (nrChannels)
+    {
+        case 3:
+            texture.Internal_Format = GL_RGB;
+            texture.Image_Format = GL_RGB;
+            break;
+        case 4:
+            texture.Internal_Format = GL_RGBA;
+            texture.Image_Format = GL_RGBA;
+            break;
+        default:
+            break;
+    }
+    
     // now generate texture
     texture.Generate(width, height, data);
     // and finally free image data

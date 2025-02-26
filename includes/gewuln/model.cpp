@@ -4,7 +4,8 @@
 
 Model::Model(): animated(false){}
 
-Model::Model(const aiScene *scene, std::string directory, bool animated) : animated(animated)
+Model::Model(const aiScene *scene, std::string directory, bool animated) 
+: animated(animated)
 {
 	this->directory = directory;
 	processNode(scene->mRootNode, scene);

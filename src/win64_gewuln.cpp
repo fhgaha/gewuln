@@ -83,8 +83,8 @@ int main()
     
 
     Shader shader = ResourceManager::LoadShader(
-        "src/shaders/tex/vertex.vert", 
-        "src/shaders/tex/fragment.frag", 
+        "D:/MyProjects/cpp/gewuln/src/shaders/tex/vertex.vert", 
+        "D:/MyProjects/cpp/gewuln/src/shaders/tex/fragment.frag", 
         nullptr, "test");
     
     // animations
@@ -92,10 +92,11 @@ int main()
     Model mona = ResourceManager::LoadModel(mona_path, true, "mona_model");
     mona_animator = Animator(mona_path, &mona);
     
-    Model room = ResourceManager::LoadModel(
-        "D:/MyProjects/cpp/gewuln/assets/models/room/gltf/room.gltf", 
+    Model floor = ResourceManager::LoadModel(
+        // "D:/MyProjects/cpp/gewuln/assets/models/room/gltf/room.gltf", 
+        "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/test_floor/gltf/test_floor.gltf",
         false, 
-        "room"
+        "floor"
     );
     
     // render loop
@@ -143,7 +144,7 @@ int main()
         
         mona.Draw(shader);
         
-        room.Draw(shader);
+        floor.Draw(shader);
  
         glCheckError();
         glfwSwapBuffers(window);

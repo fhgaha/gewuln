@@ -93,11 +93,16 @@ int main()
     mona_animator = Animator(mona_path, &mona);
     
     Model floor = ResourceManager::LoadModel(
-        // "D:/MyProjects/cpp/gewuln/assets/models/room/gltf/room.gltf", 
         "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/test_floor/gltf/test_floor.gltf",
         false, 
         "floor"
     );
+
+    // Model room = ResourceManager::LoadModel(
+    //     "D:/MyProjects/cpp/gewuln/assets/models/room/gltf/room.gltf", 
+    //     false, 
+    //     "room"
+    // );
     
     
     // render loop

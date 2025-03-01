@@ -26,6 +26,7 @@ unsigned int TextureFromFile(const char *path, const std::string &directory, boo
 class Model
 {
 public:
+	Model() {}
 	Model(std::string const &path)
 	{
 		loadModel(path);
@@ -231,7 +232,11 @@ private:
 	
 };
 
-unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma)
+//inline here cause     
+	// win64_gewuln.cpp → includes model.h → compiles to win64_gewuln.obj
+    // resource_manager.cpp → includes model.h → compiles to resource_manager.obj
+// without inline it causes linker error
+inline unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma)
 {
     std::string filename = std::string(path);
     filename = directory + '/' + filename;

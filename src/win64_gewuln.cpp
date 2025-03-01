@@ -8,7 +8,7 @@
 
 #include <gewuln/shader.h>
 #include <gewuln/camera.h>
-#include <gewuln/model.h>
+// #include <gewuln/model.h>
 
 #include <iostream>
 #include <gewuln/animation.h>
@@ -88,11 +88,9 @@ int main()
         nullptr, "test");
     
     // animations
-    auto mona_path = 
-        "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf/mona.gltf";
-        // "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/dae/mona.dae";
-        // "D:/MyProjects/cpp/gewuln/assets/models/vampire/dancing_vampire.dae";
-    Model mona(mona_path);
+    auto mona_path = "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf/mona.gltf";
+    // Model mona(mona_path);
+    Model mona = ResourceManager::LoadModel(mona_path, true, "mona");
     mona_animator = Animator(mona_path, &mona);
     
     // render loop

@@ -121,7 +121,7 @@ int main()
         
         glm::mat4 view = camera.GetViewMatrix();
         ourShader.SetMatrix4("view", view);
-
+        
         // animation stuff
         auto transforms = mona_animator.GetFinalBoneMatrices();
         for (int i = 0; i < transforms.size(); ++i) {

@@ -35,8 +35,12 @@ Texture2D ResourceManager::GetTexture(std::string name)
 
 Model ResourceManager::LoadModel(const char *file, bool animated, std::string name)
 {
-    Model m(file);
-    Models[name] = m;
+    Models[name] = loadModelFromFile(file, animated);
+    return Models[name];
+}
+
+Model ResourceManager::GetModel(std::string name)
+{
     return Models[name];
 }
 
@@ -48,6 +52,8 @@ void ResourceManager::Clear()
     // (properly) delete all textures
     for (auto iter : Textures)
         glDeleteTextures(1, &iter.second.ID);
+    
+    // glad doesnt have delete models
 }
 
 Shader ResourceManager::loadShaderFromFile(const char *vShaderFile, const char *fShaderFile, const char *gShaderFile)

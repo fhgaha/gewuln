@@ -35,6 +35,7 @@ public:
     // properly de-allocates all loaded resources
     
     static Model LoadModel(const char *file, bool animated, std::string name);
+    static Model GetModel(std::string name);
     
     static void      Clear();
 private:

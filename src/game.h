@@ -33,6 +33,8 @@ public:
     void Init();
     // game loop
     void ProcessInput(float dt);
+    void ProcessMouseMovement(float xoffset, float yoffset);
+    void ProcessMouseScroll(float yoffset);
     void Update(float dt);
     void Render();
 };

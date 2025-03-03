@@ -26,8 +26,6 @@ GLenum glCheckError_(const char *file, int line);
 const unsigned int SCR_WIDTH  = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
-
 bool firstMouse = true;
 float lastX = SCR_WIDTH/2.0f, lastY = SCR_HEIGHT/2.0f;
 
@@ -59,11 +57,11 @@ int main()
     }
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetKeyCallback(window, key_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSwapInterval(1);    //limits FPS to monitor's refresh rate
-    glfwSetKeyCallback(window, key_callback);
 
     // glad: load all OpenGL function pointers
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -182,10 +180,10 @@ void mouse_callback(GLFWwindow * window, double xpos, double ypos)
     xoffset *= sensitivity;
     yoffset *= sensitivity;
     
-    camera.ProcessMouseMovement(xoffset, yoffset);
+    my_game.ProcessMouseMovement(xoffset, yoffset);
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    camera.ProcessMouseScroll(static_cast<float>(yoffset));
+    my_game.ProcessMouseScroll(static_cast<float>(yoffset));
 }

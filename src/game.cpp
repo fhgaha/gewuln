@@ -93,6 +93,16 @@ void Game::ProcessInput(float dt)
         mona_animator.PlayAnimation("interact");
 }
 
+void Game::ProcessMouseMovement(float xoffset, float yoffset)
+{
+    Camera.ProcessMouseMovement(xoffset, yoffset);
+}
+
+void Game::ProcessMouseScroll(float yoffset)
+{
+    Camera.ProcessMouseScroll(yoffset);
+}
+
 void Game::Render()
 {
     //Renderer->DrawModel(

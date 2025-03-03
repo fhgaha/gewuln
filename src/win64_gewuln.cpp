@@ -15,9 +15,9 @@
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow* window);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
 GLenum glCheckError_(const char *file, int line);
 #define glCheckError() glCheckError_(__FILE__, __LINE__)
@@ -37,7 +37,7 @@ float lastFrame = 0.0f; // Time of last frame
 
 // Animator mona_animator;
 
-Game my_game(800, 600);
+Game my_game(SCR_WIDTH, SCR_HEIGHT);
 
 int main()
 {
@@ -51,7 +51,7 @@ int main()
 
     // glfw window creation
     GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "gewuln", NULL, NULL);
-    if (window == NULL)
+    if (!window)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -63,6 +63,7 @@ int main()
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSwapInterval(1);    //limits FPS to monitor's refresh rate
+    glfwSetKeyCallback(window, key_callback);
 
     // glad: load all OpenGL function pointers
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -89,8 +90,6 @@ int main()
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         
-        // input
-        processInput(window);
         my_game.ProcessInput(deltaTime);
 
         // render
@@ -111,28 +110,29 @@ int main()
     return 0;
 }
 
-void processInput(GLFWwindow *window)
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
-
-    // cam movement    
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.ProcessKeyboard(FORWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.ProcessKeyboard(BACKWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.ProcessKeyboard(LEFT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.ProcessKeyboard(RIGHT, deltaTime);
+    }
     
-    // // animations
-    // if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-    //     mona_animator.PlayAnimation("idle");
-    // if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-    //     mona_animator.PlayAnimation("walk");
-    // if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
-    //     mona_animator.PlayAnimation("interact");
+    if (!(key >= 0 && key < 1024)) {
+        return;
+    }
+
+    switch (action)
+    {
+    case GLFW_PRESS:
+        my_game.Keys[key] = true;
+        break;
+    case GLFW_RELEASE:
+        my_game.Keys[key] = false;
+        // my_game.KeysProcessed[key] = false;
+        break;
+    default:
+        break;
+    }
+    
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes

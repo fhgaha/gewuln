@@ -74,14 +74,23 @@ void Game::Update(float dt)
 
 void Game::ProcessInput(float dt)
 {
-   
+    // cam movement    
+    if (Keys[GLFW_KEY_W])
+        Camera.ProcessKeyboard(FORWARD, dt);
+    if (Keys[GLFW_KEY_S])
+        Camera.ProcessKeyboard(BACKWARD, dt);
+    if (Keys[GLFW_KEY_A])
+        Camera.ProcessKeyboard(LEFT, dt);
+    if (Keys[GLFW_KEY_D])
+        Camera.ProcessKeyboard(RIGHT, dt);
+    
     // animations
-    // if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-    //     mona_animator.PlayAnimation("idle");
-    // if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-    //     mona_animator.PlayAnimation("walk");
-    // if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
-    //     mona_animator.PlayAnimation("interact");
+    if (Keys[GLFW_KEY_1])
+        mona_animator.PlayAnimation("idle");
+    if (Keys[GLFW_KEY_2])
+        mona_animator.PlayAnimation("walk");
+    if (Keys[GLFW_KEY_3])
+        mona_animator.PlayAnimation("interact");
 }
 
 void Game::Render()

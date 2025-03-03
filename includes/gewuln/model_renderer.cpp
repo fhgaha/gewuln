@@ -2,6 +2,8 @@
 
 ModelRenderer::ModelRenderer(Shader & shader)
 {
+	this->shader = shader;
+	initRenderData();
 }
 
 ModelRenderer::~ModelRenderer()
@@ -10,8 +12,10 @@ ModelRenderer::~ModelRenderer()
 
 void ModelRenderer::DrawModel(Model & model, glm::vec3 pos)
 {
+	model.Draw(shader);
 }
 
 void ModelRenderer::initRenderData()
 {
+	
 }

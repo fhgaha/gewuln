@@ -8,13 +8,10 @@
 
 #include <gewuln/shader.h>
 #include <gewuln/camera.h>
-// #include <gewuln/model.h>
+#include <gewuln/resource_manager.h>
 
 #include <iostream>
-#include <gewuln/animation.h>
-#include <gewuln/animator.h>
-#include <gewuln/resource_manager.h>
-// #include <gewuln/texture.cpp>
+#include "game.h"
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -38,7 +35,9 @@ float lastX = SCR_WIDTH/2.0f, lastY = SCR_HEIGHT/2.0f;
 float deltaTime = 0.0f; // Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
 
-Animator mona_animator;
+// Animator mona_animator;
+
+Game my_game(800, 600);
 
 int main()
 {
@@ -81,17 +80,7 @@ int main()
 
     // stbi_set_flip_vertically_on_load(true);
     
-
-    Shader ourShader = ResourceManager::LoadShader(
-        "src/shaders/tex/vertex.vert", 
-        "src/shaders/tex/fragment.frag", 
-        nullptr, "test");
-    
-    // animations
-    auto mona_path = "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf/mona.gltf";
-    // Model mona(mona_path);
-    Model mona = ResourceManager::LoadModel(mona_path, true, "mona");
-    mona_animator = Animator(mona_path, &mona);
+    my_game.Init();
     
     // render loop
     while (!glfwWindowShouldClose(window))
@@ -102,7 +91,7 @@ int main()
         
         // input
         processInput(window);
-        mona_animator.UpdateAnimation(deltaTime);
+        my_game.ProcessInput(deltaTime);
 
         // render
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -110,33 +99,8 @@ int main()
               GL_COLOR_BUFFER_BIT 
             | GL_DEPTH_BUFFER_BIT
         );
-
-        ourShader.Use();
-
-        // scale -> rotate -> translate. with matrises multiplications it should be reversed. model mat is doing that.
-        // Vclip = Mprojection * Mview * Mmodel * Vlocal
         
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH/(float)SCR_HEIGHT, 0.1f, 100.0f);
-        ourShader.SetMatrix4("projection", projection);
-        
-        glm::mat4 view = camera.GetViewMatrix();
-        ourShader.SetMatrix4("view", view);
-        
-        // animation stuff
-        auto transforms = mona_animator.GetFinalBoneMatrices();
-        for (int i = 0; i < transforms.size(); ++i) {
-            auto name = "finalBonesMatrices[" + std::to_string(i) + "]";
-            ourShader.SetMatrix4(name.c_str(), transforms[i]);
-        }
-        
-        glm::mat4 model(1.0f);
-        model = glm::translate(model, glm::vec3(0, 0, 0));
-        // model = glm::rotate(model, (float)glfwGetTime() *  glm::radians(20.0f), glm::vec3(1.0f, 0.3f, 0.5f));
-        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-
-        ourShader.SetMatrix4("model", model);
-        
-        mona.Draw(ourShader);
+        my_game.Update(deltaTime);
  
         glCheckError();
         glfwSwapBuffers(window);
@@ -162,13 +126,13 @@ void processInput(GLFWwindow *window)
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(RIGHT, deltaTime);
     
-    // animations
-    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-        mona_animator.PlayAnimation("idle");
-    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-        mona_animator.PlayAnimation("walk");
-    if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
-        mona_animator.PlayAnimation("interact");
+    // // animations
+    // if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+    //     mona_animator.PlayAnimation("idle");
+    // if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+    //     mona_animator.PlayAnimation("walk");
+    // if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+    //     mona_animator.PlayAnimation("interact");
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes

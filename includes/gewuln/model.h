@@ -39,7 +39,7 @@ public:
 		}
 	}
 	
-	auto& GetBoneInfoMap() { return m_BoneInfoMap; }
+	std::map<std::string, BoneInfo>& GetBoneInfoMap() { return m_BoneInfoMap; }
     int& GetBoneCount() { return m_BoneCounter; } 
 	
 private:

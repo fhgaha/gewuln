@@ -140,5 +140,5 @@ Texture2D ResourceManager::loadTextureFromFile(const char *file, bool alpha)
 
 Model ResourceManager::loadModelFromFile(const char *file, bool animated)
 {
-    return Model(file);
+    return Model(file, animated);
 }

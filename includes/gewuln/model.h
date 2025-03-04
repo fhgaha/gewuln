@@ -27,8 +27,9 @@ class Model
 {
 public:
 	Model() {}
-	Model(std::string const &path)
+	Model(std::string const &path, bool animated)
 	{
+		this->animated = animated;
 		loadModel(path);
 	}
 	
@@ -39,17 +40,18 @@ public:
 		}
 	}
 	
-	std::map<std::string, BoneInfo>& GetBoneInfoMap() { return m_BoneInfoMap; }
-    int& GetBoneCount() { return m_BoneCounter; } 
+	std::map<std::string, BoneInfo>& 	GetBoneInfoMap() { return boneInfoMap; }
+    int& 								GetBoneCount() { return boneCounter; } 
 	
 private:
 	// model data
-	std::vector<Mesh> meshes;
-	std::string directory;
+	std::vector<Mesh>    meshes;
+	std::string          directory;
 	std::vector<Texture> textures_loaded;
 	
-	std::map<std::string, BoneInfo> m_BoneInfoMap; //
-    int m_BoneCounter = 0;
+	std::map<std::string, BoneInfo> boneInfoMap; 
+    int boneCounter = 0;
+	bool animated;
 	
 	void loadModel(std::string path)
 	{
@@ -148,7 +150,7 @@ private:
 		
 		ExtractBoneWeightForVertices(vertices,mesh,scene);
 		
-		return Mesh(vertices, indices, textures, true);
+		return Mesh(vertices, indices, textures, animated);
 	}
 	
 	std::vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName)
@@ -202,19 +204,19 @@ private:
         {
             int boneID = -1;
             std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
-            if (m_BoneInfoMap.find(boneName) == m_BoneInfoMap.end())
+            if (boneInfoMap.find(boneName) == boneInfoMap.end())
             {
                 BoneInfo newBoneInfo;
-                newBoneInfo.id = m_BoneCounter;
+                newBoneInfo.id = boneCounter;
                 newBoneInfo.offset = AssimpGLMHelpers::ConvertMatrixToGLMFormat(
                     mesh->mBones[boneIndex]->mOffsetMatrix);
-                m_BoneInfoMap[boneName] = newBoneInfo;
-                boneID = m_BoneCounter;
-                m_BoneCounter++;
+                boneInfoMap[boneName] = newBoneInfo;
+                boneID = boneCounter;
+                boneCounter++;
             }
             else
             {
-                boneID = m_BoneInfoMap[boneName].id;
+                boneID = boneInfoMap[boneName].id;
             }
             assert(boneID != -1);
             auto weights = mesh->mBones[boneIndex]->mWeights;
@@ -245,7 +247,8 @@ inline unsigned int TextureFromFile(const char *path, const std::string &directo
     glGenTextures(1, &textureID);
 
     int width, height, nrComponents;
-    unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
+    unsigned char *data = stbi_load(
+		filename.c_str(), &width, &height, &nrComponents, 0);
     if (data)
     {
         GLenum format;

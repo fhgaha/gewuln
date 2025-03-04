@@ -33,43 +33,72 @@ void Game::Init()
     auto mona_path = "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf/mona.gltf";
     Model mona = ResourceManager::LoadModel(mona_path, true, "mona");
     mona_animator = Animator(mona_path, &mona);
+    
+    
+    ResourceManager::LoadModel(
+        "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/test_floor/gltf/test_floor.gltf",
+        false,
+        "floor"
+    );
 }
 
 void Game::Update(float dt)
 {
-    
-    mona_animator.UpdateAnimation(dt);
+    //mona
+    {
+        mona_animator.UpdateAnimation(dt);
 
-    ResourceManager::GetShader("shader").Use();
+        ResourceManager::GetShader("shader").Use();
 
-    // scale -> rotate -> translate. with matrises multiplications it should be reversed. model mat is doing that.
-    // Vclip = Mprojection * Mview * Mmodel * Vlocal
-    
-    glm::mat4 projection = glm::perspective(
-        glm::radians(Camera.Zoom), (float)Width/(float)Height, 0.1f, 100.0f);
-    ResourceManager::GetShader("shader").SetMatrix4("projection", projection);
-    
-    glm::mat4 view = Camera.GetViewMatrix();
-    ResourceManager::GetShader("shader").SetMatrix4("view", view);
-    
-    // animation stuff
-    auto transforms = mona_animator.GetFinalBoneMatrices();
-    for (int i = 0; i < transforms.size(); ++i) {
-        auto name = "finalBonesMatrices[" + std::to_string(i) + "]";
-        ResourceManager::GetShader("shader").SetMatrix4(name.c_str(), transforms[i]);
+        // scale -> rotate -> translate. with matrises multiplications it should be reversed. model mat is doing that.
+        // Vclip = Mprojection * Mview * Mmodel * Vlocal
+        
+        glm::mat4 projection = glm::perspective(
+            glm::radians(Camera.Zoom), (float)Width/(float)Height, 0.1f, 100.0f);
+        ResourceManager::GetShader("shader").SetMatrix4("projection", projection);
+        
+        glm::mat4 view = Camera.GetViewMatrix();
+        ResourceManager::GetShader("shader").SetMatrix4("view", view);
+        
+        // animation stuff
+        auto transforms = mona_animator.GetFinalBoneMatrices();
+        for (int i = 0; i < transforms.size(); ++i) {
+            auto name = "finalBonesMatrices[" + std::to_string(i) + "]";
+            ResourceManager::GetShader("shader").SetMatrix4(name.c_str(), transforms[i]);
+        }
+        
+        glm::mat4 model(1.0f);
+        model = glm::translate(model, glm::vec3(0, 0, 0));
+        // model = glm::rotate(model, (float)glfwGetTime() *  glm::radians(20.0f), glm::vec3(1.0f, 0.3f, 0.5f));
+        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+
+        ResourceManager::GetShader("shader").SetMatrix4("model", model);
+        
+        auto shader = ResourceManager::GetShader("shader");
+        ResourceManager::GetModel("mona").Draw(shader);
     }
     
-    glm::mat4 model(1.0f);
-    model = glm::translate(model, glm::vec3(0, 0, 0));
-    // model = glm::rotate(model, (float)glfwGetTime() *  glm::radians(20.0f), glm::vec3(1.0f, 0.3f, 0.5f));
-    model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+    //floor
+    {
+        auto shader = ResourceManager::GetShader("shader").Use();
+        glm::mat4 projection = glm::perspective(
+            glm::radians(Camera.Zoom), (float)Width/(float)Height, 0.1f, 100.0f);
+        shader.SetMatrix4("projection", projection);
+        
+        glm::mat4 view = Camera.GetViewMatrix();
+        shader.SetMatrix4("view", view);
 
-    ResourceManager::GetShader("shader").SetMatrix4("model", model);
-    
-    auto shader = ResourceManager::GetShader("shader");
-    ResourceManager::GetModel("mona").Draw(shader);
- 
-    
+        // we ignore finalBonesMatrices here
+        
+        glm::mat4 model(1.0f);
+        model = glm::translate(model, glm::vec3(0, -1.0f, 0));
+        // model = glm::rotate(model, (float)glfwGetTime() *  glm::radians(20.0f), glm::vec3(1.0f, 0.3f, 0.5f));
+        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+        
+        shader.SetMatrix4("model", model);
+        
+        ResourceManager::GetModel("floor").Draw(shader);
+    }
 }
 
 void Game::ProcessInput(float dt)

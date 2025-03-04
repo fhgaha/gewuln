@@ -7,7 +7,6 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <gewuln/shader.h>
-#include <gewuln/camera.h>
 #include <gewuln/resource_manager.h>
 
 #include <iostream>
@@ -33,7 +32,7 @@ float lastX = SCR_WIDTH/2.0f, lastY = SCR_HEIGHT/2.0f;
 float deltaTime = 0.0f; // Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
 
-Game my_game(SCR_WIDTH, SCR_HEIGHT);
+Game game(SCR_WIDTH, SCR_HEIGHT);
 
 int main()
 {
@@ -79,7 +78,7 @@ int main()
 
     // stbi_set_flip_vertically_on_load(true);
     
-    my_game.Init();
+    game.Init();
     
     // render loop
     while (!glfwWindowShouldClose(window))
@@ -88,7 +87,7 @@ int main()
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         
-        my_game.ProcessInput(deltaTime);
+        game.ProcessInput(deltaTime);
 
         // render
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -97,7 +96,7 @@ int main()
             | GL_DEPTH_BUFFER_BIT
         );
         
-        my_game.Update(deltaTime);
+        game.Update(deltaTime);
  
         glCheckError();
         glfwSwapBuffers(window);
@@ -121,11 +120,11 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     switch (action)
     {
     case GLFW_PRESS:
-        my_game.Keys[key] = true;
+        game.Keys[key] = true;
         break;
     case GLFW_RELEASE:
-        my_game.Keys[key] = false;
-        // my_game.KeysProcessed[key] = false;
+        game.Keys[key] = false;
+        // game.KeysProcessed[key] = false;
         break;
     default:
         break;
@@ -159,12 +158,12 @@ void mouse_callback(GLFWwindow * window, double xpos, double ypos)
     xoffset *= sensitivity;
     yoffset *= sensitivity;
     
-    my_game.ProcessMouseMovement(xoffset, yoffset);
+    game.ProcessMouseMovement(xoffset, yoffset);
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    my_game.ProcessMouseScroll(static_cast<float>(yoffset));
+    game.ProcessMouseScroll(static_cast<float>(yoffset));
 }
 
 

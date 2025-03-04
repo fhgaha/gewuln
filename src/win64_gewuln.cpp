@@ -56,11 +56,13 @@ int main()
         return -1;
     }
     glfwMakeContextCurrent(window);
+    
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetKeyCallback(window, key_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    // glfwSetWindowAspectRatio(window, 4, 3);
     glfwSwapInterval(1);    //limits FPS to monitor's refresh rate
 
     // glad: load all OpenGL function pointers
@@ -141,27 +143,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
-GLenum glCheckError_(const char *file, int line)
-{
-    GLenum errorCode;
-    while ((errorCode = glGetError()) != GL_NO_ERROR)
-    {
-        std::string error;
-        switch (errorCode)
-        {
-            case GL_INVALID_ENUM:         error = "INVALID_ENUM"; break;
-            case GL_INVALID_VALUE:        error = "INVALID_VALUE"; break;
-            case GL_INVALID_OPERATION:    error = "INVALID_OPERATION"; break;
-            // case GL_STACK_OVERFLOW:    error = "STACK_OVERFLOW"; break;  //not working
-            // case GL_STACK_UNDERFLOW:   error = "STACK_UNDERFLOW"; break; //not working
-            case GL_OUT_OF_MEMORY:        error = "OUT_OF_MEMORY"; break;
-            case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
-        }
-        std::cout << "--!!--" << error << " | " << file << " (" << line << ")" << std::endl;
-    }
-    return errorCode;
-}
-
 void mouse_callback(GLFWwindow * window, double xpos, double ypos)
 {
     if (firstMouse)
@@ -186,4 +167,26 @@ void mouse_callback(GLFWwindow * window, double xpos, double ypos)
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     my_game.ProcessMouseScroll(static_cast<float>(yoffset));
+}
+
+
+GLenum glCheckError_(const char *file, int line)
+{
+    GLenum errorCode;
+    while ((errorCode = glGetError()) != GL_NO_ERROR)
+    {
+        std::string error;
+        switch (errorCode)
+        {
+            case GL_INVALID_ENUM:         error = "INVALID_ENUM"; break;
+            case GL_INVALID_VALUE:        error = "INVALID_VALUE"; break;
+            case GL_INVALID_OPERATION:    error = "INVALID_OPERATION"; break;
+            // case GL_STACK_OVERFLOW:    error = "STACK_OVERFLOW"; break;  //not working
+            // case GL_STACK_UNDERFLOW:   error = "STACK_UNDERFLOW"; break; //not working
+            case GL_OUT_OF_MEMORY:        error = "OUT_OF_MEMORY"; break;
+            case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
+        }
+        std::cout << "--!!--" << error << " | " << file << " (" << line << ")" << std::endl;
+    }
+    return errorCode;
 }

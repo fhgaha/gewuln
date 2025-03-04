@@ -8,8 +8,7 @@
 
 #include "texture.h"
 #include "shader.h"
-
-class Model; // to prevent circular reference Model <-> ResourceManager
+#include "model.h"
 
 // A static singleton ResourceManager class that hosts several
 // functions to load Textures and Shaders. Each loaded texture
@@ -38,6 +37,10 @@ public:
     static Model     GetModel(std::string name);
     
     // properly de-allocates all loaded resources
+    
+    static Model LoadModel(const char *file, bool animated, std::string name);
+    static Model GetModel(std::string name);
+    
     static void      Clear();
 private:
     // private constructor, that is we do not want any actual resource manager objects. 
@@ -47,7 +50,8 @@ private:
     static Shader    loadShaderFromFile(const char *vShaderFile, const char *fShaderFile, const char *gShaderFile = nullptr);
     // loads a single texture from file
     static Texture2D loadTextureFromFile(const char *file, bool alpha);
-    static Model     loadModelFromFile(const char *file, bool animated = false);
+    
+    static Model loadModelFromFile(const char *file, bool alpha);
 };
 
 #endif

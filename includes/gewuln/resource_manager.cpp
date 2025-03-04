@@ -15,7 +15,6 @@ std::map<std::string, Texture2D>    ResourceManager::Textures;
 std::map<std::string, Shader>       ResourceManager::Shaders;
 std::map<std::string, Model>        ResourceManager::Models;
 
-
 Shader ResourceManager::LoadShader(const char *vShaderFile, const char *fShaderFile, const char *gShaderFile, std::string name)
 {
     Shaders[name] = loadShaderFromFile(vShaderFile, fShaderFile, gShaderFile);
@@ -38,7 +37,7 @@ Texture2D ResourceManager::GetTexture(std::string name)
     return Textures[name];
 }
 
-Model ResourceManager::LoadModel(const char * file, bool animated, std::string name)
+Model ResourceManager::LoadModel(const char *file, bool animated, std::string name)
 {
     Models[name] = loadModelFromFile(file, animated);
     return Models[name];
@@ -58,7 +57,7 @@ void ResourceManager::Clear()
     for (auto iter : Textures)
         glDeleteTextures(1, &iter.second.ID);
     
-    //TODO: theres no glDeleteModels!! what should i do??
+    // glad doesnt have delete models
 }
 
 Shader ResourceManager::loadShaderFromFile(const char *vShaderFile, const char *fShaderFile, const char *gShaderFile)
@@ -140,18 +139,7 @@ Texture2D ResourceManager::loadTextureFromFile(const char *file, bool alpha)
     return texture;
 }
 
-Model ResourceManager::loadModelFromFile(const char * file, bool animated)
+Model ResourceManager::loadModelFromFile(const char *file, bool animated)
 {
-    Assimp::Importer import;
-    const aiScene *scene = import.ReadFile(file, aiProcess_Triangulate |	aiProcess_FlipUVs);
-    bool error = !scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode;
-    if(error)
-    {
-        std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
-        std::runtime_error("ERROR::ASSIMP::" + std::string(import.GetErrorString()));
-    }
-    std::string fileStr(file);
-    std::string directory = fileStr.substr(0, fileStr.find_last_of('/'));
-    
-    return Model(scene, directory, animated);
+    return Model(file);
 }

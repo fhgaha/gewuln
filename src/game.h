@@ -4,6 +4,10 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+// #include "resource_manager.h"
+#include <gewuln/resource_manager.h>
+#include <gewuln/camera.h>
+
 // Represents the current state of the game
 enum GameState {
     GAME_ACTIVE,
@@ -21,6 +25,7 @@ public:
     GameState               State;	
     bool                    Keys[1024];
     unsigned int            Width, Height;
+    Camera                  Camera;
     // constructor/destructor
     Game(unsigned int width, unsigned int height);
     ~Game();
@@ -28,6 +33,8 @@ public:
     void Init();
     // game loop
     void ProcessInput(float dt);
+    void ProcessMouseMovement(float xoffset, float yoffset);
+    void ProcessMouseScroll(float yoffset);
     void Update(float dt);
     void Render();
 };

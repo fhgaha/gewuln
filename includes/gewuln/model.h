@@ -14,8 +14,6 @@
 #include <gewuln/shader.h>
 #include <gewuln/assimp_glm_helpers.h>
 
-#include <gewuln/resource_manager.h>
-
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -23,7 +21,7 @@
 #include <map>
 #include <vector>
 
-#include "texture.h"
+unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma = false);
 
 class Model
 {
@@ -52,7 +50,21 @@ private:
 	
 	std::map<std::string, BoneInfo> m_BoneInfoMap; //
     int m_BoneCounter = 0;
-	bool animated;
+	
+	void loadModel(std::string path)
+	{
+		Assimp::Importer import;
+		const aiScene *scene = import.ReadFile(path, aiProcess_Triangulate |	aiProcess_FlipUVs);
+		bool error = !scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode;
+		if(error)
+		{
+			std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
+			return;
+		}
+		directory = path.substr(0, path.find_last_of('/'));
+		
+		processNode(scene->mRootNode, scene);
+	}
 	
 	void processNode(aiNode *node, const aiScene *scene)
 	{
@@ -74,8 +86,8 @@ private:
     {
         for (int i = 0; i < MAX_BONE_INFLUENCE; i++)
         {
-            vertex.m_BoneIDs[i] = -1;
-            vertex.m_Weights[i] = 0.0f;
+            vertex.boneIDs[i] = -1;
+            vertex.weights[i] = 0.0f;
         }
     }
 	
@@ -136,7 +148,7 @@ private:
 		
 		ExtractBoneWeightForVertices(vertices,mesh,scene);
 		
-		return Mesh(vertices, indices, textures);
+		return Mesh(vertices, indices, textures, true);
 	}
 	
 	std::vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName)
@@ -175,10 +187,10 @@ private:
     {
         for (int i = 0; i < MAX_BONE_INFLUENCE; ++i)
         {
-            if (vertex.m_BoneIDs[i] < 0)
+            if (vertex.boneIDs[i] < 0)
             {
-                vertex.m_Weights[i] = weight;
-                vertex.m_BoneIDs[i] = boneID;
+                vertex.weights[i] = weight;
+                vertex.boneIDs[i] = boneID;
                 break;
             }
         }

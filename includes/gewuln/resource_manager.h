@@ -37,10 +37,6 @@ public:
     static Model     GetModel(std::string name);
     
     // properly de-allocates all loaded resources
-    
-    static Model LoadModel(const char *file, bool animated, std::string name);
-    static Model GetModel(std::string name);
-    
     static void      Clear();
 private:
     // private constructor, that is we do not want any actual resource manager objects. 
@@ -51,7 +47,7 @@ private:
     // loads a single texture from file
     static Texture2D loadTextureFromFile(const char *file, bool alpha);
     
-    static Model loadModelFromFile(const char *file, bool alpha);
+    static Model     loadModelFromFile(const char *file, bool alpha);
 };
 
 #endif

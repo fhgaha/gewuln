@@ -39,16 +39,16 @@ struct BoneInfo
 class Mesh
 {
 public:
-	std::vector<Vertex>   vertices;
+	std::vector<Vertex>       vertices;
 	std::vector<unsigned int> indices;
-	std::vector<Texture>  textures;
+	std::vector<Texture>      textures;
 	bool IsAnimated() const;
 
 	Mesh(
-		std::vector<Vertex>   vertices, 
+		std::vector<Vertex>       vertices, 
 		std::vector<unsigned int> indices,
-		std::vector<Texture>  textures,
-		bool animated
+		std::vector<Texture>      textures,
+		bool                      animated
 	);
 	
 	void Draw(Shader &shader);

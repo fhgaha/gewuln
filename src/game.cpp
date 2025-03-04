@@ -23,8 +23,8 @@ Animator mona_animator;
 void Game::Init()
 {
     ResourceManager::LoadShader(
-        "src/shaders/tex/vertex.vert", 
-        "src/shaders/tex/fragment.frag", 
+        "D:/MyProjects/cpp/gewuln/src/shaders/vertex.vert", 
+        "D:/MyProjects/cpp/gewuln/src/shaders/fragment.frag", 
         nullptr, 
         "shader"
     );

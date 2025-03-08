@@ -6,9 +6,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <gewuln/shader.h>
-#include <gewuln/resource_manager.h>
-
 #include <iostream>
 #include "game.h"
 

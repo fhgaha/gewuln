@@ -40,6 +40,13 @@ void Game::Init()
         false,
         "floor"
     );
+    
+    
+    ResourceManager::LoadModel(
+        "D:/MyProjects/cpp/gewuln/assets/models/room/gltf/room.gltf",
+        false,
+        "room"
+    );
 }
 
 void Game::Update(float dt)
@@ -79,6 +86,28 @@ void Game::Update(float dt)
     }
     
     //floor
+    // {
+    //     auto shader = ResourceManager::GetShader("shader").Use();
+    //     glm::mat4 projection = glm::perspective(
+    //         glm::radians(Camera.Zoom), (float)Width/(float)Height, 0.1f, 100.0f);
+    //     shader.SetMatrix4("projection", projection);
+        
+    //     glm::mat4 view = Camera.GetViewMatrix();
+    //     shader.SetMatrix4("view", view);
+
+    //     // we ignore finalBonesMatrices here
+        
+    //     glm::mat4 model(1.0f);
+    //     model = glm::translate(model, glm::vec3(0, -1.0f, 0));
+    //     // model = glm::rotate(model, (float)glfwGetTime() *  glm::radians(20.0f), glm::vec3(1.0f, 0.3f, 0.5f));
+    //     model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+        
+    //     shader.SetMatrix4("model", model);
+        
+    //     ResourceManager::GetModel("floor").Draw(shader);
+    // }
+    
+    //room
     {
         auto shader = ResourceManager::GetShader("shader").Use();
         glm::mat4 projection = glm::perspective(
@@ -91,13 +120,13 @@ void Game::Update(float dt)
         // we ignore finalBonesMatrices here
         
         glm::mat4 model(1.0f);
-        model = glm::translate(model, glm::vec3(0, -1.0f, 0));
+        model = glm::translate(model, glm::vec3(0.0f, 1.0f, 0.0f));
         // model = glm::rotate(model, (float)glfwGetTime() *  glm::radians(20.0f), glm::vec3(1.0f, 0.3f, 0.5f));
-        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+        model = glm::scale(model, glm::vec3(1.1f, 1.1f, 1.1f));
         
         shader.SetMatrix4("model", model);
         
-        ResourceManager::GetModel("floor").Draw(shader);
+        ResourceManager::GetModel("room").Draw(shader);
     }
 }
 

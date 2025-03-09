@@ -2,7 +2,11 @@
 
 #include <gewuln/animation.h>
 #include <gewuln/animator.h>
+#include <gewuln/model_renderer.h>
 
+
+ModelRenderer *Renderer;
+Animator mona_animator;
 
 Game::Game(unsigned int width, unsigned int height) 
 : State(GAME_ACTIVE), Keys(), Width(width), Height(height), Camera(glm::vec3(0.0f, 0.0f, 3.0f))
@@ -12,14 +16,9 @@ Game::Game(unsigned int width, unsigned int height)
 
 Game::~Game()
 {
-    
+    delete Renderer;
 }
 
-
-// ModelRenderer *Renderer;
-Animator mona_animator;
-
-    
 void Game::Init()
 {
     ResourceManager::LoadShader(
@@ -29,7 +28,8 @@ void Game::Init()
         "shader"
     );
     
-    //Renderer = new ModelRenderer(ResourceManager::GetShader("shader"));
+    Renderer = new ModelRenderer(ResourceManager::GetShader("shader"));
+    
     auto mona_path = "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf/mona.gltf";
     Model mona = ResourceManager::LoadModel(mona_path, true, "mona");
     mona_animator = Animator(mona_path, &mona);
@@ -81,11 +81,10 @@ void Game::Update(float dt)
 
         ResourceManager::GetShader("shader").SetMatrix4("model", model);
         
-        auto shader = ResourceManager::GetShader("shader");
-        ResourceManager::GetModel("mona").Draw(shader);
+        Renderer->Draw(ResourceManager::GetModel("mona"));
     }
     
-    //floor
+    // //floor
     // {
     //     auto shader = ResourceManager::GetShader("shader").Use();
     //     glm::mat4 projection = glm::perspective(
@@ -108,26 +107,26 @@ void Game::Update(float dt)
     // }
     
     //room
-    {
-        auto shader = ResourceManager::GetShader("shader").Use();
-        glm::mat4 projection = glm::perspective(
-            glm::radians(Camera.Zoom), (float)Width/(float)Height, 0.1f, 100.0f);
-        shader.SetMatrix4("projection", projection);
+    // {
+    //     auto shader = ResourceManager::GetShader("shader").Use();
+    //     glm::mat4 projection = glm::perspective(
+    //         glm::radians(Camera.Zoom), (float)Width/(float)Height, 0.1f, 100.0f);
+    //     shader.SetMatrix4("projection", projection);
         
-        glm::mat4 view = Camera.GetViewMatrix();
-        shader.SetMatrix4("view", view);
+    //     glm::mat4 view = Camera.GetViewMatrix();
+    //     shader.SetMatrix4("view", view);
 
-        // we ignore finalBonesMatrices here
+    //     // we ignore finalBonesMatrices here
         
-        glm::mat4 model(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 1.0f, 0.0f));
-        // model = glm::rotate(model, (float)glfwGetTime() *  glm::radians(20.0f), glm::vec3(1.0f, 0.3f, 0.5f));
-        model = glm::scale(model, glm::vec3(1.1f, 1.1f, 1.1f));
+    //     glm::mat4 model(1.0f);
+    //     model = glm::translate(model, glm::vec3(0.0f, 1.0f, 0.0f));
+    //     // model = glm::rotate(model, (float)glfwGetTime() *  glm::radians(20.0f), glm::vec3(1.0f, 0.3f, 0.5f));
+    //     model = glm::scale(model, glm::vec3(1.1f, 1.1f, 1.1f));
         
-        shader.SetMatrix4("model", model);
+    //     shader.SetMatrix4("model", model);
         
-        ResourceManager::GetModel("room").Draw(shader);
-    }
+    //     ResourceManager::GetModel("room").Draw(shader);
+    // }
 }
 
 void Game::ProcessInput(float dt)

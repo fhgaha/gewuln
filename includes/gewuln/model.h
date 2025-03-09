@@ -26,6 +26,8 @@ unsigned int TextureFromFile(const char *path, const std::string &directory, boo
 class Model
 {
 public:
+	std::vector<Mesh>    meshes;
+	
 	Model() {}
 	Model(std::string const &path, bool animated)
 	{
@@ -33,19 +35,17 @@ public:
 		loadModel(path);
 	}
 	
-	void Draw(Shader &shader)
-	{
-		for(unsigned int i = 0; i < meshes.size(); i++){
-			meshes[i].Draw(shader);
-		}
-	}
+	// void Draw(Shader &shader)
+	// {
+	// 	for(unsigned int i = 0; i < meshes.size(); i++){
+	// 		meshes[i].Draw(shader);
+	// 	}
+	// }
 	
 	std::map<std::string, BoneInfo>& 	GetBoneInfoMap() { return boneInfoMap; }
     int& 								GetBoneCount() { return boneCounter; } 
 	
 private:
-	// model data
-	std::vector<Mesh>    meshes;
 	std::string          directory;
 	std::vector<Texture> textures_loaded;
 	

@@ -52,26 +52,7 @@ void Game::Init()
 
 void Game::Update(float dt)
 {
-    //mona
     mona_animator->UpdateAnimation(dt);
-    renderer->DrawAnimatedModel(
-        ResourceManager::GetModel("mona"), 
-        Camera, 
-        (float)Width/(float)Height,
-        mona_animator
-    );
-    
-    //floor
-    renderer->DrawSimpleModel(
-        ResourceManager::GetModel("floor"),
-        Camera,
-        (float)Width/(float)Height, 
-        glm::vec3(0, -1, 0),
-        0.0f, 
-        glm::vec3(0.0f, 1.0f, 0.0f),
-        glm::vec3(1.0f, 1.0f, 1.0f)
-    );
-    
 }
 
 void Game::ProcessInput(float dt)
@@ -107,8 +88,21 @@ void Game::ProcessMouseScroll(float yoffset)
 
 void Game::Render()
 {
-    //Renderer->DrawModel(
-    //     ResourceManager::GetModel("mona"),
-    //     ...
-    // );    
+    renderer->DrawAnimatedModel(
+        ResourceManager::GetModel("mona"), 
+        Camera, 
+        (float)Width/(float)Height,
+        mona_animator
+    );
+    
+    renderer->DrawSimpleModel(
+        ResourceManager::GetModel("floor"),
+        Camera,
+        (float)Width/(float)Height, 
+        glm::vec3(0, -1, 0),
+        0.0f, 
+        glm::vec3(0.0f, 1.0f, 0.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f)
+    );
+ 
 }

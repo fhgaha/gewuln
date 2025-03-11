@@ -85,6 +85,7 @@ int main()
         lastFrame = currentFrame;
         
         game.ProcessInput(deltaTime);
+        game.Update(deltaTime);
 
         // render
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -92,8 +93,8 @@ int main()
               GL_COLOR_BUFFER_BIT 
             | GL_DEPTH_BUFFER_BIT
         );
+        game.Render();
         
-        game.Update(deltaTime);
  
         glCheckError();
         glfwSwapBuffers(window);

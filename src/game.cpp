@@ -5,18 +5,18 @@
 #include <gewuln/model_renderer.h>
 
 
-ModelRenderer *Renderer;
-Animator mona_animator;
+ModelRenderer *renderer;
+Animator *mona_animator;
 
 Game::Game(unsigned int width, unsigned int height) 
 : State(GAME_ACTIVE), Keys(), Width(width), Height(height), Camera(glm::vec3(0.0f, 0.0f, 3.0f))
 { 
-	
 }
 
 Game::~Game()
 {
-    delete Renderer;
+    delete renderer;
+    delete mona_animator;
 }
 
 void Game::Init()
@@ -28,19 +28,20 @@ void Game::Init()
         "shader"
     );
     
-    Renderer = new ModelRenderer(ResourceManager::GetShader("shader"));
+    renderer = new ModelRenderer(ResourceManager::GetShader("shader"));
     
     auto mona_path = "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf/mona.gltf";
-    Model mona = ResourceManager::LoadModel(mona_path, true, "mona");
-    mona_animator = Animator(mona_path, &mona);
-    
+    ResourceManager::LoadModel(mona_path, true, "mona");
+    mona_animator = new Animator(
+        mona_path, 
+        ResourceManager::GetModel("mona")
+    );
     
     ResourceManager::LoadModel(
         "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/test_floor/gltf/test_floor.gltf",
         false,
         "floor"
     );
-    
     
     ResourceManager::LoadModel(
         "D:/MyProjects/cpp/gewuln/assets/models/room/gltf/room.gltf",
@@ -52,81 +53,25 @@ void Game::Init()
 void Game::Update(float dt)
 {
     //mona
-    {
-        mona_animator.UpdateAnimation(dt);
-
-        ResourceManager::GetShader("shader").Use();
-
-        // scale -> rotate -> translate. with matrises multiplications it should be reversed. model mat is doing that.
-        // Vclip = Mprojection * Mview * Mmodel * Vlocal
-        
-        glm::mat4 projection = glm::perspective(
-            glm::radians(Camera.Zoom), (float)Width/(float)Height, 0.1f, 100.0f);
-        ResourceManager::GetShader("shader").SetMatrix4("projection", projection);
-        
-        glm::mat4 view = Camera.GetViewMatrix();
-        ResourceManager::GetShader("shader").SetMatrix4("view", view);
-        
-        // animation stuff
-        auto transforms = mona_animator.GetFinalBoneMatrices();
-        for (int i = 0; i < transforms.size(); ++i) {
-            auto name = "finalBonesMatrices[" + std::to_string(i) + "]";
-            ResourceManager::GetShader("shader").SetMatrix4(name.c_str(), transforms[i]);
-        }
-        
-        glm::mat4 model(1.0f);
-        model = glm::translate(model, glm::vec3(0, 0, 0));
-        // model = glm::rotate(model, (float)glfwGetTime() *  glm::radians(20.0f), glm::vec3(1.0f, 0.3f, 0.5f));
-        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-
-        ResourceManager::GetShader("shader").SetMatrix4("model", model);
-        
-        Renderer->Draw(ResourceManager::GetModel("mona"));
-    }
+    mona_animator->UpdateAnimation(dt);
+    renderer->DrawAnimatedModel(
+        ResourceManager::GetModel("mona"), 
+        Camera, 
+        (float)Width/(float)Height,
+        mona_animator
+    );
     
-    // //floor
-    // {
-    //     auto shader = ResourceManager::GetShader("shader").Use();
-    //     glm::mat4 projection = glm::perspective(
-    //         glm::radians(Camera.Zoom), (float)Width/(float)Height, 0.1f, 100.0f);
-    //     shader.SetMatrix4("projection", projection);
-        
-    //     glm::mat4 view = Camera.GetViewMatrix();
-    //     shader.SetMatrix4("view", view);
-
-    //     // we ignore finalBonesMatrices here
-        
-    //     glm::mat4 model(1.0f);
-    //     model = glm::translate(model, glm::vec3(0, -1.0f, 0));
-    //     // model = glm::rotate(model, (float)glfwGetTime() *  glm::radians(20.0f), glm::vec3(1.0f, 0.3f, 0.5f));
-    //     model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-        
-    //     shader.SetMatrix4("model", model);
-        
-    //     ResourceManager::GetModel("floor").Draw(shader);
-    // }
+    //floor
+    renderer->DrawSimpleModel(
+        ResourceManager::GetModel("floor"),
+        Camera,
+        (float)Width/(float)Height, 
+        glm::vec3(0, -1, 0),
+        0.0f, 
+        glm::vec3(0.0f, 1.0f, 0.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f)
+    );
     
-    //room
-    // {
-    //     auto shader = ResourceManager::GetShader("shader").Use();
-    //     glm::mat4 projection = glm::perspective(
-    //         glm::radians(Camera.Zoom), (float)Width/(float)Height, 0.1f, 100.0f);
-    //     shader.SetMatrix4("projection", projection);
-        
-    //     glm::mat4 view = Camera.GetViewMatrix();
-    //     shader.SetMatrix4("view", view);
-
-    //     // we ignore finalBonesMatrices here
-        
-    //     glm::mat4 model(1.0f);
-    //     model = glm::translate(model, glm::vec3(0.0f, 1.0f, 0.0f));
-    //     // model = glm::rotate(model, (float)glfwGetTime() *  glm::radians(20.0f), glm::vec3(1.0f, 0.3f, 0.5f));
-    //     model = glm::scale(model, glm::vec3(1.1f, 1.1f, 1.1f));
-        
-    //     shader.SetMatrix4("model", model);
-        
-    //     ResourceManager::GetModel("room").Draw(shader);
-    // }
 }
 
 void Game::ProcessInput(float dt)
@@ -143,11 +88,11 @@ void Game::ProcessInput(float dt)
     
     // animations
     if (Keys[GLFW_KEY_1])
-        mona_animator.PlayAnimation("idle");
+        mona_animator->PlayAnimation("idle");
     if (Keys[GLFW_KEY_2])
-        mona_animator.PlayAnimation("walk");
+        mona_animator->PlayAnimation("walk");
     if (Keys[GLFW_KEY_3])
-        mona_animator.PlayAnimation("interact");
+        mona_animator->PlayAnimation("interact");
 }
 
 void Game::ProcessMouseMovement(float xoffset, float yoffset)

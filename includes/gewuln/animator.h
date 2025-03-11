@@ -15,7 +15,7 @@ public:
 	
 	Animator(){};
 	
-	Animator(const std::string& animationPath, Model* model): animations()
+	Animator(const std::string &animationPath, Model &model): animations()
 	{
 		Assimp::Importer importer;
 		const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate);
@@ -30,7 +30,7 @@ public:
 			for (unsigned int i = 0; i < scene->mNumAnimations; i++)
 			{
 				auto anim_name = scene->mAnimations[i]->mName.C_Str();
-				auto animation = Animation(scene->mAnimations[i], scene, model);
+				auto animation = Animation(scene->mAnimations[i], scene, &model);
 				animations[anim_name] = animation;
 			}
 			

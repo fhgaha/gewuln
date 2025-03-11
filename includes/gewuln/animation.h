@@ -22,7 +22,7 @@ class Animation
 public:
 	Animation() = default;
 
-	Animation(const aiAnimation* animation, const aiScene* scene, Model* model)
+	Animation(const aiAnimation *animation, const aiScene *scene, Model *model)
 	{
 		m_Duration = animation->mDuration;
 		m_TicksPerSecond = animation->mTicksPerSecond;

@@ -34,7 +34,7 @@ Game game(SCR_WIDTH, SCR_HEIGHT);
 int main()
 {
     std::cout << "Started main program" << std::endl;
-    
+
     // glfw: initialize and configure
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -50,7 +50,7 @@ int main()
         return -1;
     }
     glfwMakeContextCurrent(window);
-    
+
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetKeyCallback(window, key_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
@@ -67,35 +67,35 @@ int main()
     }
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // wireframe
     glEnable(GL_DEPTH_TEST);
-    
+
     { // process alpha channel of textures
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
     // stbi_set_flip_vertically_on_load(true);
-    
+
     game.Init();
-    
+
     // render loop
     while (!glfwWindowShouldClose(window))
     {
         float currentFrame = static_cast<float>(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-        
+
         game.ProcessInput(deltaTime);
         game.Update(deltaTime);
 
         // render
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(
-              GL_COLOR_BUFFER_BIT 
+              GL_COLOR_BUFFER_BIT
             | GL_DEPTH_BUFFER_BIT
         );
         game.Render();
-        
- 
+
+
         glCheckError();
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -110,7 +110,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
     }
-    
+
     if (!(key >= 0 && key < 1024)) {
         return;
     }
@@ -127,13 +127,13 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     default:
         break;
     }
-    
+
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-    // make sure the viewport matches the new window dimensions; note that width and 
+    // make sure the viewport matches the new window dimensions; note that width and
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
 }
@@ -146,16 +146,16 @@ void mouse_callback(GLFWwindow * window, double xpos, double ypos)
         lastY = ypos;
         firstMouse = false;
     }
-    
+
     float xoffset = xpos - lastX;
     float yoffset = ypos - lastY;
     lastX = xpos;
     lastY = ypos;
-    
+
     float sensitivity = 0.1f;
     xoffset *= sensitivity;
     yoffset *= sensitivity;
-    
+
     game.ProcessMouseMovement(xoffset, yoffset);
 }
 

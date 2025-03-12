@@ -44,7 +44,7 @@ void Game::Init()
     );
     
     ResourceManager::LoadModel(
-        "D:/MyProjects/cpp/gewuln/assets/models/room/gltf/room.gltf",
+        "D:/MyProjects/cpp/gewuln/assets/models/room/gltf/applyed_transforms/room.gltf",
         false,
         "room"
     );
@@ -96,13 +96,8 @@ void Game::Render()
     );
     
     renderer->DrawSimpleModel(
-        ResourceManager::GetModel("floor"),
+        ResourceManager::GetModel("room"),
         Camera,
-        (float)Width/(float)Height, 
-        glm::vec3(0, -1, 0),
-        0.0f, 
-        glm::vec3(0.0f, 1.0f, 0.0f),
-        glm::vec3(1.0f, 1.0f, 1.0f)
+        (float)Width/(float)Height
     );
- 
 }

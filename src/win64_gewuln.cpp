@@ -51,10 +51,12 @@ int main()
     }
     glfwMakeContextCurrent(window);
 
+    // callbacks
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetKeyCallback(window, key_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
+    
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     // glfwSetWindowAspectRatio(window, 4, 3);
     glfwSwapInterval(1);    //limits FPS to monitor's refresh rate
@@ -67,7 +69,8 @@ int main()
     }
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // wireframe
     glEnable(GL_DEPTH_TEST);
-
+    glEnable(GL_CULL_FACE); // draw faces of front sides only
+    
     { // process alpha channel of textures
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

@@ -9,6 +9,10 @@
 #include <iostream>
 #include "game.h"
 
+// Use NVIDIA Gpu for NVIDIA Optimus laptops/GPUs
+extern "C" {
+    __declspec(dllexport) unsigned long NvOptimusEnablement = 0x00000001;
+}
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);

@@ -77,15 +77,6 @@ private:
 		}
 	}
 	
-	void SetVertexBoneDataToDefault(Vertex& vertex)
-    {
-        for (int i = 0; i < MAX_BONE_INFLUENCE; i++)
-        {
-            vertex.boneIDs[i] = -1;
-            vertex.weights[i] = 0.0f;
-        }
-    }
-	
 	Mesh processMesh(aiMesh *mesh, const aiScene *scene)
 	{
 		std::vector<Vertex>       vertices;
@@ -107,27 +98,33 @@ private:
 			vector.z = mesh->mNormals[i].z;
 			vertex.Normal = vector;
 			
-			
-			if(mesh->mTextureCoords[0]) { // does the mesh contain texture coordinates?
-				glm::vec2 vec;
-				vec.x = mesh->mTextureCoords[0][i].x;
-				vec.y = mesh->mTextureCoords[0][i].y;
-				vertex.TexCoords = vec;
-			} else {
-				vertex.TexCoords = glm::vec2(0.0f, 0.0f);
+			glm::vec2 vec = glm::vec2(0.0f, 0.0f);
+			// use texture coordinates if mesh has any
+			for (size_t tcIdx = 0; tcIdx < AI_MAX_NUMBER_OF_TEXTURECOORDS; tcIdx++){
+				if (mesh->HasTextureCoords(tcIdx)) {
+					vec.x = mesh->mTextureCoords[tcIdx][i].x;
+					vec.y = mesh->mTextureCoords[tcIdx][i].y;
+					break;
+				}
 			}
+			vertex.TexCoords = vec;
 			
-			SetVertexBoneDataToDefault(vertex);
+			//default bone datas
+			for (int j = 0; j < MAX_BONE_INFLUENCE; j++)
+			{
+				vertex.boneIDs[j] = -1;
+				vertex.weights[j] = 0.0f;
+			}
 			
 			vertices.push_back(vertex);
 		}
 		
 		// process indices
-		for(unsigned int i = 0; i < mesh->mNumFaces; i++)
+		for(unsigned int j = 0; j < mesh->mNumFaces; j++)
 		{
-			aiFace face = mesh->mFaces[i];
-			for(unsigned int j = 0; j < face.mNumIndices; j++){
-				indices.push_back(face.mIndices[j]);
+			aiFace face = mesh->mFaces[j];
+			for(unsigned int k = 0; k < face.mNumIndices; k++){
+				indices.push_back(face.mIndices[k]);
 			}
 		}
 		
@@ -141,7 +138,7 @@ private:
 			textures.insert(textures.end(), specularMaps.begin(),	specularMaps.end());
 		}
 		
-		ExtractBoneWeightForVertices(vertices,mesh,scene);
+		ExtractBoneWeightForVertices(vertices, mesh, scene);
 		
 		return Mesh(vertices, indices, textures, animated);
 	}
@@ -180,6 +177,7 @@ private:
 	
 	void SetVertexBoneData(Vertex& vertex, int boneID, float weight)
     {
+		// funny results if set 1 instead of MAX_BONE_INFLUENCE
         for (int i = 0; i < MAX_BONE_INFLUENCE; ++i)
         {
             if (vertex.boneIDs[i] < 0)

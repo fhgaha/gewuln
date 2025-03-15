@@ -6,7 +6,6 @@
 #include <assimp/scene.h>
 #include <gewuln/bone.h>
 #include <functional>
-// #include <gewuln/animdata.h>
 #include <gewuln/model.h>
 
 struct AssimpNodeData
@@ -27,7 +26,7 @@ public:
 		m_Duration = animation->mDuration;
 		m_TicksPerSecond = animation->mTicksPerSecond;
 		aiMatrix4x4 globalTransformation = scene->mRootNode->mTransformation;
-		globalTransformation = globalTransformation.Inverse();
+		globalTransformation = globalTransformation.Inverse();	//??
 		ReadHierarchyData(m_RootNode, scene->mRootNode);
 		ReadMissingBones(animation, *model);
 	}
@@ -80,8 +79,8 @@ private:
 	{
 		int size = animation->mNumChannels;
 
-		auto& boneInfoMap = model.GetBoneInfoMap();//getting m_BoneInfoMap from Model class
-		int& boneCount = model.GetBoneCount(); //getting the m_BoneCounter from Model class
+		auto& boneInfoMap = model.GetBoneInfoMap();
+		int& boneCount = model.GetBoneCount(); 
 
 		//reading channels(bones engaged in an animation and their keyframes)
 		for (int i = 0; i < size; i++)

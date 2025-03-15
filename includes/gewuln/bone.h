@@ -72,11 +72,14 @@ public:
 		}
 	}
 	
+	/*interpolates  b/w positions,rotations & scaling keys based on the curren time of 
+    the animation and prepares the local transformation matrix by combining all keys 
+    tranformations*/
 	void Update(float animationTime)
 	{
-		glm::mat4 translation = InterpolatePosition(animationTime);
-		glm::mat4 rotation = InterpolateRotation(animationTime);
-		glm::mat4 scale = InterpolateScaling(animationTime);
+		glm::mat4 translation 	= InterpolatePosition(animationTime);
+		glm::mat4 rotation 		= InterpolateRotation(animationTime);
+		glm::mat4 scale 		= InterpolateScaling(animationTime);
 		localTransform = translation * rotation * scale;
 	}
 	
@@ -120,6 +123,16 @@ public:
 
 
 private:
+	std::vector<KeyPosition> positions;
+	std::vector<KeyRotation> rotations;
+	std::vector<KeyScale> scales;
+	int numPositions;
+	int numRotations;
+	int numScalings;
+
+	glm::mat4 localTransform;
+	std::string name;
+	int id;
 
 	float GetScaleFactor(float lastTimeStamp, float nextTimeStamp, float animationTime)
 	{
@@ -160,11 +173,15 @@ private:
 		int p0Index = GetRotationIndex(animationTime);
 		int p1Index = p0Index + 1;
 		float scaleFactor = GetScaleFactor(
-			rotations[p0Index].timeStamp, rotations[p1Index].timeStamp, animationTime);
-		glm::quat finalRotation = glm::slerp(rotations[p0Index].orientation, rotations[p1Index].orientation, scaleFactor);
+			rotations[p0Index].timeStamp, 
+			rotations[p1Index].timeStamp, 
+			animationTime);
+		glm::quat finalRotation = glm::slerp(
+			rotations[p0Index].orientation, 
+			rotations[p1Index].orientation, 
+			scaleFactor);
 		finalRotation = glm::normalize(finalRotation);
 		return glm::toMat4(finalRotation);
-
 	}
 
 	glm::mat4 InterpolateScaling(float animationTime)
@@ -175,19 +192,15 @@ private:
 		int p0Index = GetScaleIndex(animationTime);
 		int p1Index = p0Index + 1;
 		float scaleFactor = GetScaleFactor(
-			scales[p0Index].timeStamp, scales[p1Index].timeStamp, animationTime);
-		glm::vec3 finalScale = glm::mix(scales[p0Index].scale, scales[p1Index].scale, scaleFactor);
+			scales[p0Index].timeStamp, 
+			scales[p1Index].timeStamp, 
+			animationTime);
+		glm::vec3 finalScale = glm::mix(
+			scales[p0Index].scale, 
+			scales[p1Index].scale, 
+			scaleFactor);
 		return glm::scale(glm::mat4(1.0f), finalScale);
 	}
 
-	std::vector<KeyPosition> positions;
-	std::vector<KeyRotation> rotations;
-	std::vector<KeyScale> scales;
-	int numPositions;
-	int numRotations;
-	int numScalings;
-
-	glm::mat4 localTransform;
-	std::string name;
-	int id;
+	
 };

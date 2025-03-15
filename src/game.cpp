@@ -92,7 +92,8 @@ void Game::Render()
         ResourceManager::GetModel("mona"), 
         Camera, 
         (float)Width/(float)Height,
-        mona_animator
+        mona_animator,
+        glm::vec3(-1, 0, 0)
     );
     
     renderer->DrawSimpleModel(

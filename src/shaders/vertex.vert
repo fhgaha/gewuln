@@ -1,4 +1,5 @@
-#version 330 core
+// #version 330 core
+#version 460 core
 
 layout(location = 0) in vec3 aPos;
 layout(location = 1) in vec3 aNormal;
@@ -21,10 +22,10 @@ void main()
     vec4 totalPosition = vec4(0.0f);
     for(int i = 0 ; i <= MAX_BONE_INFLUENCE ; i++)
     {
-        if(aBoneIds[i] == -1) 
+        if(aBoneIds[i] == -1) {
             continue;
-        if(aBoneIds[i] >= MAX_BONES) 
-        {
+        }
+        if(aBoneIds[i] >= MAX_BONES) {
             totalPosition = vec4(aPos, 1.0f);
             break;
         }
@@ -32,7 +33,7 @@ void main()
         totalPosition += localPosition * aWeights[i];
         // vec3 localNormal = mat3(finalBonesMatrices[boneIds[i]]) * aNormal;
     }
-		
+	
     gl_Position = projection * view * model * totalPosition;
     TexCoords = aTexCoords;
 }

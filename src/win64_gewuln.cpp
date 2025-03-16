@@ -26,6 +26,8 @@ GLenum glCheckError_(const char *file, int line);
 const unsigned int SCR_WIDTH  = 800;
 const unsigned int SCR_HEIGHT = 600;
 
+const bool debug = true;
+
 bool firstMouse = true;
 float lastX = SCR_WIDTH/2.0f, lastY = SCR_HEIGHT/2.0f;
 
@@ -41,9 +43,13 @@ int main()
 
     // glfw: initialize and configure
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    // hints should be configured before we create a window:
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    if (debug) {
+        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
+    }
 
     // glfw window creation
     GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "gewuln", NULL, NULL);
@@ -71,6 +77,15 @@ int main()
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
+
+    if (debug) {
+        int flags; glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+        if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
+        {
+            std::cout << "Successfully initialized Open GL debug context\n";
+        }
+    }    
+    
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // wireframe
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE); // draw faces of front sides only

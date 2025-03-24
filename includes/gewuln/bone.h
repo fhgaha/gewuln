@@ -125,14 +125,14 @@ public:
 private:
 	std::vector<KeyPosition> positions;
 	std::vector<KeyRotation> rotations;
-	std::vector<KeyScale> scales;
-	int numPositions;
-	int numRotations;
-	int numScalings;
+	std::vector<KeyScale> 	 scales;
+	int 					 numPositions;
+	int 					 numRotations;
+	int 					 numScalings;
 
-	glm::mat4 localTransform;
-	std::string name;
-	int id;
+	glm::mat4 				 localTransform;
+	std::string 			 name;
+	int 					 id;
 
 	float GetScaleFactor(float lastTimeStamp, float nextTimeStamp, float animationTime)
 	{
@@ -201,6 +201,4 @@ private:
 			scaleFactor);
 		return glm::scale(glm::mat4(1.0f), finalScale);
 	}
-
-	
 };

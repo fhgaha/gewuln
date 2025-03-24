@@ -18,7 +18,7 @@ Mesh::Mesh(
 bool Mesh::IsAnimated() const {	return animated; }
 
 void Mesh::Draw(Shader &shader){
-	unsigned int diffuseNr = 1;
+	unsigned int diffuseNr  = 1;
 	unsigned int specularNr = 1;
 	for(unsigned int i = 0; i < textures.size(); i++)
 	{

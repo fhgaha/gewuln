@@ -132,7 +132,7 @@ int main()
         game.Render();
 
 
-        glCheckError();
+        // glCheckError();
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
@@ -153,15 +153,15 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
     switch (action)
     {
-    case GLFW_PRESS:
-        game.Keys[key] = true;
-        break;
-    case GLFW_RELEASE:
-        game.Keys[key] = false;
-        // game.KeysProcessed[key] = false;
-        break;
-    default:
-        break;
+        case GLFW_PRESS:
+            game.Keys[key] = true;
+            break;
+        case GLFW_RELEASE:
+            game.Keys[key] = false;
+            // game.KeysProcessed[key] = false;
+            break;
+        default:
+            break;
     }
 
 }
@@ -201,9 +201,9 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 }
 
 
-GLenum glCheckError_(const char *file, int line)
-{
-    GLenum errorCode;
+// GLenum glCheckError_(const char *file, int line)
+// {
+    // GLenum errorCode;
     // while ((errorCode = glGetError()) != GL_NO_ERROR)
     // {
     //     std::string error;
@@ -219,8 +219,8 @@ GLenum glCheckError_(const char *file, int line)
     //     }
     //     std::cout << "--!!--" << error << " | " << file << " (" << line << ")" << std::endl;
     // }
-    return errorCode;
-}
+//     return errorCode;
+// }
 
 void APIENTRY glDebugOutput(
     GLenum source,

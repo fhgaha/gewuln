@@ -29,19 +29,18 @@ public:
         glm::mat4 projection = glm::perspective(glm::radians(cam.Zoom), aspect, 0.1f, 100.0f);
         shader.SetMatrix4("projection", projection);
         
-        glm::mat4 view = cam.GetViewMatrix();
+		glm::mat4 view = cam.GetViewMatrix();
         shader.SetMatrix4("view", view);
         
-        calc_bone_matrices(animator);
+        set_bone_matrices(animator);
         
         glm::mat4 model(1.0f);
         model = glm::translate(model, pos);
 		model = glm::rotate(model, glm::radians(rot_deg), rot_axis);
         model = glm::scale(model, scale);
-
         shader.SetMatrix4("model", model);
-        
 		
+
 		for(unsigned int i = 0; i < loaded_model.meshes.size(); i++){
 			loaded_model.meshes[i].Draw(shader);
 		}
@@ -63,7 +62,7 @@ public:
         glm::mat4 view = cam.GetViewMatrix();
         shader.SetMatrix4("view", view);
      
-	 	// we dont call calc_bone_matrices here
+	 	// we dont call set_bone_matrices here
 	    
         glm::mat4 model(1.0f);
         model = glm::translate(model, pos);
@@ -81,12 +80,16 @@ public:
 private:
 	Shader &shader;
 	
-	void calc_bone_matrices(Animator *animator) {
+	void set_bone_matrices(Animator *animator) {
         auto transforms = animator->GetFinalBoneMatrices();
         for (int i = 0; i < transforms.size(); ++i) {
             auto name = "finalBonesMatrices[" + std::to_string(i) + "]";
-            ResourceManager::GetShader("shader").SetMatrix4(name.c_str(), transforms[i]);
+            shader.SetMatrix4(name.c_str(), transforms[i]);
+			
+			// std::cout << i << " :\n";
+			// AssimpGLMHelpers::PrintMatix4(transforms[i]);
         }
+		// std::cout << "===========";
 	}
 };
 

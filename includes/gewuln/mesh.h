@@ -19,7 +19,7 @@ struct Vertex
 	glm::vec2 TexCoords;	
 
 	//below is for animation	
-	int boneIDs[MAX_BONE_INFLUENCE]; //bone indexes which will influence this vertex
+	int boneIDs[MAX_BONE_INFLUENCE];   //bone indexes which will influence this vertex
 	float weights[MAX_BONE_INFLUENCE]; //weights from each bone
 };
 

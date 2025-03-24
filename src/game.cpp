@@ -21,6 +21,8 @@ Game::~Game()
 
 void Game::Init()
 {
+    Camera.Position = glm::vec3(-1.0f, 1.0f, 3.0f);
+
     ResourceManager::LoadShader(
         "D:/MyProjects/cpp/gewuln/src/shaders/vertex.vert", 
         "D:/MyProjects/cpp/gewuln/src/shaders/fragment.frag", 
@@ -30,24 +32,24 @@ void Game::Init()
     
     renderer = new ModelRenderer(ResourceManager::GetShader("shader"));
     
-    auto mona_path = "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf/mona.gltf";
+    auto mona_path = "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf_2/mona.gltf";
     ResourceManager::LoadModel(mona_path, true, "mona");
     mona_animator = new Animator(
         mona_path, 
         ResourceManager::GetModel("mona")
     );
     
-    ResourceManager::LoadModel(
-        "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/test_floor/gltf/test_floor.gltf",
-        false,
-        "floor"
-    );
+    // ResourceManager::LoadModel(
+    //     "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/test_floor/gltf/test_floor.gltf",
+    //     false,
+    //     "floor"
+    // );
     
-    ResourceManager::LoadModel(
-        "D:/MyProjects/cpp/gewuln/assets/models/room/gltf/applyed_transforms/room.gltf",
-        false,
-        "room"
-    );
+    // ResourceManager::LoadModel(
+    //     "D:/MyProjects/cpp/gewuln/assets/models/room/gltf/applyed_transforms/room.gltf",
+    //     false,
+    //     "room"
+    // );
 }
 
 void Game::Update(float dt)
@@ -96,9 +98,9 @@ void Game::Render()
         glm::vec3(-1, 0, 0)
     );
     
-    renderer->DrawSimpleModel(
-        ResourceManager::GetModel("room"),
-        Camera,
-        (float)Width/(float)Height
-    );
+    // renderer->DrawSimpleModel(
+    //     ResourceManager::GetModel("room"),
+    //     Camera,
+    //     (float)Width/(float)Height
+    // );
 }

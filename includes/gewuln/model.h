@@ -196,8 +196,24 @@ private:
     {
         for (int boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex)
         {
+			/*some Assimp bones have a structure like this:
+				mesh->mBones[boneIndex]->mNumWeights == 1
+			and
+				aiVertexWeight vw = mesh->mBones[boneIndex]->mWeights[0];
+				vw.mBoneId = 0;
+				vw.mWeight = 0.0f;
+			lets skip that thing.
+			this causes triangle horrors apparantely. 
+			*/
+			
+			if (mesh->mBones[boneIndex]->mNumWeights == 1) {
+				continue;
+			}
+			
             int boneID = -1;
             std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
+			
+			
             if (boneInfoMap.find(boneName) == boneInfoMap.end())
             {
                 BoneInfo newBoneInfo;

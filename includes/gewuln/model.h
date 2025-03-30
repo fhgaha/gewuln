@@ -205,7 +205,6 @@ private:
 			lets skip that thing.
 			this causes triangle horrors apparantely. 
 			*/
-			
 			if (mesh->mBones[boneIndex]->mNumWeights == 1) {
 				continue;
 			}

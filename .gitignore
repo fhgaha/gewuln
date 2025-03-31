@@ -5,8 +5,8 @@
 .focus/
 
 # Ignore specific files
-/misc/Developer Command Prompt for VS 2019.lnk
-/misc/focus.exe - Shortcut.lnk
+/misc/*.lnk
+
 
 # Ignore build directory
 build/

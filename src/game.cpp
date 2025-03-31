@@ -19,9 +19,6 @@ Game::Game(unsigned int width, unsigned int height)
 Game::~Game()
 {
     delete renderer;
-    //TODO
-    // delete characters;
-    // delete active_character;
 }
 
 void Game::Init()
@@ -40,7 +37,7 @@ void Game::Init()
     {
         auto mona_path = "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf_2/mona.gltf";
         ResourceManager::LoadModel(mona_path, true, "mona");
-        
+
         characters["mona"] = Character(
             &ResourceManager::GetModel("mona"),
             Animator(
@@ -111,13 +108,10 @@ void Game::ProcessMouseScroll(float yoffset)
 
 void Game::Render()
 {
-    //TODO pass just active character
-    //TODO pass just camera not aspect ratio and camera
-    renderer->DrawAnimatedModel(
-        *(active_character->model),        
+    renderer->DrawCharacter(
+        active_character,
         free_look_cam,
         (float)Width/(float)Height,
-        &(active_character->animator),
         glm::vec3(-1, 0, 0)
     );
 

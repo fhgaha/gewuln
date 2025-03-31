@@ -9,22 +9,15 @@ class Character {
 	public:
 		Model		*model;
 		Animator	animator;
-		
+
 		Character(){};
-	
+
 		Character(Model *model, Animator animator){
 			this->model = model;
 			this->animator = animator;
-			
+
 			this->animator.PlayAnimation("idle");
 		}
-		
-		//TODO
-		// ~Character(){
-			// delete model;
-			// delete animator;
-		// }
-	
 };
 
 #endif

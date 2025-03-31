@@ -6,6 +6,8 @@
 #include "mesh.h"
 #include "model.h"
 #include "character.h"
+#include "stdio.h"
+#include "glm/ext.hpp"
 
 class ModelRenderer
 {
@@ -15,17 +17,22 @@ public:
 
 	void DrawCharacter(
 		Character *character,
-		Camera cam, float aspect,
-		glm::vec3 pos = glm::vec3(0, 0, 0),
-		float rot_deg = 0.0f, glm::vec3 rot_axis = glm::vec3(0.0f, 1.0f, 0.0f),
+		Camera cam,
+		float aspect,
+		float rot_deg = 0.0f,
+		glm::vec3 rot_axis = glm::vec3(0.0f, 1.0f, 0.0f),
 		glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f)
 	){
+		// printf("ass: %s\n", glm::to_string(character->position).c_str());
+
 		DrawAnimatedModel(
 			*character->model,
-			cam, aspect,
+			cam,
+			aspect,
 			&character->animator,
-			pos,
-			rot_deg, rot_axis,
+			character->position,
+			rot_deg,
+			rot_axis,
 			scale
 		);
 	}
@@ -102,11 +109,7 @@ private:
         for (int i = 0; i < transforms.size(); ++i) {
             auto name = "finalBonesMatrices[" + std::to_string(i) + "]";
             shader.SetMatrix4(name.c_str(), transforms[i]);
-
-			// std::cout << i << " :\n";
-			// AssimpGLMHelpers::PrintMatix4(transforms[i]);
         }
-		// std::cout << "===========";
 	}
 };
 

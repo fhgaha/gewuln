@@ -1,7 +1,7 @@
 #include "game.h"
 
-#include <gewuln/animation.h>
-#include <gewuln/animator.h>
+// #include <gewuln/animation.h>
+// #include <gewuln/animator.h>
 #include <gewuln/model_renderer.h>
 
 #include <gewuln/character.h>
@@ -43,7 +43,8 @@ void Game::Init()
             Animator(
                 mona_path,
                 ResourceManager::GetModel("mona")
-            )
+            ),
+            glm::vec3(-1.0f, 0.0f, 0.0f)
         );
         active_character = &characters["mona"];
     }
@@ -66,7 +67,7 @@ void Game::Init()
 void Game::Update(float dt)
 {
     if (active_character) {
-        active_character->animator.UpdateAnimation(dt);
+        active_character->Update(dt);
     }
 }
 
@@ -84,16 +85,9 @@ void Game::ProcessInput(float dt)
 
     // animations
     if (active_character) {
-        if (Keys[GLFW_KEY_1]) {
-            active_character->animator.PlayAnimation("idle");
-        }
-        if (Keys[GLFW_KEY_2]){
-            active_character->animator.PlayAnimation("walk");
-        }
-        if (Keys[GLFW_KEY_3]){
-            active_character->animator.PlayAnimation("interact");
-        }
+        active_character->ProcessInput(Keys);
     }
+
 }
 
 void Game::ProcessMouseMovement(float xoffset, float yoffset)
@@ -111,8 +105,8 @@ void Game::Render()
     renderer->DrawCharacter(
         active_character,
         free_look_cam,
-        (float)Width/(float)Height,
-        glm::vec3(-1, 0, 0)
+        (float)Width/(float)Height
+        // glm::vec3(-1, 0, 0)
     );
 
     renderer->DrawSimpleModel(

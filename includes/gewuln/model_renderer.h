@@ -23,15 +23,13 @@ public:
 		glm::vec3 rot_axis = glm::vec3(0.0f, 1.0f, 0.0f),
 		glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f)
 	){
-		// printf("ass: %s\n", glm::to_string(character->position).c_str());
-
 		DrawAnimatedModel(
 			*character->model,
 			cam,
 			aspect,
 			&character->animator,
 			character->position,
-			rot_deg,
+			glm::degrees(character->rot_rad),
 			rot_axis,
 			scale
 		);

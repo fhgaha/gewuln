@@ -1,9 +1,5 @@
 #include "game.h"
-
-// #include <gewuln/animation.h>
-// #include <gewuln/animator.h>
 #include <gewuln/model_renderer.h>
-
 #include <gewuln/character.h>
 #include <map>
 
@@ -74,18 +70,22 @@ void Game::Update(float dt)
 void Game::ProcessInput(float dt)
 {
     // cam movement
-    if (Keys[GLFW_KEY_W])
+    // if (Keys[GLFW_KEY_W])
+    if (Keys[GLFW_KEY_UP])
         free_look_cam.ProcessKeyboard(FORWARD, dt);
-    if (Keys[GLFW_KEY_S])
+    // if (Keys[GLFW_KEY_S])
+    if (Keys[GLFW_KEY_DOWN])
         free_look_cam.ProcessKeyboard(BACKWARD, dt);
-    if (Keys[GLFW_KEY_A])
+    // if (Keys[GLFW_KEY_A])
+    if (Keys[GLFW_KEY_LEFT])
         free_look_cam.ProcessKeyboard(LEFT, dt);
-    if (Keys[GLFW_KEY_D])
+    // if (Keys[GLFW_KEY_D])
+    if (Keys[GLFW_KEY_RIGHT])
         free_look_cam.ProcessKeyboard(RIGHT, dt);
 
     // animations
     if (active_character) {
-        active_character->ProcessInput(Keys);
+        active_character->ProcessInput(Keys, dt);
     }
 
 }
@@ -115,5 +115,5 @@ void Game::Render()
         (float)Width/(float)Height
     );
 
-
+    
 }

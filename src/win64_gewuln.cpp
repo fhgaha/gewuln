@@ -71,7 +71,7 @@ int main()
     glfwSetKeyCallback(window, key_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
-    
+
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     // glfwSetWindowAspectRatio(window, 4, 3);
     glfwSwapInterval(1);    //limits FPS to monitor's refresh rate
@@ -98,12 +98,12 @@ int main()
                 , 0, nullptr, GL_TRUE
             );
         }
-    }    
-    
+    }
+
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // wireframe
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE); // draw faces of front sides only
-    
+
     { // process alpha channel of textures
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -153,6 +153,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
     switch (action)
     {
+		// https://www.glfw.org/docs/3.3/input_guide.html
         case GLFW_PRESS:
             game.Keys[key] = true;
             break;
@@ -244,7 +245,7 @@ void APIENTRY glDebugOutput(
         case GL_DEBUG_SOURCE_APPLICATION:       std::cout << "Source: Application"; break;
         case GL_DEBUG_SOURCE_OTHER:             std::cout << "Source: Other"; break;
     } std::cout << std::endl;
-    
+
     switch (type)
     {
         case GL_DEBUG_TYPE_ERROR:               std::cout << "Type: Error"; break;
@@ -257,7 +258,7 @@ void APIENTRY glDebugOutput(
         case GL_DEBUG_TYPE_POP_GROUP:           std::cout << "Type: Pop Group"; break;
         case GL_DEBUG_TYPE_OTHER:               std::cout << "Type: Other"; break;
     } std::cout << std::endl;
-    
+
     switch (severity)
     {
         case GL_DEBUG_SEVERITY_HIGH:            std::cout << "Severity: high"; break;

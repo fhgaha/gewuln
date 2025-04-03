@@ -27,14 +27,14 @@ public:
 	// If gShaderFile is not nullptr, it also loads a geometry shader
     static Shader    LoadShader(const char *vShaderFile, const char *fShaderFile, const char *gShaderFile, std::string name);
     // retrieves a stored sader
-    static Shader    GetShader(std::string name);
+    static Shader&   GetShader(const std::string &name);
     // loads (and generates) a texture from file
     static Texture2D LoadTexture(const char *file, bool alpha, std::string name);
     // retrieves a stored texture
     static Texture2D GetTexture(std::string name);
     
     static Model     LoadModel(const char *file, bool animated, std::string name);
-    static Model     GetModel(std::string name);
+    static Model&    GetModel(const std::string name);
     
     // properly de-allocates all loaded resources
     static void      Clear();

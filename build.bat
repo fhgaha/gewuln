@@ -2,8 +2,10 @@
 
 @echo off
 
+cls
+
 set third_party_path=D:\MyProjects\cpp\third_party
-set glad_c_path=%third_party_path%\glad\src\glad.c
+set glad_c_path=%third_party_path%\glad-4.6-core\src\glad.c
 set sources=../includes/gewuln/texture.cpp ../includes/gewuln/shader.cpp ../includes/gewuln/resource_manager.cpp ../src/game.cpp ../includes/gewuln/mesh.cpp
 
 pushd build
@@ -16,7 +18,7 @@ cl -Zi /std:c++20 /EHsc ../src/win64_gewuln.cpp ^
 %sources% ^
 /I../includes ^
 /I"%~dp0..\third_party\glfw-3.4.bin.WIN64\include" ^
-/I"%~dp0..\third_party\glad\include" ^
+/I"%~dp0..\third_party\glad-4.6-core\include" ^
 /DGLFW_STATIC ^
 /link ^
 /LIBPATH:"%~dp0..\third_party\glfw-3.4.bin.WIN64\lib-vc2019" glfw3dll.lib ^

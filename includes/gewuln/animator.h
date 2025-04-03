@@ -8,6 +8,8 @@
 #include <gewuln/animation.h>
 #include <gewuln/bone.h>
 
+const unsigned int MAX_BONES_AMOUNT = 100;
+
 class Animator
 {
 public:
@@ -15,7 +17,7 @@ public:
 	
 	Animator(){};
 	
-	Animator(const std::string& animationPath, Model* model): animations()
+	Animator(const std::string &animationPath, Model &model): animations()
 	{
 		Assimp::Importer importer;
 		const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate);
@@ -23,25 +25,24 @@ public:
 		// if (!scene->mAnimations || scene->mNumAnimations == 0) {
 		if (!scene->HasAnimations()) {
 			std::cerr << "ERROR: No animations found in file: " << animationPath << std::endl;
-			return;	//??
-    	} else {
+			return;
+    	} 
 			
-			// import animations
-			for (unsigned int i = 0; i < scene->mNumAnimations; i++)
-			{
-				auto anim_name = scene->mAnimations[i]->mName.C_Str();
-				auto animation = Animation(scene->mAnimations[i], scene, model);
-				animations[anim_name] = animation;
-			}
-			
-			currentTime = 0.0;
-			currentAnimation = &animations["idle"];
+		// import animations
+		for (unsigned int i = 0; i < scene->mNumAnimations; i++)
+		{
+			auto anim_name = scene->mAnimations[i]->mName.C_Str();
+			auto animation = Animation(scene->mAnimations[i], scene, &model);
+			animations[anim_name] = animation;
+		}
+		
+		currentTime = 0.0;
+		currentAnimation = &animations["idle"];
 
-			finalBoneMatrices.reserve(100);
+		finalBoneMatrices.reserve(MAX_BONES_AMOUNT);
 
-			for (int i = 0; i < 100; i++)
-				finalBoneMatrices.push_back(glm::mat4(1.0f));
-			
+		for (int i = 0; i < 100; i++){
+			finalBoneMatrices.push_back(glm::mat4(1.0f));
 		}
 	}
 

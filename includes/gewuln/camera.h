@@ -33,8 +33,8 @@ public:
     glm::vec3 WorldUp;
     // euler Angles
     float Yaw;     // курс   - rotation around Oy
-    float Pitch;   // тангаж - rotation around Ox 
-    // float Roll; // крен   - rotation around Oz  
+    float Pitch;   // тангаж - rotation around Ox
+    // float Roll; // крен   - rotation around Oz
 
     // camera options
     float MovementSpeed;
@@ -43,13 +43,13 @@ public:
 
     // constructor with vectors
     Camera(
-		glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), 
-		glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), 
-		float yaw = YAW, 
+		glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
+		glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f),
+		float yaw = YAW,
 		float pitch = PITCH
-	) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), 
-	MovementSpeed(SPEED), 
-	MouseSensitivity(SENSITIVITY), 
+	) : Front(glm::vec3(0.0f, 0.0f, -1.0f)),
+	MovementSpeed(SPEED),
+	MouseSensitivity(SENSITIVITY),
 	Zoom(ZOOM)
     {
         Position = position;
@@ -58,10 +58,13 @@ public:
         Pitch = pitch;
         updateCameraVectors();
     }
-    
+
 	// constructor with scalar values
-    Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch) 
-	: Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
+    Camera(
+        float posX, float posY, float posZ,
+        float upX, float upY, float upZ,
+        float yaw, float pitch
+    ): Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
     {
         Position = glm::vec3(posX, posY, posZ);
         WorldUp = glm::vec3(upX, upY, upZ);

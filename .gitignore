@@ -4,6 +4,8 @@
 .lapce/
 .focus/
 
+# Ignore specific files
+/misc/*.lnk
 
 # Ignore build directory
 build/

@@ -6,7 +6,6 @@
 #include <assimp/scene.h>
 #include <gewuln/bone.h>
 #include <functional>
-// #include <gewuln/animdata.h>
 #include <gewuln/model.h>
 
 struct AssimpNodeData
@@ -22,12 +21,12 @@ class Animation
 public:
 	Animation() = default;
 
-	Animation(const aiAnimation* animation, const aiScene* scene, Model* model)
+	Animation(const aiAnimation *animation, const aiScene *scene, Model *model)
 	{
 		m_Duration = animation->mDuration;
 		m_TicksPerSecond = animation->mTicksPerSecond;
 		aiMatrix4x4 globalTransformation = scene->mRootNode->mTransformation;
-		globalTransformation = globalTransformation.Inverse();
+		globalTransformation = globalTransformation.Inverse();	//??
 		ReadHierarchyData(m_RootNode, scene->mRootNode);
 		ReadMissingBones(animation, *model);
 	}
@@ -51,7 +50,7 @@ public:
 	inline float GetTicksPerSecond() { return m_TicksPerSecond; }
 	inline float GetDuration() { return m_Duration;}
 	inline const AssimpNodeData& GetRootNode() { return m_RootNode; }
-	inline const std::map<std::string,BoneInfo>& GetBoneIDMap() { return m_BoneInfoMap;	}
+	inline const std::map<std::string, BoneInfo>& GetBoneIDMap() { return m_BoneInfoMap;	}
 
 private:
 	float m_Duration;
@@ -80,8 +79,8 @@ private:
 	{
 		int size = animation->mNumChannels;
 
-		auto& boneInfoMap = model.GetBoneInfoMap();//getting m_BoneInfoMap from Model class
-		int& boneCount = model.GetBoneCount(); //getting the m_BoneCounter from Model class
+		auto& boneInfoMap = model.GetBoneInfoMap();
+		int& boneCount = model.GetBoneCount(); 
 
 		//reading channels(bones engaged in an animation and their keyframes)
 		for (int i = 0; i < size; i++)

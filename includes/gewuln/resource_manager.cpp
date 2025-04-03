@@ -20,7 +20,7 @@ Shader ResourceManager::LoadShader(const char *vShaderFile, const char *fShaderF
     return Shaders[name];
 }
 
-Shader ResourceManager::GetShader(std::string name)
+Shader& ResourceManager::GetShader(const std::string &name)
 {
     return Shaders[name];
 }
@@ -42,7 +42,7 @@ Model ResourceManager::LoadModel(const char *file, bool animated, std::string na
     return Models[name];
 }
 
-Model ResourceManager::GetModel(std::string name)
+Model& ResourceManager::GetModel(const std::string name)
 {
     return Models[name];
 }

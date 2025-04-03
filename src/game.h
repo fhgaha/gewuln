@@ -4,7 +4,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-// #include "resource_manager.h"
 #include <gewuln/resource_manager.h>
 #include <gewuln/camera.h>
 
@@ -22,10 +21,12 @@ class Game
 {
 public:
     // game state
-    GameState               State;	
+    GameState               State;
     bool                    Keys[1024];
     unsigned int            Width, Height;
-    Camera                  Camera;
+    Camera                  free_look_cam;
+
+
     // constructor/destructor
     Game(unsigned int width, unsigned int height);
     ~Game();

@@ -18,7 +18,7 @@ Mesh::Mesh(
 bool Mesh::IsAnimated() const {	return animated; }
 
 void Mesh::Draw(Shader &shader){
-	unsigned int diffuseNr = 1;
+	unsigned int diffuseNr  = 1;
 	unsigned int specularNr = 1;
 	for(unsigned int i = 0; i < textures.size(); i++)
 	{
@@ -68,7 +68,7 @@ void Mesh::setupMesh() {
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Vertex::TexCoords));
 
-	if (animated){		
+	if (animated){
 		// ids
 		glEnableVertexAttribArray(3);
 		glVertexAttribIPointer(3, 4, GL_INT, sizeof(Vertex), (void*)offsetof(Vertex, Vertex::boneIDs));

@@ -3,7 +3,7 @@
 #include <gewuln/character.h>
 #include <map>
 
-ModelRenderer *renderer;
+ModelRenderer *model_renderer;
 
 std::unordered_map<std::string, Character>  characters;
 Character                                   *active_character;
@@ -14,7 +14,7 @@ Game::Game(unsigned int width, unsigned int height)
 
 Game::~Game()
 {
-    delete renderer;
+    delete model_renderer;
 }
 
 void Game::Init()
@@ -28,7 +28,7 @@ void Game::Init()
         "shader"
     );
 
-    renderer = new ModelRenderer(ResourceManager::GetShader("shader"));
+    model_renderer = new ModelRenderer(ResourceManager::GetShader("shader"));
 
     {
         auto mona_path = "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf_2/mona.gltf";
@@ -102,18 +102,18 @@ void Game::ProcessMouseScroll(float yoffset)
 
 void Game::Render()
 {
-    renderer->DrawCharacter(
+    model_renderer->DrawCharacter(
         active_character,
         free_look_cam,
         (float)Width/(float)Height
         // glm::vec3(-1, 0, 0)
     );
 
-    renderer->DrawSimpleModel(
+    model_renderer->DrawSimpleModel(
         ResourceManager::GetModel("room"),
         free_look_cam,
         (float)Width/(float)Height
     );
 
-    
+
 }

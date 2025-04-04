@@ -9,10 +9,6 @@
 #include <iostream>
 #include "game.h"
 
-// why does it build without linker errors?
-#include <ft2build.h>
-#include <freetype/freetype.h>
-
 // Use NVIDIA Gpu for NVIDIA Optimus laptops/GPUs
 extern "C" {
     __declspec(dllexport) unsigned long NvOptimusEnablement = 0x00000001;
@@ -115,18 +111,8 @@ int main()
 
     // stbi_set_flip_vertically_on_load(true);
 
+
     game.Init();
-
-
-    FT_Library ft;
-    if (FT_Init_FreeType(&ft))
-        std::cout << "ERROR::FREETYPE: Could not init FreeType Library" <<
-        std::endl;
-
-    FT_Face face;
-    if (FT_New_Face(ft, "fonts/arial.ttf", 0, &face))
-        std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
-
 
     // render loop
     while (!glfwWindowShouldClose(window))

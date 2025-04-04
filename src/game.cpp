@@ -1,9 +1,11 @@
 #include "game.h"
 #include <gewuln/model_renderer.h>
 #include <gewuln/character.h>
+#include <gewuln/text_renderer.h>
 #include <map>
 
-ModelRenderer *model_renderer;
+ModelRenderer   *model_renderer;
+TextRenderer    *text_renderer;
 
 std::unordered_map<std::string, Character>  characters;
 Character                                   *active_character;
@@ -15,6 +17,7 @@ Game::Game(unsigned int width, unsigned int height)
 Game::~Game()
 {
     delete model_renderer;
+    delete text_renderer;
 }
 
 void Game::Init()
@@ -45,8 +48,6 @@ void Game::Init()
         active_character = &characters["mona"];
     }
 
-
-
     ResourceManager::LoadModel(
         "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/test_floor/gltf/test_floor.gltf",
         false,
@@ -58,6 +59,12 @@ void Game::Init()
         false,
         "room"
     );
+
+
+    {
+        text_renderer = new TextRenderer(this->Width, this->Height);
+        text_renderer->Load("D:/MyProjects/cpp/gewuln/assets/fonts/arial/arial.ttf", 24);
+    }
 }
 
 void Game::Update(float dt)
@@ -106,7 +113,6 @@ void Game::Render()
         active_character,
         free_look_cam,
         (float)Width/(float)Height
-        // glm::vec3(-1, 0, 0)
     );
 
     model_renderer->DrawSimpleModel(
@@ -115,5 +121,5 @@ void Game::Render()
         (float)Width/(float)Height
     );
 
-
+    text_renderer->Draw("Test text ppgg", 5.0f, 5.0f, 1.0f);
 }

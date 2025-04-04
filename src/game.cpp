@@ -28,10 +28,10 @@ void Game::Init()
         "D:/MyProjects/cpp/gewuln/src/shaders/vertex.vert",
         "D:/MyProjects/cpp/gewuln/src/shaders/fragment.frag",
         nullptr,
-        "shader"
+        "model_shader"
     );
 
-    model_renderer = new ModelRenderer(ResourceManager::GetShader("shader"));
+    model_renderer = new ModelRenderer(ResourceManager::GetShader("model_shader"));
 
     {
         auto mona_path = "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf_2/mona.gltf";
@@ -121,5 +121,12 @@ void Game::Render()
         (float)Width/(float)Height
     );
 
-    text_renderer->Draw("Test text ppgg", 5.0f, 5.0f, 1.0f);
+    std::string line_1 = "Probably a doghouse,";
+    std::string line_2 = "though I'm not sure";
+    std::string line_3 = "since there's no dog around";
+
+    //                                                        font height  scale  some height
+    text_renderer->Draw(line_1, this->Width/5.0f, this->Height - 24.0f *    2.0f *   4.0f, 2.0f);
+    text_renderer->Draw(line_2, this->Width/5.0f, this->Height - 24.0f *    2.0f *   3.0f, 2.0f);
+    text_renderer->Draw(line_3, this->Width/5.0f, this->Height - 24.0f *    2.0f *   2.0f, 2.0f);
 }

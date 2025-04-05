@@ -4,6 +4,7 @@
 #include <gewuln/text_renderer.h>
 #include <map>
 
+
 ModelRenderer   *model_renderer;
 TextRenderer    *text_renderer;
 
@@ -67,14 +68,18 @@ void Game::Init()
     }
 }
 
+
 void Game::Update(float dt)
 {
+    this->dt = dt;
+
     if (active_character) {
         active_character->Update(dt);
     }
 }
 
-void Game::ProcessInput(float dt)
+
+void Game::ProcessInput()
 {
     // cam movement
     // if (Keys[GLFW_KEY_W])
@@ -121,12 +126,23 @@ void Game::Render()
         (float)Width/(float)Height
     );
 
-    std::string line_1 = "Probably a doghouse,";
-    std::string line_2 = "though I'm not sure";
-    std::string line_3 = "since there's no dog around";
 
-    //                                                        font height  scale  some height
-    text_renderer->Draw(line_1, this->Width/5.0f, this->Height - 24.0f *    2.0f *   4.0f, 2.0f);
-    text_renderer->Draw(line_2, this->Width/5.0f, this->Height - 24.0f *    2.0f *   3.0f, 2.0f);
-    text_renderer->Draw(line_3, this->Width/5.0f, this->Height - 24.0f *    2.0f *   2.0f, 2.0f);
+    //fps
+    if (true) {
+        text_renderer->Draw("FPS: " + std::to_string(1/this->dt), this->Width/100.0f * 5.0f, this->Height/100.0f * 5.0f, 1.0f);
+    }
+
+    //subtitles
+    if (false)
+    {
+        std::string line_1 = "Probably a doghouse,";
+        std::string line_2 = "though I'm not sure";
+        std::string line_3 = "since there's no dog around";
+
+        //                                                        font height  scale  some height
+        text_renderer->Draw(line_1, this->Width/5.0f, this->Height - 24.0f *    2.0f *   4.0f, 2.0f);
+        text_renderer->Draw(line_2, this->Width/5.0f, this->Height - 24.0f *    2.0f *   3.0f, 2.0f);
+        text_renderer->Draw(line_3, this->Width/5.0f, this->Height - 24.0f *    2.0f *   2.0f, 2.0f);
+    }
+
 }

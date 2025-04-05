@@ -121,8 +121,8 @@ int main()
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        game.ProcessInput(deltaTime);
         game.Update(deltaTime);
+        game.ProcessInput();
 
         // render
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);

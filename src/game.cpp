@@ -35,7 +35,8 @@ void Game::Init()
     model_renderer = new ModelRenderer(ResourceManager::GetShader("model_shader"));
 
     {
-        auto mona_path = "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf_2/mona.gltf";
+        // auto mona_path = "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf_2/mona.gltf";
+        auto mona_path = "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf_3_cube_collider/mona.gltf";
         ResourceManager::LoadModel(mona_path, true, "mona");
 
         characters["mona"] = Character(
@@ -49,19 +50,20 @@ void Game::Init()
         active_character = &characters["mona"];
     }
 
-    ResourceManager::LoadModel(
-        "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/test_floor/gltf/test_floor.gltf",
-        false,
-        "floor"
-    );
+    // ResourceManager::LoadModel(
+    //     "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/test_floor/gltf/test_floor.gltf",
+    //     false,
+    //     "floor"
+    // );
 
-    ResourceManager::LoadModel(
-        "D:/MyProjects/cpp/gewuln/assets/models/room/gltf/applyed_transforms/room.gltf",
-        false,
-        "room"
-    );
+    // ResourceManager::LoadModel(
+    //     "D:/MyProjects/cpp/gewuln/assets/models/room/gltf/applyed_transforms/room.gltf",
+    //     false,
+    //     "room"
+    // );
 
 
+    //text renderer
     {
         text_renderer = new TextRenderer(this->Width, this->Height);
         text_renderer->Load("D:/MyProjects/cpp/gewuln/assets/fonts/arial/arial.ttf", 24);
@@ -120,11 +122,11 @@ void Game::Render()
         (float)Width/(float)Height
     );
 
-    model_renderer->DrawSimpleModel(
-        ResourceManager::GetModel("room"),
-        free_look_cam,
-        (float)Width/(float)Height
-    );
+    // model_renderer->DrawSimpleModel(
+    //     ResourceManager::GetModel("room"),
+    //     free_look_cam,
+    //     (float)Width/(float)Height
+    // );
 
 
     //fps

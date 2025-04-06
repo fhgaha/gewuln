@@ -44,6 +44,7 @@ public:
 	std::vector<Texture>      textures;
 	bool IsAnimated() const;
 
+	Mesh(){}
 	Mesh(
 		std::vector<Vertex>       vertices, 
 		std::vector<unsigned int> indices,

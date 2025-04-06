@@ -111,6 +111,7 @@ int main()
 
     // stbi_set_flip_vertically_on_load(true);
 
+
     game.Init();
 
     // render loop
@@ -120,8 +121,8 @@ int main()
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        game.ProcessInput(deltaTime);
         game.Update(deltaTime);
+        game.ProcessInput();
 
         // render
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);

@@ -25,7 +25,7 @@ public:
     bool                    Keys[1024];
     unsigned int            Width, Height;
     Camera                  free_look_cam;
-
+    float                   dt;
 
     // constructor/destructor
     Game(unsigned int width, unsigned int height);
@@ -33,10 +33,10 @@ public:
     // initialize game state (load all shaders/textures/levels)
     void Init();
     // game loop
-    void ProcessInput(float dt);
+    void Update(float dt);
+    void ProcessInput();
     void ProcessMouseMovement(float xoffset, float yoffset);
     void ProcessMouseScroll(float yoffset);
-    void Update(float dt);
     void Render();
 };
 

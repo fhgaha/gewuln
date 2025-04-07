@@ -23,16 +23,24 @@
 
 unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma = false);
 
+/*
+For static models all their transformations should be "applied" in Blender, i.e. Location, Rotation and should be reseted to (0, 0, 0)
+and Scale to (1, 1, 1). This is achieved through `Ctrl + A -> All Transforms` in Blender. No position, rotation or scale data is stored
+once model loading process is finished. Blender's description: https://docs.blender.org/manual/en/latest/scene_layout/object/editing/apply.html
+*/
 class Model
 {
 public:
+	glm::vec3			position;
 	std::vector<Mesh>	meshes;
-	Mesh				collider_mesh;
+	Mesh				collider_mesh;		//optional
+	Mesh				interactable_mesh;	//optional
 
 	Model() {}
-	Model(std::string const &path, bool animated)
+	Model(std::string const &path, bool animated, glm::vec3 pos = glm::vec3(0.0f))
 	{
 		this->animated = animated;
+		this->position = pos;
 		loadModel(path);
 	}
 
@@ -70,38 +78,71 @@ private:
 	void processNode(aiNode *node, const aiScene *scene)
 	{
 		//looking for a collider
-		//Usage: in Blender create a cube, select the Cube object, create custom property "is_collider"
-		
-		// std::cout << "node: " << node->mName.data << "\n";		
+		//Usage: in Blender create a cube, select the Cube object, create custom property "is_collider".
+
+		// std::cout << "node: " << node->mName.data << "\n";
 		bool node_is_collider = false;
+		bool node_is_interactable = false;
 		bool has_metadata = node->mMetaData != nullptr && node->mMetaData->mNumProperties > 0;
 		if (has_metadata) {
 			for (unsigned int i = 0; i < node->mMetaData->mNumProperties; i++)
 			{
+				//collider
 				if (node->mMetaData->mKeys[i] == aiString("is_collider")){
-					// std::cout << "!!found a collider: " << "" << "\n";
-					
+					std::cout << "!!found a collider: " << node->mName.data << "\n";
+
 					if (node->mNumMeshes != 1) {
-						std::cout << "COLLIDER NODE SHOULD HAVE ONE MESH. Having instead: " 
+						std::cout << "COLLIDER NODE SHOULD HAVE ONE MESH. Having instead: "
 							<< node->mNumMeshes << "\n";
-						break;
+						// break;
 					}
-					
+
 					node_is_collider = true;
+				}
+
+				//interactable
+				if (node->mMetaData->mKeys[i] == aiString("is_interactable")){
+					std::cout << "!!found an interactable: " << node->mName.data << "\n";
+
+					if (node->mNumMeshes != 1) {
+						std::cout << "INTERACTABLE NODE SHOULD HAVE ONE MESH. Having instead: "
+							<< node->mNumMeshes << "\n";
+						// break;
+					}
+
+					node_is_interactable = true;
 				}
 			}
 		}
-		
+
 		// process all the node’s meshes (if any)
 		for(unsigned int i = 0; i < node->mNumMeshes; i++)
 		{
 			aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
 			Mesh mesh_processed = processMesh(mesh, scene);
+			
+			
+			//displace verts according to its parent position
+			// glm::mat4 transform = AssimpGLMHelpers::ConvertMatrixToGLMFormat(node->mTransformation);
+			// for (unsigned int i = 0; i < mesh_processed.vertices.size(); i++)
+			// {
+			// 	 glm::vec4 v = transform * glm::vec4(
+			// 		mesh_processed.vertices[i].Position.x,
+			// 		mesh_processed.vertices[i].Position.y,
+			// 		mesh_processed.vertices[i].Position.z,
+			// 		1.0f
+			// 	 );
+			// 	 mesh_processed.vertices[i].Position = glm::vec3(v.x, v.y, v.z);
+			// }
+			
+
 			if (node_is_collider) {
 				collider_mesh = mesh_processed;
+			} else if (node_is_interactable) {
+				interactable_mesh = mesh_processed;
 			} else {
-				meshes.push_back(mesh_processed);
 			}
+			meshes.push_back(mesh_processed);
 		}
 
 		// then do the same for each of its children
@@ -109,7 +150,7 @@ private:
 		{
 			processNode(node->mChildren[i], scene);
 		}
-		
+
 	}
 
 	Mesh processMesh(aiMesh *mesh, const aiScene *scene)
@@ -121,17 +162,8 @@ private:
 		for(unsigned int i = 0; i < mesh->mNumVertices; i++)
 		{
 			Vertex vertex;
-			// process vertex positions, normals and texture coordinates
-			glm::vec3 vector;
-			vector.x = mesh->mVertices[i].x;
-			vector.y = mesh->mVertices[i].y;
-			vector.z = mesh->mVertices[i].z;
-			vertex.Position = vector;
-
-			vector.x = mesh->mNormals[i].x;
-			vector.y = mesh->mNormals[i].y;
-			vector.z = mesh->mNormals[i].z;
-			vertex.Normal = vector;
+			vertex.Position = glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
+			vertex.Normal 	= glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
 
 			glm::vec2 tex_coords = glm::vec2(0.0f, 0.0f);
 			// use texture coordinates if mesh has any
@@ -250,7 +282,8 @@ private:
                 BoneInfo newBoneInfo;
                 newBoneInfo.id = boneCounter;
                 newBoneInfo.offset = AssimpGLMHelpers::ConvertMatrixToGLMFormat(
-                    mesh->mBones[boneIndex]->mOffsetMatrix);
+                    mesh->mBones[boneIndex]->mOffsetMatrix
+				);
                 boneInfoMap[boneName] = newBoneInfo;
                 boneID = boneCounter;
                 boneCounter++;

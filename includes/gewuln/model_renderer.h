@@ -71,9 +71,11 @@ public:
 	// not animated model. we ignore finalBonesMatrices here
 	void DrawSimpleModel(
 		Model& loaded_model,
-		Camera cam, float aspect,
+		Camera cam, 
+		float aspect,
 		glm::vec3 pos = glm::vec3(0, 0, 0),
-		float rot_deg = 0.0f, glm::vec3 rot_axis = glm::vec3(0.0f, 1.0f, 0.0f),
+		float rot_deg = 0.0f, 
+		glm::vec3 rot_axis = glm::vec3(0.0f, 1.0f, 0.0f),
 		glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f)
 	){
         shader.Use();

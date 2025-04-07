@@ -3286,17 +3286,23 @@
 	],
 	"materials":[
 		{
-			"alphaMode":"BLEND",
 			"doubleSided":true,
-			"name":"ColliderMaterial",
+			"extensions":{
+				"KHR_materials_specular":{
+					"specularColorFactor":[
+						1.0039219856262207,
+						1.0039219856262207,
+						1.0039219856262207
+					]
+				}
+			},
+			"name":"Face",
 			"pbrMetallicRoughness":{
-				"baseColorFactor":[
-					0,
-					0.33568504452705383,
-					0.8003387451171875,
-					0.5
-				],
-				"metallicFactor":0
+				"baseColorTexture":{
+					"index":0
+				},
+				"metallicFactor":0,
+				"roughnessFactor":0.875
 			}
 		},
 		{
@@ -3312,26 +3318,6 @@
 				}
 			},
 			"name":"Body_Texturemat.001",
-			"pbrMetallicRoughness":{
-				"baseColorTexture":{
-					"index":0
-				},
-				"metallicFactor":0
-			}
-		},
-		{
-			"alphaMode":"BLEND",
-			"doubleSided":true,
-			"extensions":{
-				"KHR_materials_specular":{
-					"specularColorFactor":[
-						2.0,
-						2.0,
-						2.0
-					]
-				}
-			},
-			"name":"Eyesmat.001",
 			"pbrMetallicRoughness":{
 				"baseColorTexture":{
 					"index":1
@@ -3351,7 +3337,7 @@
 					]
 				}
 			},
-			"name":"Facemat.001",
+			"name":"Eyesmat.001",
 			"pbrMetallicRoughness":{
 				"baseColorTexture":{
 					"index":2
@@ -3371,7 +3357,7 @@
 					]
 				}
 			},
-			"name":"Handsmat.001",
+			"name":"Facemat.001",
 			"pbrMetallicRoughness":{
 				"baseColorTexture":{
 					"index":3
@@ -3391,7 +3377,7 @@
 					]
 				}
 			},
-			"name":"Legs_Texturemat.001",
+			"name":"Handsmat.001",
 			"pbrMetallicRoughness":{
 				"baseColorTexture":{
 					"index":4
@@ -3411,7 +3397,7 @@
 					]
 				}
 			},
-			"name":"Skinmat.001",
+			"name":"Legs_Texturemat.001",
 			"pbrMetallicRoughness":{
 				"baseColorTexture":{
 					"index":5
@@ -3431,10 +3417,30 @@
 					]
 				}
 			},
-			"name":"eyelashmat.001",
+			"name":"Skinmat.001",
 			"pbrMetallicRoughness":{
 				"baseColorTexture":{
 					"index":6
+				},
+				"metallicFactor":0
+			}
+		},
+		{
+			"alphaMode":"BLEND",
+			"doubleSided":true,
+			"extensions":{
+				"KHR_materials_specular":{
+					"specularColorFactor":[
+						2.0,
+						2.0,
+						2.0
+					]
+				}
+			},
+			"name":"eyelashmat.001",
+			"pbrMetallicRoughness":{
+				"baseColorTexture":{
+					"index":7
 				},
 				"metallicFactor":0
 			}
@@ -3549,7 +3555,7 @@
 		},
 		{
 			"sampler":0,
-			"source":1
+			"source":2
 		},
 		{
 			"sampler":0,
@@ -3561,14 +3567,23 @@
 		},
 		{
 			"sampler":0,
-			"source":0
+			"source":4
 		},
 		{
 			"sampler":0,
-			"source":4
+			"source":1
+		},
+		{
+			"sampler":0,
+			"source":5
 		}
 	],
 	"images":[
+		{
+			"mimeType":"image/png",
+			"name":"MonaSax_Face",
+			"uri":"MonaSax_Face.png"
+		},
 		{
 			"mimeType":"image/png",
 			"name":"MonaSax_Body_B_01",
@@ -3577,7 +3592,7 @@
 		{
 			"mimeType":"image/png",
 			"name":"MonaSax_Face",
-			"uri":"MonaSax_Face.png"
+			"uri":"MonaSax_Face-1.png"
 		},
 		{
 			"mimeType":"image/png",

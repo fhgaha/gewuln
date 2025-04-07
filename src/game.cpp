@@ -56,11 +56,12 @@ void Game::Init()
     //     "floor"
     // );
 
-    // ResourceManager::LoadModel(
-    //     "D:/MyProjects/cpp/gewuln/assets/models/room/gltf/applyed_transforms/room.gltf",
-    //     false,
-    //     "room"
-    // );
+    ResourceManager::LoadModel(
+        // "D:/MyProjects/cpp/gewuln/assets/models/room/gltf/applyed_transforms/room.gltf",
+        "D:/MyProjects/cpp/gewuln/assets/models/room/gltf_2_cube_interactable/room.gltf",
+        false,
+        "room"
+    );
 
 
     //text renderer
@@ -77,7 +78,16 @@ void Game::Update(float dt)
 
     if (active_character) {
         active_character->Update(dt);
+        
+        
+        // glm::vec3 some_pos = active_character->model->collider_mesh.vertices[0].Position;
+        // some_pos += active_character->position;
+        // std::cout << "active character vertex 0 pos: " << some_pos << "\n";
     }
+    
+    // Model &room = ResourceManager::GetModel("room");
+    // glm::vec3 some_room_vert_pos = room.interactable_mesh.vertices[0].Position;
+    // std::cout << "room interactable vertex 0 pos: " << some_room_vert_pos << "\n";
 }
 
 
@@ -122,11 +132,11 @@ void Game::Render()
         (float)Width/(float)Height
     );
 
-    // model_renderer->DrawSimpleModel(
-    //     ResourceManager::GetModel("room"),
-    //     free_look_cam,
-    //     (float)Width/(float)Height
-    // );
+    model_renderer->DrawSimpleModel(
+        ResourceManager::GetModel("room"),
+        free_look_cam,
+        (float)Width/(float)Height
+    );
 
 
     //fps

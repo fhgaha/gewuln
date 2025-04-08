@@ -62,10 +62,25 @@ public:
         model = glm::scale(model, scale);
         shader.SetMatrix4("model", model);
 
-
+		// for meshes Draw() calls are frag shader calls
 		for(unsigned int i = 0; i < loaded_model.meshes.size(); i++){
 			loaded_model.meshes[i].Draw(shader);
 		}
+		
+		
+		//draw collider wireframe
+		// if (true) {
+		// 	{	//set wireframe settings
+		// 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		// 		shader.SetBool("drawing_wireframe", true);
+		// 		shader.SetVector3f("wireframe_color", 0.5f, 1.0f, 5.0f);
+		// 	}
+		// 	loaded_model.collider_mesh.Draw(shader);
+		// 	{	//reset
+		// 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		// 		shader.SetBool("drawing_wireframe", false);
+		// 	}
+		// }
 	}
 
 	// not animated model. we ignore finalBonesMatrices here
@@ -94,10 +109,24 @@ public:
         model = glm::scale(model, scale);
 
         shader.SetMatrix4("model", model);
-
+		
 
 		for(unsigned int i = 0; i < loaded_model.meshes.size(); i++){
 			loaded_model.meshes[i].Draw(shader);
+		}
+		
+		//draw interactable wireframe
+		if (true) {
+			{	//set wireframe settings
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+				shader.SetBool("drawing_wireframe", true);
+				shader.SetVector3f("wireframe_color", 0.0f, 1.0f, 1.0f);
+			}
+			loaded_model.interactable_mesh.Draw(shader);
+			{	//reset
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+				shader.SetBool("drawing_wireframe", false);
+			}
 		}
 	}
 

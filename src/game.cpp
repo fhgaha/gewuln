@@ -26,8 +26,8 @@ void Game::Init()
     free_look_cam.Position = glm::vec3(-1.0f, 1.0f, 3.0f);
 
     ResourceManager::LoadShader(
-        "D:/MyProjects/cpp/gewuln/src/shaders/vertex.vert",
-        "D:/MyProjects/cpp/gewuln/src/shaders/fragment.frag",
+        "D:/MyProjects/cpp/gewuln/src/shaders/default/default.vert",
+        "D:/MyProjects/cpp/gewuln/src/shaders/default/default.frag",
         nullptr,
         "model_shader"
     );

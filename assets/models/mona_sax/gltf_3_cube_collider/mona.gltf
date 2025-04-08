@@ -21,17 +21,7 @@
 				"is_collider":"1.0"
 			},
 			"mesh":0,
-			"name":"Cube",
-			"scale":[
-				0.25,
-				0.25,
-				1
-			],
-			"translation":[
-				0,
-				0,
-				-1
-			]
+			"name":"Cube"
 		},
 		{
 			"name":"mixamorig:HeadTop_End",
@@ -3649,14 +3639,14 @@
 			"componentType":5126,
 			"count":24,
 			"max":[
-				1,
-				1,
-				1
+				0.25,
+				0.25,
+				0
 			],
 			"min":[
-				-1,
-				-1,
-				-1
+				-0.25,
+				-0.25,
+				-2
 			],
 			"type":"VEC3"
 		},

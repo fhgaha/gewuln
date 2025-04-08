@@ -141,8 +141,8 @@ private:
 			} else if (node_is_interactable) {
 				interactable_mesh = mesh_processed;
 			} else {
+				meshes.push_back(mesh_processed);
 			}
-			meshes.push_back(mesh_processed);
 		}
 
 		// then do the same for each of its children

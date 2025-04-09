@@ -81,28 +81,7 @@ public:
 				shader.SetVector3f("wireframe_color", 1.0f, 0.0f, 0.0f);
 			}
 			
-			// for (size_t i = 0; i < loaded_model.collider_mesh.vertices.size(); i++)
-			// {
-			// 	loaded_model.collider_mesh.vertices[i].Position += glm::vec3(0.0f, 0.0f, 0.01f);
-			// 	glm::vec3 pos = loaded_model.collider_mesh.vertices[i].Position;
-			// 	std::cout << "vert " << i << ", pos " << pos << "\n";
-			// }
-			// std::cout << "=======================\n";
-			
-			std::vector<Vertex> verts = loaded_model.collider_mesh.vertices;
-			for (size_t i = 0; i < verts.size(); i++)
-			{
-				verts[i].Position = glm::vec3(0.0f, 0.0f, -10.f) + verts[i].Position;
-			}
-			
-			Mesh(
-				verts,
-				loaded_model.collider_mesh.indices,
-				loaded_model.collider_mesh.textures,
-				false
-			).Draw(shader);
-			
-			// loaded_model.collider_mesh.Draw(shader);
+			loaded_model.collider_mesh.Draw(shader);
 
 			{	//reset wireframe to textures
 				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -151,7 +130,9 @@ public:
 				shader.SetBool("drawing_wireframe", true);
 				shader.SetVector3f("wireframe_color", 0.0f, 1.0f, 1.0f);
 			}
+
 			loaded_model.interactable_mesh.Draw(shader);
+
 			{	//reset
 				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 				shader.SetBool("drawing_wireframe", false);

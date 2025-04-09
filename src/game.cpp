@@ -78,16 +78,7 @@ void Game::Update(float dt)
 
     if (active_character) {
         active_character->Update(dt);
-        
-        
-        // glm::vec3 some_pos = active_character->model->collider_mesh.vertices[0].Position;
-        // some_pos += active_character->position;
-        // std::cout << "active character vertex 0 pos: " << some_pos << "\n";
     }
-    
-    // Model &room = ResourceManager::GetModel("room");
-    // glm::vec3 some_room_vert_pos = room.interactable_mesh.vertices[0].Position;
-    // std::cout << "room interactable vertex 0 pos: " << some_room_vert_pos << "\n";
 }
 
 

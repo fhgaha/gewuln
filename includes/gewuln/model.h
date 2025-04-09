@@ -124,29 +124,16 @@ private:
 		{
 			aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
 			
-			Mesh mesh_processed = processMesh(mesh, scene);
-
 			if (node_is_collider) {
-				collider_mesh = mesh_processed;
+				collider_mesh = processMesh(mesh, scene, false);
 				node_is_collider = false;
 			} else if (node_is_interactable) {
-				interactable_mesh = mesh_processed;
+				interactable_mesh = processMesh(mesh, scene, false);
 				node_is_interactable = false;
 			} else {
-				meshes.push_back(mesh_processed);
+				meshes.push_back(processMesh(mesh, scene, this->animated));
 			}
 		}
-		
-		// for (size_t i = 0; i < meshes.size(); i++)
-		// {
-		// 	if (&collider_mesh.indices == &meshes[i].indices 
-		// 	&& &collider_mesh.textures == &meshes[i].textures
-		// 	&& &collider_mesh.vertices == &meshes[i].vertices
-		// 	) {
-		// 		std::cout << "collider is inside meshes!" << "\n";
-		// 	}
-		// }
-		
 
 		// then do the same for each of its children
 		for(unsigned int i = 0; i < node->mNumChildren; i++)
@@ -156,7 +143,7 @@ private:
 
 	}
 
-	Mesh processMesh(aiMesh *mesh, const aiScene *scene)
+	Mesh processMesh(aiMesh *mesh, const aiScene *scene, bool animated)
 	{
 		std::vector<Vertex>       vertices;
 		std::vector<unsigned int> indices;

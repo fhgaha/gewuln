@@ -70,8 +70,6 @@ private:
 		}
 		directory = path.substr(0, path.find_last_of('/'));
 
-		// std::cout << "materials amnt: " << scene->mNumMaterials << '\n';
-
 		processNode(scene->mRootNode, scene);
 	}
 
@@ -89,7 +87,10 @@ private:
 			{
 				//collider
 				if (node->mMetaData->mKeys[i] == aiString("is_collider")){
-					std::cout << "!!found a collider: " << node->mName.data << "\n";
+					std::cout << "!!found a collider " << node->mName.data 
+					<< " in a node " << node->mName.data
+					<< " of a scene " << scene->mName.data 
+					<< "\n";
 
 					if (node->mNumMeshes != 1) {
 						std::cout << "COLLIDER NODE SHOULD HAVE ONE MESH. Having instead: "
@@ -102,7 +103,10 @@ private:
 
 				//interactable
 				if (node->mMetaData->mKeys[i] == aiString("is_interactable")){
-					std::cout << "!!found an interactable: " << node->mName.data << "\n";
+					std::cout << "!!found an interactable " << node->mName.data
+					<< " in a node " << node->mName.data
+					<< " of a scene " << scene->mName.data 
+					<< "\n";
 
 					if (node->mNumMeshes != 1) {
 						std::cout << "INTERACTABLE NODE SHOULD HAVE ONE MESH. Having instead: "
@@ -119,31 +123,30 @@ private:
 		for(unsigned int i = 0; i < node->mNumMeshes; i++)
 		{
 			aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
+			
 			Mesh mesh_processed = processMesh(mesh, scene);
-			
-			
-			//displace verts according to its parent position
-			// glm::mat4 transform = AssimpGLMHelpers::ConvertMatrixToGLMFormat(node->mTransformation);
-			// for (unsigned int i = 0; i < mesh_processed.vertices.size(); i++)
-			// {
-			// 	 glm::vec4 v = transform * glm::vec4(
-			// 		mesh_processed.vertices[i].Position.x,
-			// 		mesh_processed.vertices[i].Position.y,
-			// 		mesh_processed.vertices[i].Position.z,
-			// 		1.0f
-			// 	 );
-			// 	 mesh_processed.vertices[i].Position = glm::vec3(v.x, v.y, v.z);
-			// }
-			
 
 			if (node_is_collider) {
 				collider_mesh = mesh_processed;
+				node_is_collider = false;
 			} else if (node_is_interactable) {
 				interactable_mesh = mesh_processed;
+				node_is_interactable = false;
 			} else {
 				meshes.push_back(mesh_processed);
 			}
 		}
+		
+		// for (size_t i = 0; i < meshes.size(); i++)
+		// {
+		// 	if (&collider_mesh.indices == &meshes[i].indices 
+		// 	&& &collider_mesh.textures == &meshes[i].textures
+		// 	&& &collider_mesh.vertices == &meshes[i].vertices
+		// 	) {
+		// 		std::cout << "collider is inside meshes!" << "\n";
+		// 	}
+		// }
+		
 
 		// then do the same for each of its children
 		for(unsigned int i = 0; i < node->mNumChildren; i++)
@@ -204,7 +207,7 @@ private:
 			std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
 			textures.insert(textures.end(), specularMaps.begin(),	specularMaps.end());
 		}
-
+		
 		ExtractBoneWeightForVertices(vertices, mesh, scene);
 
 		return Mesh(vertices, indices, textures, animated);
@@ -269,9 +272,10 @@ private:
 			lets skip that thing.
 			this causes triangle horrors apparantely.
 			*/
-			if (mesh->mBones[boneIndex]->mNumWeights == 1) {
+			if (mesh->HasBones() && mesh->mBones[boneIndex]->mNumWeights == 1) {
 				continue;
 			}
+
 
             int boneID = -1;
             std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();

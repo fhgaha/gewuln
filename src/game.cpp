@@ -11,6 +11,8 @@ TextRenderer    *text_renderer;
 std::unordered_map<std::string, Character>  characters;
 Character                                   *active_character;
 
+bool            show_granny_text;
+
 
 Game::Game(unsigned int width, unsigned int height)
 : State(GAME_ACTIVE), Keys(), Width(width), Height(height), free_look_cam(glm::vec3(0.0f, 0.0f, 3.0f)){}
@@ -107,7 +109,7 @@ void Game::ProcessInput()
 
 
     if (active_character) {
-        active_character->ProcessInput(Keys, dt);
+        active_character->ProcessInput(Keys, this, dt);
     }
 
 }
@@ -149,16 +151,21 @@ void Game::Render()
     }
 
     //subtitles
-    if (false)
+    if (show_granny_text)
     {
-        std::string line_1 = "Probably a doghouse,";
+        std::string line_1 = "Probably some granny's kitchen,";
         std::string line_2 = "though I'm not sure";
-        std::string line_3 = "since there's no dog around";
+        std::string line_3 = "since there's no granny around";
 
         //                                                        font height  scale  some height
-        text_renderer->Draw(line_1, this->Width/5.0f, this->Height - 24.0f *    2.0f *   4.0f, 2.0f);
-        text_renderer->Draw(line_2, this->Width/5.0f, this->Height - 24.0f *    2.0f *   3.0f, 2.0f);
-        text_renderer->Draw(line_3, this->Width/5.0f, this->Height - 24.0f *    2.0f *   2.0f, 2.0f);
+        text_renderer->Draw(line_1, this->Width/100.0f * 10.0f, this->Height - 24.0f *    2.0f *   4.0f, 1.5f);
+        text_renderer->Draw(line_2, this->Width/100.0f * 10.0f, this->Height - 24.0f *    2.0f *   3.0f, 1.5f);
+        text_renderer->Draw(line_3, this->Width/100.0f * 10.0f, this->Height - 24.0f *    2.0f *   2.0f, 1.5f);
     }
+}
 
+
+void Game::PlayCameraThing() const
+{
+    show_granny_text = true;
 }

@@ -35,7 +35,7 @@ class Character {
 		}
 
 
-		void ProcessInput(const bool keys[], const float dt) {
+		void ProcessInput(const bool keys[], const Game *game, const float dt) {
 
 			if (keys[GLFW_KEY_E]){
 				// get all the interactables
@@ -47,8 +47,7 @@ class Character {
 					if (mdl.interactable_mesh.has_value()) {
 						const Mesh *intrcbl_mesh = &mdl.interactable_mesh.value();
 						
-						
-						
+
 						//collider mesh is drawn properly, with updated position, but it still has zero based positions in log. why? how?
 						auto cldr_verts = this->model->collider_mesh.value().vertices;
 						// std::cout << "collider:\n";
@@ -72,15 +71,15 @@ class Character {
 							intrcbl_mesh->vertices
 						);
 						
-						
 						if (collider_intersects_an_interactable){
-						// if (true){
 							std::cout << "it intersects!\n";
+							game->PlayCameraThing();
 						}
 						else 
 						{
 							std::cout << "it DOES NOT intersect!\n";
 						}
+						return;
 					}
 				}
 				

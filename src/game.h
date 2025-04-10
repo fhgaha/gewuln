@@ -38,6 +38,8 @@ public:
     void ProcessMouseMovement(float xoffset, float yoffset);
     void ProcessMouseScroll(float yoffset);
     void Render();
+    
+    void PlayCameraThing() const;
 };
 
 #endif

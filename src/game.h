@@ -24,8 +24,14 @@ public:
     GameState               State;
     bool                    Keys[1024];
     unsigned int            Width, Height;
-    Camera                  free_look_cam;
     float                   dt;
+    
+    Camera                  free_look_camera;
+    Camera                  look_at_camera_corridor;
+    Camera                  look_at_camera_kitchen_start;
+    Camera                  look_at_camera_kitchen_end;
+    Camera                  *active_cam;
+    
 
     // constructor/destructor
     Game(unsigned int width, unsigned int height);
@@ -39,7 +45,7 @@ public:
     void ProcessMouseScroll(float yoffset);
     void Render();
     
-    void PlayCameraThing() const;
+    void PlayCameraThing();
 };
 
 #endif

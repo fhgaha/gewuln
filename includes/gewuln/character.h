@@ -35,7 +35,7 @@ class Character {
 		}
 
 
-		void ProcessInput(const bool keys[], const Game *game, const float dt) {
+		void ProcessInput(const bool keys[], Game *game, const float dt) {
 
 			if (keys[GLFW_KEY_E]){
 				// get all the interactables

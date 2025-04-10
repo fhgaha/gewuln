@@ -5,17 +5,17 @@
 #include <map>
 
 
-ModelRenderer   *model_renderer;
-TextRenderer    *text_renderer;
+ModelRenderer                               *model_renderer;
+TextRenderer                                *text_renderer;
 
 std::unordered_map<std::string, Character>  characters;
 Character                                   *active_character;
 
-bool            show_granny_text;
+bool                                        show_granny_text;
 
 
 Game::Game(unsigned int width, unsigned int height)
-: State(GAME_ACTIVE), Keys(), Width(width), Height(height), free_look_cam(glm::vec3(0.0f, 0.0f, 3.0f)){}
+: State(GAME_ACTIVE), Keys(), Width(width), Height(height), free_look_camera(glm::vec3(0.0f, 0.0f, 3.0f)){}
 
 Game::~Game()
 {
@@ -34,7 +34,7 @@ void Game::Init()
     );
 
     model_renderer = new ModelRenderer(ResourceManager::GetShader("model_shader"));
-    model_renderer->draw_gizmos = true;
+    model_renderer->draw_gizmos = false;
 
     {
         auto mona_path = "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf_3_cube_collider/mona.gltf";
@@ -50,12 +50,6 @@ void Game::Init()
         );
         active_character = &characters["mona"];
     }
-
-    // ResourceManager::LoadModel(
-    //     "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/test_floor/gltf/test_floor.gltf",
-    //     false,
-    //     "floor"
-    // );
 
     ResourceManager::LoadModel(
         // "D:/MyProjects/cpp/gewuln/assets/models/room/gltf/applyed_transforms/room.gltf",
@@ -73,12 +67,36 @@ void Game::Init()
 
 
     // free_look_cam.Position = glm::vec3(-1.0f, 1.0f, 3.0f);
-    free_look_cam = Camera(
+    free_look_camera = Camera(
 		glm::vec3(-3.228f, 3.582f, 4.333f),
 		glm::vec3(0.0f, 1.0f, 0.0f),
         -39.0f,
         41.0f
 	);
+    
+    look_at_camera_corridor = Camera(
+		glm::vec3(-3.228f, 3.582f, 4.333f),
+		glm::vec3(0.0f, 1.0f, 0.0f),
+        -39.0f,
+        41.0f
+	);
+    
+    look_at_camera_kitchen_start = Camera(
+		glm::vec3(1.367f,    2.045f,    3.924f),
+		glm::vec3(0.0f, 1.0f, 0.0f),
+        -86.3601f,
+        16.0f
+	);
+    
+    look_at_camera_kitchen_end = Camera(
+		glm::vec3(0.673f, 2.138f, 4.030f),
+		glm::vec3(0.0f, 1.0f, 0.0f),
+        -263.88f,
+        19.7599f
+	);
+    
+    
+    active_cam = &look_at_camera_corridor;
 }
 
 
@@ -88,24 +106,29 @@ void Game::Update(float dt)
 
     if (active_character) {
         active_character->Update(dt);
+    
+        //tmp
+        glm::vec3 trg = active_character->position + glm::vec3(0.0f, 1.5f, 0.0f);
+        active_cam->LookAt(&trg);
     }
+    
 }
 
 
 void Game::ProcessInput()
 {
-    // if (Keys[GLFW_KEY_W])
-    if (Keys[GLFW_KEY_UP])
-        free_look_cam.ProcessKeyboard(FORWARD, dt);
-    // if (Keys[GLFW_KEY_S])
-    if (Keys[GLFW_KEY_DOWN])
-        free_look_cam.ProcessKeyboard(BACKWARD, dt);
-    // if (Keys[GLFW_KEY_A])
-    if (Keys[GLFW_KEY_LEFT])
-        free_look_cam.ProcessKeyboard(LEFT, dt);
-    // if (Keys[GLFW_KEY_D])
-    if (Keys[GLFW_KEY_RIGHT])
-        free_look_cam.ProcessKeyboard(RIGHT, dt);
+    // // if (Keys[GLFW_KEY_W])
+    // if (Keys[GLFW_KEY_UP])
+    //     active_cam->ProcessKeyboard(FORWARD, dt);
+    // // if (Keys[GLFW_KEY_S])
+    // if (Keys[GLFW_KEY_DOWN])
+    //     active_cam->ProcessKeyboard(BACKWARD, dt);
+    // // if (Keys[GLFW_KEY_A])
+    // if (Keys[GLFW_KEY_LEFT])
+    //     active_cam->ProcessKeyboard(LEFT, dt);
+    // // if (Keys[GLFW_KEY_D])
+    // if (Keys[GLFW_KEY_RIGHT])
+    //     active_cam->ProcessKeyboard(RIGHT, dt);
 
 
     if (active_character) {
@@ -116,37 +139,38 @@ void Game::ProcessInput()
 
 void Game::ProcessMouseMovement(float xoffset, float yoffset)
 {
-    free_look_cam.ProcessMouseMovement(xoffset, yoffset);
+    // active_cam->ProcessMouseMovement(xoffset, yoffset);
 }
 
 void Game::ProcessMouseScroll(float yoffset)
 {
-    free_look_cam.ProcessMouseScroll(yoffset);
+    // active_cam->ProcessMouseScroll(yoffset);
 }
 
 void Game::Render()
 {
 
-    // std::cout << "camera pos " << free_look_cam.Position
-    // << " yaw " << free_look_cam.Yaw
-    // << " pitch " << free_look_cam.Pitch
+    // std::cout << "camera pos " << active_cam->Position
+    // << " yaw " << active_cam->Yaw
+    // << " pitch " << active_cam->Pitch
+    // << " zoom " << active_cam->Zoom
     // << "\n";
 
     model_renderer->DrawCharacter(
         active_character,
-        free_look_cam,
+        *active_cam,
         (float)Width/(float)Height
     );
 
     model_renderer->DrawSimpleModel(
         ResourceManager::GetModel("room"),
-        free_look_cam,
+        *active_cam,
         (float)Width/(float)Height
     );
 
 
     //fps
-    if (true) {
+    if (false) {
         text_renderer->Draw("FPS: " + std::to_string(1/this->dt), this->Width/100.0f * 5.0f, this->Height/100.0f * 5.0f, 1.0f);
     }
 
@@ -164,8 +188,14 @@ void Game::Render()
     }
 }
 
-
-void Game::PlayCameraThing() const
+void Game::PlayCameraThing()
 {
+    //TODO camera is still targeting mona so it snips to her immidiatelly
+    active_cam = &look_at_camera_kitchen_start;
+    
+    // start cam movement
+    // final kitchen cam state: pos [    0.673,    2.138,    4.030] yaw -169.84 pitch 22.1999 zoom 35.8083
+    
     show_granny_text = true;
+    
 }

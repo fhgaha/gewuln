@@ -40,13 +40,17 @@ public:
     float MovementSpeed;
     float MouseSensitivity;
     float Zoom;
+    
+    //TODO temp
+    glm::vec3 target;
 
-    // constructor with vectors
+    // constructor with vectors. Yaw - курс, pitch - тангаж 
     Camera(
 		glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f),
 		float yaw = YAW,
-		float pitch = PITCH
+		float pitch = PITCH,
+        float zoom = ZOOM
 	) : Front(glm::vec3(0.0f, 0.0f, -1.0f)),
 	MovementSpeed(SPEED),
 	MouseSensitivity(SENSITIVITY),
@@ -73,10 +77,15 @@ public:
         updateCameraVectors();
     }
 
+
     // returns the view matrix calculated using Euler Angles and the LookAt Matrix
     glm::mat4 GetViewMatrix()
     {
-        return glm::lookAt(Position, Position + Front, Up);
+        // return glm::lookAt(Position, Position + Front, Up);
+        
+        
+        //TODO temp. move this into separate class
+        return glm::lookAt(Position, target, Up);
     }
 
     // processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
@@ -123,6 +132,12 @@ public:
             Zoom = 1.0f;
         if (Zoom > 45.0f)
             Zoom = 45.0f;
+    }
+    
+    // TODO temporar function, move into a separate class
+    void LookAt(const glm::vec3 *target) 
+    {
+        this->target = *target;
     }
 
 private:

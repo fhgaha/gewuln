@@ -7,7 +7,9 @@
 #include <gewuln/animation.h>
 #include <gewuln/animator.h>
 #include <gewuln/model.h>
+#include <gewuln/gewuln_math.h>
 #include <iostream>
+#include <map>
 
 class Character {
 	public:
@@ -34,6 +36,61 @@ class Character {
 
 
 		void ProcessInput(const bool keys[], const float dt) {
+
+			if (keys[GLFW_KEY_E]){
+				// get all the interactables
+				
+				//TODO should iterate through not just all loaded models but only through all the currently instanced models
+				std::map<std::string, Model> *models = &ResourceManager::Models;
+				for (const auto &[name, mdl] : *models)
+				{
+					if (mdl.interactable_mesh.has_value()) {
+						const Mesh *intrcbl_mesh = &mdl.interactable_mesh.value();
+						
+						
+						
+						//collider mesh is drawn properly, with updated position, but it still has zero based positions in log. why? how?
+						auto cldr_verts = this->model->collider_mesh.value().vertices;
+						// std::cout << "collider:\n";
+						for (size_t i = 0; i < cldr_verts.size(); i++)
+						{
+							cldr_verts[i].Position += this->position;
+						// 	std::cout << "\t" << i <<":\t" << cldr_verts[i].Position << "\n";
+						}
+						
+						// std::cout << "interactable:\n";
+						// for (size_t i = 0; i < intrcbl_mesh->vertices.size(); i++)
+						// {
+						// 	std::cout << "\t" << i <<":\t" << intrcbl_mesh->vertices[i].Position << "\n";
+						// }
+						// std::cout << "=======================\n";
+						
+						
+						
+						bool collider_intersects_an_interactable = GewulnMath::intersect(
+							cldr_verts, 
+							intrcbl_mesh->vertices
+						);
+						
+						
+						if (collider_intersects_an_interactable){
+						// if (true){
+							std::cout << "it intersects!\n";
+						}
+						else 
+						{
+							std::cout << "it DOES NOT intersect!\n";
+						}
+					}
+				}
+				
+
+				// check if collider intersects one of the interactables
+
+				//if does - run the cutscene
+				//if not - do nothing
+			}
+
 
 			if (keys[GLFW_KEY_A]){
 				rot_rad += ROT_SPEED * dt;

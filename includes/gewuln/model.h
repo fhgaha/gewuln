@@ -20,6 +20,8 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include <optional>
+
 
 unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma = false);
 
@@ -33,8 +35,8 @@ class Model
 public:
 	glm::vec3			position;
 	std::vector<Mesh>	meshes;
-	Mesh				collider_mesh;		//optional
-	Mesh				interactable_mesh;	//optional
+	std::optional<Mesh>	collider_mesh;	
+	std::optional<Mesh>	interactable_mesh;
 
 	Model() {}
 	Model(std::string const &path, bool animated, glm::vec3 pos = glm::vec3(0.0f))
@@ -87,15 +89,14 @@ private:
 			{
 				//collider
 				if (node->mMetaData->mKeys[i] == aiString("is_collider")){
-					std::cout << "!!found a collider " << node->mName.data 
-					<< " in a node " << node->mName.data
-					<< " of a scene " << scene->mName.data 
-					<< "\n";
+					// std::cout << "!!found a collider " << node->mName.data 
+					// << " in a node " << node->mName.data
+					// << " of a scene " << scene->mName.data 
+					// << "\n";
 
 					if (node->mNumMeshes != 1) {
 						std::cout << "COLLIDER NODE SHOULD HAVE ONE MESH. Having instead: "
 							<< node->mNumMeshes << "\n";
-						// break;
 					}
 
 					node_is_collider = true;
@@ -103,15 +104,14 @@ private:
 
 				//interactable
 				if (node->mMetaData->mKeys[i] == aiString("is_interactable")){
-					std::cout << "!!found an interactable " << node->mName.data
-					<< " in a node " << node->mName.data
-					<< " of a scene " << scene->mName.data 
-					<< "\n";
+					// std::cout << "!!found an interactable " << node->mName.data
+					// << " in a node " << node->mName.data
+					// << " of a scene " << scene->mName.data 
+					// << "\n";
 
 					if (node->mNumMeshes != 1) {
 						std::cout << "INTERACTABLE NODE SHOULD HAVE ONE MESH. Having instead: "
 							<< node->mNumMeshes << "\n";
-						// break;
 					}
 
 					node_is_interactable = true;

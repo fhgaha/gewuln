@@ -23,7 +23,6 @@ Game::~Game()
 
 void Game::Init()
 {
-    free_look_cam.Position = glm::vec3(-1.0f, 1.0f, 3.0f);
 
     ResourceManager::LoadShader(
         "D:/MyProjects/cpp/gewuln/src/shaders/default/default.vert",
@@ -33,9 +32,9 @@ void Game::Init()
     );
 
     model_renderer = new ModelRenderer(ResourceManager::GetShader("model_shader"));
+    model_renderer->draw_gizmos = true;
 
     {
-        // auto mona_path = "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf_2/mona.gltf";
         auto mona_path = "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf_3_cube_collider/mona.gltf";
         ResourceManager::LoadModel(mona_path, true, "mona");
 
@@ -69,6 +68,15 @@ void Game::Init()
         text_renderer = new TextRenderer(this->Width, this->Height);
         text_renderer->Load("D:/MyProjects/cpp/gewuln/assets/fonts/arial/arial.ttf", 24);
     }
+
+
+    // free_look_cam.Position = glm::vec3(-1.0f, 1.0f, 3.0f);
+    free_look_cam = Camera(
+		glm::vec3(-3.228f, 3.582f, 4.333f),
+		glm::vec3(0.0f, 1.0f, 0.0f),
+        -39.0f,
+        41.0f
+	);
 }
 
 
@@ -84,7 +92,6 @@ void Game::Update(float dt)
 
 void Game::ProcessInput()
 {
-    // cam movement
     // if (Keys[GLFW_KEY_W])
     if (Keys[GLFW_KEY_UP])
         free_look_cam.ProcessKeyboard(FORWARD, dt);
@@ -98,7 +105,7 @@ void Game::ProcessInput()
     if (Keys[GLFW_KEY_RIGHT])
         free_look_cam.ProcessKeyboard(RIGHT, dt);
 
-    // animations
+
     if (active_character) {
         active_character->ProcessInput(Keys, dt);
     }
@@ -117,6 +124,12 @@ void Game::ProcessMouseScroll(float yoffset)
 
 void Game::Render()
 {
+
+    // std::cout << "camera pos " << free_look_cam.Position
+    // << " yaw " << free_look_cam.Yaw
+    // << " pitch " << free_look_cam.Pitch
+    // << "\n";
+
     model_renderer->DrawCharacter(
         active_character,
         free_look_cam,

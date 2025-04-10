@@ -31,6 +31,7 @@ void Mesh::Draw(Shader &shader){
 		else if(name == "texture_specular")
 			number = std::to_string(specularNr++);
 		
+		// in frag shader it is `uniform sampler2D texture_diffuse1`. why here we have `material.` prefix? 
 		shader.SetFloat(("material." + name + number).c_str(), i);
 		glBindTexture(GL_TEXTURE_2D, textures[i].id);
 	}

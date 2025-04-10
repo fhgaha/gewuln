@@ -13,6 +13,8 @@ class ModelRenderer
 {
 
 public:
+	bool	draw_gizmos;
+
 	ModelRenderer(Shader &shader): shader(shader){}
 
 	void DrawCharacter(
@@ -74,6 +76,7 @@ public:
 		
 		
 		//draw collider wireframe
+		if (draw_gizmos && loaded_model.collider_mesh.has_value())
 		{
 			{	//set wireframe settings
 				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -81,7 +84,7 @@ public:
 				shader.SetVector3f("wireframe_color", 1.0f, 0.0f, 0.0f);
 			}
 			
-			loaded_model.collider_mesh.Draw(shader);
+			loaded_model.collider_mesh.value().Draw(shader);
 
 			{	//reset wireframe to textures
 				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -124,6 +127,7 @@ public:
 		}
 		
 		//draw interactable wireframe
+		if (draw_gizmos && loaded_model.interactable_mesh.has_value())
 		{
 			{	//set wireframe settings
 				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -131,7 +135,7 @@ public:
 				shader.SetVector3f("wireframe_color", 0.0f, 1.0f, 1.0f);
 			}
 
-			loaded_model.interactable_mesh.Draw(shader);
+			loaded_model.interactable_mesh.value().Draw(shader);
 
 			{	//reset
 				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);

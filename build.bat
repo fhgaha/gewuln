@@ -11,7 +11,8 @@ set sources=^
 ../includes/gewuln/resource_manager.cpp ^
 ../src/game.cpp ^
 ../includes/gewuln/mesh.cpp ^
-../includes/gewuln/camera.cpp
+../includes/gewuln/camera_look_at.cpp ^
+../includes/gewuln/camera_fly.cpp
 
 pushd build
 

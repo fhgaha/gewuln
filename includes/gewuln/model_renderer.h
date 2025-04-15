@@ -19,7 +19,7 @@ public:
 
 	void DrawCharacter(
 		Character *character,
-		Camera cam,
+		CameraFly cam,
 		float aspect,
 		float rot_deg = 0.0f,
 		glm::vec3 rot_axis = glm::vec3(0.0f, 1.0f, 0.0f),
@@ -39,11 +39,11 @@ public:
 
 	void DrawAnimatedModel(
 		Model& loaded_model,
-		Camera cam, 
+		CameraFly cam,
 		float aspect,
 		Animator *animator,
 		glm::vec3 pos = glm::vec3(0, 0, 0),
-		float rot_deg = 0.0f, 
+		float rot_deg = 0.0f,
 		glm::vec3 rot_axis = glm::vec3(0.0f, 1.0f, 0.0f),
 		glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f)
 	){
@@ -73,8 +73,8 @@ public:
 		for(unsigned int i = 0; i < loaded_model.meshes.size(); i++){
 			loaded_model.meshes[i].Draw(shader);
 		}
-		
-		
+
+
 		//draw collider wireframe
 		if (draw_gizmos && loaded_model.collider_mesh.has_value())
 		{
@@ -83,7 +83,7 @@ public:
 				shader.SetBool("drawing_wireframe", true);
 				shader.SetVector3f("wireframe_color", 1.0f, 0.0f, 0.0f);
 			}
-			
+
 			loaded_model.collider_mesh.value().Draw(shader);
 
 			{	//reset wireframe to textures
@@ -91,16 +91,16 @@ public:
 				shader.SetBool("drawing_wireframe", false);
 			}
 		}
-		
+
 	}
 
 	// not animated model. we ignore finalBonesMatrices here
 	void DrawSimpleModel(
 		Model& loaded_model,
-		Camera cam, 
+		CameraFly cam,
 		float aspect,
 		glm::vec3 pos = glm::vec3(0, 0, 0),
-		float rot_deg = 0.0f, 
+		float rot_deg = 0.0f,
 		glm::vec3 rot_axis = glm::vec3(0.0f, 1.0f, 0.0f),
 		glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f)
 	){
@@ -120,12 +120,12 @@ public:
         model = glm::scale(model, scale);
 
         shader.SetMatrix4("model", model);
-		
+
 
 		for(unsigned int i = 0; i < loaded_model.meshes.size(); i++){
 			loaded_model.meshes[i].Draw(shader);
 		}
-		
+
 		//draw interactable wireframe
 		if (draw_gizmos && loaded_model.interactable_mesh.has_value())
 		{

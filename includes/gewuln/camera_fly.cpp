@@ -1,6 +1,6 @@
-#include <gewuln/camera.h>
+#include <gewuln/camera_fly.h>
 
-Camera::Camera(
+CameraFly::CameraFly(
 	glm::vec3 position,
 	glm::vec3 up,
 	float yaw,
@@ -19,7 +19,7 @@ Zoom(ZOOM)
     updateCameraVectors();
 }
 
-Camera::Camera(
+CameraFly::CameraFly(
     float posX, float posY, float posZ,
     float upX, float upY, float upZ,
     float yaw, float pitch
@@ -32,16 +32,16 @@ Camera::Camera(
     updateCameraVectors();
 }
 
-glm::mat4 Camera::GetViewMatrix()
+glm::mat4 CameraFly::GetViewMatrix()
 {
-    // return glm::lookAt(Position, Position + Front, Up);
+    return glm::lookAt(Position, Position + Front, Up);
 
 
     //TODO temp. move this into separate class
-    return glm::lookAt(Position, target, Up);
+    // return glm::lookAt(Position, target, Up);
 }
 
-void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime)
+void CameraFly::ProcessKeyboard(Camera_Movement direction, float deltaTime)
 {
     float velocity = MovementSpeed * deltaTime;
     if (direction == FORWARD)
@@ -54,7 +54,7 @@ void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime)
         Position += Right * velocity;
 }
 
-void Camera::ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch)
+void CameraFly::ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch)
 {
     xoffset *= MouseSensitivity;
     yoffset *= MouseSensitivity;
@@ -75,7 +75,7 @@ void Camera::ProcessMouseMovement(float xoffset, float yoffset, GLboolean constr
     updateCameraVectors();
 }
 
-void Camera::ProcessMouseScroll(float yoffset)
+void CameraFly::ProcessMouseScroll(float yoffset)
 {
     Zoom -= (float)yoffset;
     if (Zoom < 1.0f)
@@ -84,12 +84,12 @@ void Camera::ProcessMouseScroll(float yoffset)
         Zoom = 45.0f;
 }
 
-void Camera::LookAt(const glm::vec3 *target)
+void CameraFly::LookAt(const glm::vec3 *target)
 {
     this->target = *target;
 }
 
-void Camera::updateCameraVectors()
+void CameraFly::updateCameraVectors()
 {
     // calculate the new Front vector
     glm::vec3 front;

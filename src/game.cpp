@@ -67,36 +67,37 @@ void Game::Init()
 
 
     // free_look_cam.Position = glm::vec3(-1.0f, 1.0f, 3.0f);
-    free_look_camera = Camera(
+    free_look_camera = CameraFly(
 		glm::vec3(-3.228f, 3.582f, 4.333f),
 		glm::vec3(0.0f, 1.0f, 0.0f),
         -39.0f,
         41.0f
 	);
-    
-    look_at_camera_corridor = Camera(
+
+    look_at_camera_corridor = CameraLookAt(
 		glm::vec3(-3.228f, 3.582f, 4.333f),
 		glm::vec3(0.0f, 1.0f, 0.0f),
         -39.0f,
         41.0f
 	);
-    
-    look_at_camera_kitchen_start = Camera(
+
+    look_at_camera_kitchen_start = CameraLookAt(
 		glm::vec3(1.367f,    2.045f,    3.924f),
 		glm::vec3(0.0f, 1.0f, 0.0f),
         -86.3601f,
         16.0f
 	);
-    
-    look_at_camera_kitchen_end = Camera(
+
+    look_at_camera_kitchen_end = CameraLookAt(
 		glm::vec3(0.673f, 2.138f, 4.030f),
 		glm::vec3(0.0f, 1.0f, 0.0f),
         -263.88f,
         19.7599f
 	);
-    
-    
-    active_cam = &look_at_camera_corridor;
+
+
+    // active_cam = &look_at_camera_corridor;
+    active_cam = &free_look_camera;
 }
 
 
@@ -106,29 +107,29 @@ void Game::Update(float dt)
 
     if (active_character) {
         active_character->Update(dt);
-    
+
         //tmp
         glm::vec3 trg = active_character->position + glm::vec3(0.0f, 1.5f, 0.0f);
         active_cam->LookAt(&trg);
     }
-    
+
 }
 
 
 void Game::ProcessInput()
 {
-    // // if (Keys[GLFW_KEY_W])
-    // if (Keys[GLFW_KEY_UP])
-    //     active_cam->ProcessKeyboard(FORWARD, dt);
-    // // if (Keys[GLFW_KEY_S])
-    // if (Keys[GLFW_KEY_DOWN])
-    //     active_cam->ProcessKeyboard(BACKWARD, dt);
-    // // if (Keys[GLFW_KEY_A])
-    // if (Keys[GLFW_KEY_LEFT])
-    //     active_cam->ProcessKeyboard(LEFT, dt);
-    // // if (Keys[GLFW_KEY_D])
-    // if (Keys[GLFW_KEY_RIGHT])
-    //     active_cam->ProcessKeyboard(RIGHT, dt);
+    // if (Keys[GLFW_KEY_W])
+    if (Keys[GLFW_KEY_UP])
+        active_cam->ProcessKeyboard(FORWARD, dt);
+    // if (Keys[GLFW_KEY_S])
+    if (Keys[GLFW_KEY_DOWN])
+        active_cam->ProcessKeyboard(BACKWARD, dt);
+    // if (Keys[GLFW_KEY_A])
+    if (Keys[GLFW_KEY_LEFT])
+        active_cam->ProcessKeyboard(LEFT, dt);
+    // if (Keys[GLFW_KEY_D])
+    if (Keys[GLFW_KEY_RIGHT])
+        active_cam->ProcessKeyboard(RIGHT, dt);
 
 
     if (active_character) {
@@ -139,12 +140,12 @@ void Game::ProcessInput()
 
 void Game::ProcessMouseMovement(float xoffset, float yoffset)
 {
-    // active_cam->ProcessMouseMovement(xoffset, yoffset);
+    active_cam->ProcessMouseMovement(xoffset, yoffset);
 }
 
 void Game::ProcessMouseScroll(float yoffset)
 {
-    // active_cam->ProcessMouseScroll(yoffset);
+    active_cam->ProcessMouseScroll(yoffset);
 }
 
 void Game::Render()
@@ -191,11 +192,11 @@ void Game::Render()
 void Game::PlayCameraThing()
 {
     //TODO camera is still targeting mona so it snips to her immidiatelly
-    active_cam = &look_at_camera_kitchen_start;
-    
+    // active_cam = &look_at_camera_kitchen_start;
+
     // start cam movement
     // final kitchen cam state: pos [    0.673,    2.138,    4.030] yaw -169.84 pitch 22.1999 zoom 35.8083
-    
+
     show_granny_text = true;
-    
+
 }

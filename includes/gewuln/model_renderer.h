@@ -13,11 +13,13 @@ class ModelRenderer
 {
 
 public:
+	bool	draw_gizmos;
+
 	ModelRenderer(Shader &shader): shader(shader){}
 
 	void DrawCharacter(
 		Character *character,
-		Camera cam,
+		Camera *cam,
 		float aspect,
 		float rot_deg = 0.0f,
 		glm::vec3 rot_axis = glm::vec3(0.0f, 1.0f, 0.0f),
@@ -37,10 +39,12 @@ public:
 
 	void DrawAnimatedModel(
 		Model& loaded_model,
-		Camera cam, float aspect,
+		Camera *cam,
+		float aspect,
 		Animator *animator,
 		glm::vec3 pos = glm::vec3(0, 0, 0),
-		float rot_deg = 0.0f, glm::vec3 rot_axis = glm::vec3(0.0f, 1.0f, 0.0f),
+		float rot_deg = 0.0f,
+		glm::vec3 rot_axis = glm::vec3(0.0f, 1.0f, 0.0f),
 		glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f)
 	){
         shader.Use();
@@ -48,13 +52,16 @@ public:
         // scale -> rotate -> translate. with matrises multiplications it should be reversed. model mat is doing that.
         // Vclip = Mprojection * Mview * Mmodel * Vlocal
 
-        glm::mat4 projection = glm::perspective(glm::radians(cam.Zoom), aspect, 0.1f, 100.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(cam->Zoom), aspect, 0.1f, 100.0f);
         shader.SetMatrix4("projection", projection);
 
-		glm::mat4 view = cam.GetViewMatrix();
+		glm::mat4 view = cam->GetViewMatrix();
         shader.SetMatrix4("view", view);
 
-        set_bone_matrices(animator);
+		auto transforms = animator->GetFinalBoneMatrices();
+        for (int i = 0; i < transforms.size(); ++i) {
+            shader.SetMatrix4(("finalBonesMatrices[" + std::to_string(i) + "]").c_str(), transforms[i]);
+        }
 
         glm::mat4 model(1.0f);
         model = glm::translate(model, pos);
@@ -62,26 +69,47 @@ public:
         model = glm::scale(model, scale);
         shader.SetMatrix4("model", model);
 
-
+		// for meshes Draw() calls are frag shader calls
 		for(unsigned int i = 0; i < loaded_model.meshes.size(); i++){
 			loaded_model.meshes[i].Draw(shader);
 		}
+
+
+		//draw collider wireframe
+		if (draw_gizmos && loaded_model.collider_mesh.has_value())
+		{
+			{	//set wireframe settings
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+				shader.SetBool("drawing_wireframe", true);
+				shader.SetVector3f("wireframe_color", 1.0f, 0.0f, 0.0f);
+			}
+
+			loaded_model.collider_mesh.value().Draw(shader);
+
+			{	//reset wireframe to textures
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+				shader.SetBool("drawing_wireframe", false);
+			}
+		}
+
 	}
 
 	// not animated model. we ignore finalBonesMatrices here
 	void DrawSimpleModel(
-		Model& loaded_model,
-		Camera cam, float aspect,
+		Model &loaded_model,
+		Camera *cam,
+		float aspect,
 		glm::vec3 pos = glm::vec3(0, 0, 0),
-		float rot_deg = 0.0f, glm::vec3 rot_axis = glm::vec3(0.0f, 1.0f, 0.0f),
+		float rot_deg = 0.0f,
+		glm::vec3 rot_axis = glm::vec3(0.0f, 1.0f, 0.0f),
 		glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f)
 	){
         shader.Use();
 
-        glm::mat4 projection = glm::perspective(glm::radians(cam.Zoom), aspect, 0.1f, 100.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(cam->Zoom), aspect, 0.1f, 100.0f);
         shader.SetMatrix4("projection", projection);
 
-        glm::mat4 view = cam.GetViewMatrix();
+        glm::mat4 view = cam->GetViewMatrix();
         shader.SetMatrix4("view", view);
 
 	 	// we dont call set_bone_matrices here
@@ -97,18 +125,27 @@ public:
 		for(unsigned int i = 0; i < loaded_model.meshes.size(); i++){
 			loaded_model.meshes[i].Draw(shader);
 		}
+
+		//draw interactable wireframe
+		if (draw_gizmos && loaded_model.interactable_mesh.has_value())
+		{
+			{	//set wireframe settings
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+				shader.SetBool("drawing_wireframe", true);
+				shader.SetVector3f("wireframe_color", 0.0f, 1.0f, 1.0f);
+			}
+
+			loaded_model.interactable_mesh.value().Draw(shader);
+
+			{	//reset
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+				shader.SetBool("drawing_wireframe", false);
+			}
+		}
 	}
 
 private:
 	Shader &shader;
-
-	void set_bone_matrices(Animator *animator) {
-        auto transforms = animator->GetFinalBoneMatrices();
-        for (int i = 0; i < transforms.size(); ++i) {
-            auto name = "finalBonesMatrices[" + std::to_string(i) + "]";
-            shader.SetMatrix4(name.c_str(), transforms[i]);
-        }
-	}
 };
 
 #endif

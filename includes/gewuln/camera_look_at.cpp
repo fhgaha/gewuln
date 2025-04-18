@@ -19,42 +19,17 @@ Camera(
 
 glm::mat4 CameraLookAt::GetViewMatrix()
 {
-    return glm::lookAt(Position, target, Up);
-}
-
-void CameraLookAt::ProcessKeyboard(Camera_Movement direction, float deltaTime)
-{
-    float velocity = MovementSpeed * deltaTime;
-    if (direction == FORWARD)
-        Position += Front * velocity;
-    if (direction == BACKWARD)
-        Position -= Front * velocity;
-    if (direction == LEFT)
-        Position -= Right * velocity;
-    if (direction == RIGHT)
-        Position += Right * velocity;
-}
-
-void CameraLookAt::ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch)
-{
-    xoffset *= MouseSensitivity;
-    yoffset *= MouseSensitivity;
-
-    Yaw   += xoffset;
-    Pitch += yoffset;
-
-    // make sure that when pitch is out of bounds, screen doesn't get flipped
-    if (constrainPitch)
-    {
-        if (Pitch > 89.0f)
-            Pitch = 89.0f;
-        if (Pitch < -89.0f)
-            Pitch = -89.0f;
-    }
-
-    // update Front, Right and Up Vectors using the updated Euler angles
     updateCameraVectors();
+    return glm::lookAt(Position, target, WorldUp);  //using WorldUp prevents camera rotation
+
+    // return glm::lookAt(Position, target, up);    //if you need rotation around local Oz (i.e. roll) use this
 }
+
+// no need this in case of camera look at
+void CameraLookAt::ProcessKeyboard(Camera_Movement direction, float deltaTime){}
+
+// no need this in case of camera look at
+void CameraLookAt::ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch){}
 
 void CameraLookAt::ProcessMouseScroll(float yoffset)
 {

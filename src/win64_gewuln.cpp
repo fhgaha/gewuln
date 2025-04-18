@@ -6,18 +6,23 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <gewuln/shader.h>
-#include <gewuln/camera.h>
-#include <gewuln/model.h>
-
 #include <iostream>
-#include <gewuln/animation.h>
-#include <gewuln/animator.h>
+#include "game.h"
+
+// Use NVIDIA Gpu for NVIDIA Optimus laptops/GPUs
+extern "C" {
+    __declspec(dllexport) unsigned long NvOptimusEnablement = 0x00000001;
+}
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow* window);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
+void APIENTRY glDebugOutput(
+    GLenum source, GLenum type, unsigned int id,
+    GLenum severity, GLsizei length,
+    const char *message, const void *userParam
+);
 
 GLenum glCheckError_(const char *file, int line);
 #define glCheckError() glCheckError_(__FILE__, __LINE__)
@@ -26,7 +31,7 @@ GLenum glCheckError_(const char *file, int line);
 const unsigned int SCR_WIDTH  = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+const bool debug = true;
 
 bool firstMouse = true;
 float lastX = SCR_WIDTH/2.0f, lastY = SCR_HEIGHT/2.0f;
@@ -35,31 +40,40 @@ float lastX = SCR_WIDTH/2.0f, lastY = SCR_HEIGHT/2.0f;
 float deltaTime = 0.0f; // Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
 
-Animator mona_animator;
+Game game(SCR_WIDTH, SCR_HEIGHT);
 
 int main()
 {
     std::cout << "Started main program" << std::endl;
-    
+
     // glfw: initialize and configure
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    // hints should be configured before we create a window:
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    if (debug) {
+        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
+    }
 
     // glfw window creation
     GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "gewuln", NULL, NULL);
-    if (window == NULL)
+    if (!window)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return -1;
     }
     glfwMakeContextCurrent(window);
+
+    // callbacks
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetKeyCallback(window, key_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
+
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    // glfwSetWindowAspectRatio(window, 4, 3);
     glfwSwapInterval(1);    //limits FPS to monitor's refresh rate
 
     // glad: load all OpenGL function pointers
@@ -68,74 +82,58 @@ int main()
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
+
+    if (debug) {
+        int flags; glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+        if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
+        {
+            std::cout << "Successfully initialized Open GL debug context\n";
+            glEnable(GL_DEBUG_OUTPUT);
+            glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+            glDebugMessageCallback(glDebugOutput, nullptr);
+            glDebugMessageControl(
+                  GL_DEBUG_SOURCE_API
+                , GL_DEBUG_TYPE_ERROR
+                , GL_DEBUG_SEVERITY_HIGH
+                , 0, nullptr, GL_TRUE
+            );
+        }
+    }
+
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // wireframe
     glEnable(GL_DEPTH_TEST);
-    
+    glEnable(GL_CULL_FACE); // draw faces of front sides only
+
     { // process alpha channel of textures
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
     // stbi_set_flip_vertically_on_load(true);
-    
-    Shader ourShader("src/shaders/tex/vertex.vert", "src/shaders/tex/fragment.frag");
 
-    // animations
-    auto mona_path = 
-        "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf/mona.gltf";
-        // "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/dae/mona.dae";
-        // "D:/MyProjects/cpp/gewuln/assets/models/vampire/dancing_vampire.dae";
-    Model mona(mona_path);
-    mona_animator = Animator(mona_path, &mona);
-    
-    Model room("D:/MyProjects/cpp/gewuln/assets/models/room/gltf/room.gltf");
-    
+
+    game.Init();
+
     // render loop
     while (!glfwWindowShouldClose(window))
     {
         float currentFrame = static_cast<float>(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-        
-        // input
-        processInput(window);
-        mona_animator.UpdateAnimation(deltaTime);
+
+        game.Update(deltaTime);
+        game.ProcessInput();
 
         // render
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(
-              GL_COLOR_BUFFER_BIT 
+              GL_COLOR_BUFFER_BIT
             | GL_DEPTH_BUFFER_BIT
         );
+        game.Render();
 
-        ourShader.use();
 
-        // scale -> rotate -> translate. with matrises multiplications it should be reversed. model mat is doing that.
-        // Vclip = Mprojection * Mview * Mmodel * Vlocal
-        
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH/(float)SCR_HEIGHT, 0.1f, 100.0f);
-        ourShader.setMat4("projection", projection);
-        
-        glm::mat4 view = camera.GetViewMatrix();
-        ourShader.setMat4("view", view);
-
-        // animation stuff
-        auto transforms = mona_animator.GetFinalBoneMatrices();
-        for (int i = 0; i < transforms.size(); ++i) {
-            ourShader.setMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
-        }
-        
-        glm::mat4 model(1.0f);
-        model = glm::translate(model, glm::vec3(0, 0, 0));
-        // model = glm::rotate(model, (float)glfwGetTime() *  glm::radians(20.0f), glm::vec3(1.0f, 0.3f, 0.5f));
-        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-
-        ourShader.setMat4("model", model);
-        
-        mona.Draw(ourShader);
-        room.Draw(ourShader);
- 
-        glCheckError();
+        // glCheckError();
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
@@ -144,57 +142,38 @@ int main()
     return 0;
 }
 
-void processInput(GLFWwindow *window)
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
+    }
 
-    // cam movement    
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.ProcessKeyboard(FORWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.ProcessKeyboard(BACKWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.ProcessKeyboard(LEFT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.ProcessKeyboard(RIGHT, deltaTime);
-    
-    // animations
-    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-        mona_animator.PlayAnimation("idle");
-    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-        mona_animator.PlayAnimation("walk");
-    if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
-        mona_animator.PlayAnimation("interact");
+    if (!(key >= 0 && key < 1024)) {
+        return;
+    }
+
+    switch (action)
+    {
+		// https://www.glfw.org/docs/3.3/input_guide.html
+        case GLFW_PRESS:
+            game.Keys[key] = true;
+            break;
+        case GLFW_RELEASE:
+            game.Keys[key] = false;
+            // game.KeysProcessed[key] = false;
+            break;
+        default:
+            break;
+    }
+
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-    // make sure the viewport matches the new window dimensions; note that width and 
+    // make sure the viewport matches the new window dimensions; note that width and
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
-}
-
-GLenum glCheckError_(const char *file, int line)
-{
-    GLenum errorCode;
-    while ((errorCode = glGetError()) != GL_NO_ERROR)
-    {
-        std::string error;
-        switch (errorCode)
-        {
-            case GL_INVALID_ENUM:         error = "INVALID_ENUM"; break;
-            case GL_INVALID_VALUE:        error = "INVALID_VALUE"; break;
-            case GL_INVALID_OPERATION:    error = "INVALID_OPERATION"; break;
-            // case GL_STACK_OVERFLOW:    error = "STACK_OVERFLOW"; break;  //not working
-            // case GL_STACK_UNDERFLOW:   error = "STACK_UNDERFLOW"; break; //not working
-            case GL_OUT_OF_MEMORY:        error = "OUT_OF_MEMORY"; break;
-            case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
-        }
-        std::cout << "--!!--" << error << " | " << file << " (" << line << ")" << std::endl;
-    }
-    return errorCode;
 }
 
 void mouse_callback(GLFWwindow * window, double xpos, double ypos)
@@ -205,20 +184,88 @@ void mouse_callback(GLFWwindow * window, double xpos, double ypos)
         lastY = ypos;
         firstMouse = false;
     }
-    
+
     float xoffset = xpos - lastX;
     float yoffset = ypos - lastY;
     lastX = xpos;
     lastY = ypos;
-    
+
     float sensitivity = 0.1f;
     xoffset *= sensitivity;
     yoffset *= sensitivity;
-    
-    camera.ProcessMouseMovement(xoffset, yoffset);
+
+    game.ProcessMouseMovement(xoffset, yoffset);
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    camera.ProcessMouseScroll(static_cast<float>(yoffset));
+    game.ProcessMouseScroll(static_cast<float>(yoffset));
+}
+
+
+// GLenum glCheckError_(const char *file, int line)
+// {
+    // GLenum errorCode;
+    // while ((errorCode = glGetError()) != GL_NO_ERROR)
+    // {
+    //     std::string error;
+    //     switch (errorCode)
+    //     {
+    //         case GL_INVALID_ENUM:         error = "INVALID_ENUM"; break;
+    //         case GL_INVALID_VALUE:        error = "INVALID_VALUE"; break;
+    //         case GL_INVALID_OPERATION:    error = "INVALID_OPERATION"; break;
+    //         // case GL_STACK_OVERFLOW:    error = "STACK_OVERFLOW"; break;  //not working
+    //         // case GL_STACK_UNDERFLOW:   error = "STACK_UNDERFLOW"; break; //not working
+    //         case GL_OUT_OF_MEMORY:        error = "OUT_OF_MEMORY"; break;
+    //         case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
+    //     }
+    //     std::cout << "--!!--" << error << " | " << file << " (" << line << ")" << std::endl;
+    // }
+//     return errorCode;
+// }
+
+void APIENTRY glDebugOutput(
+    GLenum source,
+    GLenum type,
+    unsigned int id,
+    GLenum severity,
+    GLsizei length,
+    const char *message,
+    const void *userParam
+){
+    // ignore non-significant error/warning codes
+    if(id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
+    std::cout << "---------------" << std::endl;
+    std::cout << "Debug message (" << id << "): " << message << std::endl;
+    switch (source)
+    {
+        case GL_DEBUG_SOURCE_API:               std::cout << "Source: API"; break;
+        case GL_DEBUG_SOURCE_WINDOW_SYSTEM:     std::cout << "Source: Window System"; break;
+        case GL_DEBUG_SOURCE_SHADER_COMPILER:   std::cout << "Source: Shader Compiler"; break;
+        case GL_DEBUG_SOURCE_THIRD_PARTY:       std::cout << "Source: Third Party"; break;
+        case GL_DEBUG_SOURCE_APPLICATION:       std::cout << "Source: Application"; break;
+        case GL_DEBUG_SOURCE_OTHER:             std::cout << "Source: Other"; break;
+    } std::cout << std::endl;
+
+    switch (type)
+    {
+        case GL_DEBUG_TYPE_ERROR:               std::cout << "Type: Error"; break;
+        case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: std::cout << "Type: Deprecated Behaviour"; break;
+        case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  std::cout << "Type: Undefined Behaviour"; break;
+        case GL_DEBUG_TYPE_PORTABILITY:         std::cout << "Type: Portability"; break;
+        case GL_DEBUG_TYPE_PERFORMANCE:         std::cout << "Type: Performance"; break;
+        case GL_DEBUG_TYPE_MARKER:              std::cout << "Type: Marker"; break;
+        case GL_DEBUG_TYPE_PUSH_GROUP:          std::cout << "Type: Push Group"; break;
+        case GL_DEBUG_TYPE_POP_GROUP:           std::cout << "Type: Pop Group"; break;
+        case GL_DEBUG_TYPE_OTHER:               std::cout << "Type: Other"; break;
+    } std::cout << std::endl;
+
+    switch (severity)
+    {
+        case GL_DEBUG_SEVERITY_HIGH:            std::cout << "Severity: high"; break;
+        case GL_DEBUG_SEVERITY_MEDIUM:          std::cout << "Severity: medium"; break;
+        case GL_DEBUG_SEVERITY_LOW:             std::cout << "Severity: low"; break;
+        case GL_DEBUG_SEVERITY_NOTIFICATION:    std::cout << "Severity: notification"; break;
+    } std::cout << std::endl;
+    std::cout << std::endl;
 }

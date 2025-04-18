@@ -8,6 +8,8 @@
 #include <gewuln/animation.h>
 #include <gewuln/bone.h>
 
+const unsigned int MAX_BONES_AMOUNT = 100;
+
 class Animator
 {
 public:
@@ -15,7 +17,7 @@ public:
 	
 	Animator(){};
 	
-	Animator(const std::string& animationPath, Model* model): animations()
+	Animator(const std::string &animationPath, Model &model): animations()
 	{
 		Assimp::Importer importer;
 		const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate);
@@ -23,25 +25,24 @@ public:
 		// if (!scene->mAnimations || scene->mNumAnimations == 0) {
 		if (!scene->HasAnimations()) {
 			std::cerr << "ERROR: No animations found in file: " << animationPath << std::endl;
-			return;	//??
-    	} else {
+			return;
+    	} 
 			
-			// import animations
-			for (unsigned int i = 0; i < scene->mNumAnimations; i++)
-			{
-				auto anim_name = scene->mAnimations[i]->mName.C_Str();
-				auto animation = Animation(scene->mAnimations[i], scene, model);
-				animations[anim_name] = animation;
-			}
-			
-			m_CurrentTime = 0.0;
-			m_CurrentAnimation = &animations["idle"];
+		// import animations
+		for (unsigned int i = 0; i < scene->mNumAnimations; i++)
+		{
+			auto anim_name = scene->mAnimations[i]->mName.C_Str();
+			auto animation = Animation(scene->mAnimations[i], scene, &model);
+			animations[anim_name] = animation;
+		}
+		
+		currentTime = 0.0;
+		currentAnimation = &animations["idle"];
 
-			m_FinalBoneMatrices.reserve(100);
+		finalBoneMatrices.reserve(MAX_BONES_AMOUNT);
 
-			for (int i = 0; i < 100; i++)
-				m_FinalBoneMatrices.push_back(glm::mat4(1.0f));
-			
+		for (int i = 0; i < 100; i++){
+			finalBoneMatrices.push_back(glm::mat4(1.0f));
 		}
 	}
 
@@ -49,12 +50,12 @@ public:
 	{
 		if (!check_has_animations()) return;
 		
-		m_DeltaTime = dt;
-		if (m_CurrentAnimation)
+		deltaTime = dt;
+		if (currentAnimation)
 		{
-			m_CurrentTime += m_CurrentAnimation->GetTicksPerSecond() * dt;
-			m_CurrentTime = fmod(m_CurrentTime, m_CurrentAnimation->GetDuration());
-			CalculateBoneTransform(&m_CurrentAnimation->GetRootNode(), glm::mat4(1.0f));
+			currentTime += currentAnimation->GetTicksPerSecond() * dt;
+			currentTime = fmod(currentTime, currentAnimation->GetDuration());
+			CalculateBoneTransform(&currentAnimation->GetRootNode(), glm::mat4(1.0f));
 		}
 	}
 	
@@ -71,12 +72,12 @@ public:
 			return;
 		}
 		
-		if (m_CurrentAnimation == try_play) {
+		if (currentAnimation == try_play) {
 			return;
 		}
 		
-		m_CurrentAnimation = try_play;
-		m_CurrentTime = 0.0f;
+		currentAnimation = try_play;
+		currentTime = 0.0f;
 	}
 
 	void CalculateBoneTransform(const AssimpNodeData* node, glm::mat4 parentTransform)
@@ -84,35 +85,35 @@ public:
 		std::string nodeName = node->name;
 		glm::mat4 nodeTransform = node->transformation;
 
-		Bone* Bone = m_CurrentAnimation->FindBone(nodeName);
+		Bone* Bone = currentAnimation->FindBone(nodeName);
 
 		if (Bone)
 		{
-			Bone->Update(m_CurrentTime);
+			Bone->Update(currentTime);
 			nodeTransform = Bone->GetLocalTransform();
 		}
 
 		glm::mat4 globalTransformation = parentTransform * nodeTransform;
 
-		auto boneInfoMap = m_CurrentAnimation->GetBoneIDMap();
+		auto boneInfoMap = currentAnimation->GetBoneIDMap();
 		if (boneInfoMap.find(nodeName) != boneInfoMap.end())
 		{
 			int index = boneInfoMap[nodeName].id;
 			glm::mat4 offset = boneInfoMap[nodeName].offset;
-			m_FinalBoneMatrices[index] = globalTransformation * offset;
+			finalBoneMatrices[index] = globalTransformation * offset;
 		}
 
 		for (int i = 0; i < node->childrenCount; i++)
 			CalculateBoneTransform(&node->children[i], globalTransformation);
 	}
 
-	std::vector<glm::mat4> GetFinalBoneMatrices() { return m_FinalBoneMatrices;	}
+	std::vector<glm::mat4> GetFinalBoneMatrices() { return finalBoneMatrices;	}
 
 private:
-	std::vector<glm::mat4> m_FinalBoneMatrices;
-	Animation* m_CurrentAnimation;
-	float m_CurrentTime;
-	float m_DeltaTime;
+	std::vector<glm::mat4> finalBoneMatrices;
+	Animation* currentAnimation;
+	float currentTime;
+	float deltaTime;
 	
 	bool check_has_animations() {
 		if (animations.empty()) {

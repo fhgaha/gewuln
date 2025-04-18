@@ -159,13 +159,13 @@ void Game::Render()
 
     model_renderer->DrawCharacter(
         active_character,
-        *active_cam,
+        active_cam,
         (float)Width/(float)Height
     );
 
     model_renderer->DrawSimpleModel(
         ResourceManager::GetModel("room"),
-        *active_cam,
+        active_cam,
         (float)Width/(float)Height
     );
 

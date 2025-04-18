@@ -19,7 +19,7 @@ public:
 
 	void DrawCharacter(
 		Character *character,
-		CameraFly cam,
+		Camera *cam,
 		float aspect,
 		float rot_deg = 0.0f,
 		glm::vec3 rot_axis = glm::vec3(0.0f, 1.0f, 0.0f),
@@ -39,7 +39,7 @@ public:
 
 	void DrawAnimatedModel(
 		Model& loaded_model,
-		CameraFly cam,
+		Camera *cam,
 		float aspect,
 		Animator *animator,
 		glm::vec3 pos = glm::vec3(0, 0, 0),
@@ -52,10 +52,10 @@ public:
         // scale -> rotate -> translate. with matrises multiplications it should be reversed. model mat is doing that.
         // Vclip = Mprojection * Mview * Mmodel * Vlocal
 
-        glm::mat4 projection = glm::perspective(glm::radians(cam.Zoom), aspect, 0.1f, 100.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(cam->Zoom), aspect, 0.1f, 100.0f);
         shader.SetMatrix4("projection", projection);
 
-		glm::mat4 view = cam.GetViewMatrix();
+		glm::mat4 view = cam->GetViewMatrix();
         shader.SetMatrix4("view", view);
 
 		auto transforms = animator->GetFinalBoneMatrices();
@@ -96,8 +96,8 @@ public:
 
 	// not animated model. we ignore finalBonesMatrices here
 	void DrawSimpleModel(
-		Model& loaded_model,
-		CameraFly cam,
+		Model &loaded_model,
+		Camera *cam,
 		float aspect,
 		glm::vec3 pos = glm::vec3(0, 0, 0),
 		float rot_deg = 0.0f,
@@ -106,10 +106,10 @@ public:
 	){
         shader.Use();
 
-        glm::mat4 projection = glm::perspective(glm::radians(cam.Zoom), aspect, 0.1f, 100.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(cam->Zoom), aspect, 0.1f, 100.0f);
         shader.SetMatrix4("projection", projection);
 
-        glm::mat4 view = cam.GetViewMatrix();
+        glm::mat4 view = cam->GetViewMatrix();
         shader.SetMatrix4("view", view);
 
 	 	// we dont call set_bone_matrices here

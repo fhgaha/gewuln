@@ -27,11 +27,12 @@ public:
     unsigned int            Width, Height;
     float                   dt;
 
+    //cameras
     CameraFly               free_look_camera;
     CameraLookAt            look_at_camera_corridor;
     CameraLookAt            look_at_camera_kitchen_start;
     CameraLookAt            look_at_camera_kitchen_end;
-    CameraFly            *active_cam;
+    Camera                  *active_cam;
 
 
     // constructor/destructor

@@ -1,44 +1,26 @@
 #include <gewuln/camera_fly.h>
 
+
 CameraFly::CameraFly(
 	glm::vec3 position,
 	glm::vec3 up,
 	float yaw,
 	float pitch,
     float zoom
-):
-Front(glm::vec3(0.0f, 0.0f, -1.0f)),
-MovementSpeed(SPEED),
-MouseSensitivity(SENSITIVITY),
-Zoom(ZOOM)
+): Camera(
+	position,
+	up,
+	yaw,
+	pitch,
+    zoom
+)
 {
-	Position = position;
-    WorldUp = up;
-    Yaw = yaw;
-    Pitch = pitch;
-    updateCameraVectors();
-}
-
-CameraFly::CameraFly(
-    float posX, float posY, float posZ,
-    float upX, float upY, float upZ,
-    float yaw, float pitch
-): Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
-{
-    Position = glm::vec3(posX, posY, posZ);
-    WorldUp = glm::vec3(upX, upY, upZ);
-    Yaw = yaw;
-    Pitch = pitch;
     updateCameraVectors();
 }
 
 glm::mat4 CameraFly::GetViewMatrix()
 {
     return glm::lookAt(Position, Position + Front, Up);
-
-
-    //TODO temp. move this into separate class
-    // return glm::lookAt(Position, target, Up);
 }
 
 void CameraFly::ProcessKeyboard(Camera_Movement direction, float deltaTime)
@@ -86,7 +68,6 @@ void CameraFly::ProcessMouseScroll(float yoffset)
 
 void CameraFly::LookAt(const glm::vec3 *target)
 {
-    this->target = *target;
 }
 
 void CameraFly::updateCameraVectors()

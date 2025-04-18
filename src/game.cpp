@@ -13,9 +13,16 @@ Character                                   *active_character;
 
 bool                                        show_granny_text;
 
+//cameras
+CameraFly               free_look_camera = CameraFly(glm::vec3(0.0f, 0.0f, 3.0f));
+CameraLookAt            look_at_camera_corridor;
+CameraLookAt            look_at_camera_kitchen_start;
+CameraLookAt            look_at_camera_kitchen_end;
+Camera                  *active_cam;
+
 
 Game::Game(unsigned int width, unsigned int height)
-: State(GAME_ACTIVE), Keys(), Width(width), Height(height), free_look_camera(glm::vec3(0.0f, 0.0f, 3.0f)){}
+: State(GAME_ACTIVE), Keys(), Width(width), Height(height)/*, free_look_camera(glm::vec3(0.0f, 0.0f, 3.0f))*/{}
 
 Game::~Game()
 {
@@ -34,7 +41,7 @@ void Game::Init()
     );
 
     model_renderer = new ModelRenderer(ResourceManager::GetShader("model_shader"));
-    model_renderer->draw_gizmos = false;
+    model_renderer->draw_gizmos = true;
 
     {
         auto mona_path = "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf_3_cube_collider/mona.gltf";
@@ -96,8 +103,8 @@ void Game::Init()
 	);
 
 
-    // active_cam = &look_at_camera_corridor;
-    active_cam = &free_look_camera;
+    active_cam = &look_at_camera_corridor;
+    // active_cam = &free_look_camera;
 }
 
 
@@ -192,7 +199,7 @@ void Game::Render()
 void Game::PlayCameraThing()
 {
     //TODO camera is still targeting mona so it snips to her immidiatelly
-    // active_cam = &look_at_camera_kitchen_start;
+    active_cam = &look_at_camera_kitchen_start;
 
     // start cam movement
     // final kitchen cam state: pos [    0.673,    2.138,    4.030] yaw -169.84 pitch 22.1999 zoom 35.8083

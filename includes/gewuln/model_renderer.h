@@ -48,7 +48,7 @@ public:
 		glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f)
 	){
         shader.Use();
-
+        
         // scale -> rotate -> translate. with matrises multiplications it should be reversed. model mat is doing that.
         // Vclip = Mprojection * Mview * Mmodel * Vlocal
 

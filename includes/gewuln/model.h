@@ -35,7 +35,7 @@ class Model
 public:
 	glm::vec3			position;
 	std::vector<Mesh>	meshes;
-	std::optional<Mesh>	collider_mesh;	
+	std::optional<Mesh>	collider_mesh;
 	std::optional<Mesh>	interactable_mesh;
 
 	Model() {}
@@ -89,9 +89,9 @@ private:
 			{
 				//collider
 				if (node->mMetaData->mKeys[i] == aiString("is_collider")){
-					// std::cout << "!!found a collider " << node->mName.data 
+					// std::cout << "!!found a collider " << node->mName.data
 					// << " in a node " << node->mName.data
-					// << " of a scene " << scene->mName.data 
+					// << " of a scene " << scene->mName.data
 					// << "\n";
 
 					if (node->mNumMeshes != 1) {
@@ -106,7 +106,7 @@ private:
 				if (node->mMetaData->mKeys[i] == aiString("is_interactable")){
 					// std::cout << "!!found an interactable " << node->mName.data
 					// << " in a node " << node->mName.data
-					// << " of a scene " << scene->mName.data 
+					// << " of a scene " << scene->mName.data
 					// << "\n";
 
 					if (node->mNumMeshes != 1) {
@@ -123,7 +123,7 @@ private:
 		for(unsigned int i = 0; i < node->mNumMeshes; i++)
 		{
 			aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-			
+
 			if (node_is_collider) {
 				collider_mesh = processMesh(mesh, scene, false);
 				node_is_collider = false;
@@ -194,7 +194,7 @@ private:
 			std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
 			textures.insert(textures.end(), specularMaps.begin(),	specularMaps.end());
 		}
-		
+
 		ExtractBoneWeightForVertices(vertices, mesh, scene);
 
 		return Mesh(vertices, indices, textures, animated);
@@ -330,8 +330,14 @@ inline unsigned int TextureFromFile(const char *path, const std::string &directo
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		//filtered
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		// unfiltered
+		// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
         stbi_image_free(data);
     }

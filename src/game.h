@@ -5,8 +5,8 @@
 #include <GLFW/glfw3.h>
 
 #include <gewuln/resource_manager.h>
-#include <gewuln/camera_look_at.h>
-#include <gewuln/camera_fly.h>
+#include <gewuln/camera/camera_look_at.h>
+#include <gewuln/camera/camera_fly.h>
 
 // Represents the current state of the game
 enum GameState {

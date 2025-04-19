@@ -9,10 +9,10 @@ set sources=^
 ../includes/gewuln/texture.cpp ^
 ../includes/gewuln/shader.cpp ^
 ../includes/gewuln/resource_manager.cpp ^
-../src/game.cpp ^
 ../includes/gewuln/mesh.cpp ^
-../includes/gewuln/camera_look_at.cpp ^
-../includes/gewuln/camera_fly.cpp
+../src/game.cpp ^
+../src/camera/camera_look_at.cpp ^
+../src/camera/camera_fly.cpp
 
 pushd build
 

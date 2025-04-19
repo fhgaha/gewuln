@@ -1,4 +1,4 @@
-#include <gewuln/camera_look_at.h>
+#include <gewuln/camera/camera_look_at.h>
 
 CameraLookAt::CameraLookAt(
 	glm::vec3 position,
@@ -19,7 +19,6 @@ Camera(
 
 glm::mat4 CameraLookAt::GetViewMatrix()
 {
-    updateCameraVectors();
     return glm::lookAt(Position, target, WorldUp);  //using WorldUp prevents camera rotation
 
     // return glm::lookAt(Position, target, up);    //if you need rotation around local Oz (i.e. roll) use this

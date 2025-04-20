@@ -57,7 +57,7 @@ public:
         Zoom = zoom;
     }
     
-    ~Camera(){}
+    virtual ~Camera() = default;
     
     // returns the view matrix calculated using Euler Angles and the LookAt Matrix
     virtual glm::mat4 GetViewMatrix() = 0;

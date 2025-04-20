@@ -15,15 +15,7 @@ Character                                   *active_character;
 
 bool                                        show_granny_text;
 
-//cameras
-//use unordered map maybe?
-CameraFly               free_look_camera = CameraFly(glm::vec3(0.0f, 0.0f, 3.0f));
-CameraLookAt            look_at_camera_corridor;
-CameraLookAt            look_at_camera_kitchen_start;
-CameraLookAt            look_at_camera_kitchen_end;
-Camera                  *active_cam;
-
-std::unordered_map<std::string, Room*>       rooms;
+std::unordered_map<std::string, std::unique_ptr<Room>>       rooms;
 
 Game::Game(unsigned int width, unsigned int height)
 : State(GAME_ACTIVE), Keys(), Width(width), Height(height)/*, free_look_camera(glm::vec3(0.0f, 0.0f, 3.0f))*/{}
@@ -76,81 +68,39 @@ void Game::Init()
         text_renderer->Load("D:/MyProjects/cpp/gewuln/assets/fonts/arial/arial.ttf", 24);
     }
 
-
-    // free_look_cam.Position = glm::vec3(-1.0f, 1.0f, 3.0f);
-    free_look_camera = CameraFly(
+    //setting up rooms
+    rooms["start_room"] = std::make_unique<Room>();
+    auto& start_room = rooms["start_room"];
+    start_room->cameras["cam_fly"] = std::make_unique<CameraFly>(
+        glm::vec3(-3.228f, 3.582f, 4.333f),
+        glm::vec3(0.0f, 1.0f, 0.0f),
+        -39.0f,
+        41.0f
+    );
+    
+    start_room->cameras["look_at_camera_corridor"] = std::make_unique<CameraLookAt>(
 		glm::vec3(-3.228f, 3.582f, 4.333f),
 		glm::vec3(0.0f, 1.0f, 0.0f),
         -39.0f,
         41.0f
-	);
+    );
 
-    look_at_camera_corridor = CameraLookAt(
-		glm::vec3(-3.228f, 3.582f, 4.333f),
-		glm::vec3(0.0f, 1.0f, 0.0f),
-        -39.0f,
-        41.0f
-	);
-
-    look_at_camera_kitchen_start = CameraLookAt(
+    start_room->cameras["look_at_camera_kitchen_start"] = std::make_unique<CameraLookAt>(
 		glm::vec3(1.367f,    2.045f,    3.924f),
 		glm::vec3(0.0f, 1.0f, 0.0f),
         -86.3601f,
         16.0f
-	);
-
-    look_at_camera_kitchen_end = CameraLookAt(
+    );
+    
+    start_room->cameras["look_at_camera_kitchen_end"] = std::make_unique<CameraLookAt>(
 		glm::vec3(0.673f, 2.138f, 4.030f),
 		glm::vec3(0.0f, 1.0f, 0.0f),
         -263.88f,
         19.7599f
-	);
-    
-    // auto some_cam = std::make_unique<CameraFly>(
-    //     CameraFly(
-    //         glm::vec3(-3.228f, 3.582f, 4.333f),
-    //         glm::vec3(0.0f, 1.0f, 0.0f),
-    //         -39.0f,
-    //         41.0f
-    //     )
-    // );
-    
-    // auto some_room = new Room{
-    //     .cameras = {
-    //         {
-    //             "test", 
-    //             new CameraFly(
-    //                 glm::vec3(-3.228f, 3.582f, 4.333f),
-    //                 glm::vec3(0.0f, 1.0f, 0.0f),
-    //                 -39.0f,
-    //                 41.0f
-    //             )
-    //         }
-    //     }
-    // };
-            
-    rooms = {
-        {
-            "start_room", 
-            new Room{
-                .cameras = {
-                    {
-                        "some_camera", 
-                        new CameraFly(
-                            glm::vec3(-3.228f, 3.582f, 4.333f),
-                            glm::vec3(0.0f, 1.0f, 0.0f),
-                            -39.0f,
-                            41.0f
-                        )
-                    }
-                }
-            }
-        }
-    };
+    );
 
-
-    active_cam = &look_at_camera_corridor;
-    // active_cam = &free_look_camera;
+    start_room->initial_cam = start_room->cameras["look_at_camera_corridor"].get();
+    start_room->active_cam = start_room->initial_cam;
 }
 
 
@@ -163,7 +113,7 @@ void Game::Update(float dt)
 
         //tmp
         glm::vec3 trg = active_character->position + glm::vec3(0.0f, 1.5f, 0.0f);
-        active_cam->LookAt(&trg);
+        rooms["start_room"]->active_cam->LookAt(&trg);
     }
 
 }
@@ -173,16 +123,16 @@ void Game::ProcessInput()
 {
     // if (Keys[GLFW_KEY_W])
     if (Keys[GLFW_KEY_UP])
-        active_cam->ProcessKeyboard(FORWARD, dt);
+        rooms["start_room"]->active_cam->ProcessKeyboard(FORWARD, dt);
     // if (Keys[GLFW_KEY_S])
     if (Keys[GLFW_KEY_DOWN])
-        active_cam->ProcessKeyboard(BACKWARD, dt);
+        rooms["start_room"]->active_cam->ProcessKeyboard(BACKWARD, dt);
     // if (Keys[GLFW_KEY_A])
     if (Keys[GLFW_KEY_LEFT])
-        active_cam->ProcessKeyboard(LEFT, dt);
+        rooms["start_room"]->active_cam->ProcessKeyboard(LEFT, dt);
     // if (Keys[GLFW_KEY_D])
     if (Keys[GLFW_KEY_RIGHT])
-        active_cam->ProcessKeyboard(RIGHT, dt);
+        rooms["start_room"]->active_cam->ProcessKeyboard(RIGHT, dt);
 
 
     if (active_character) {
@@ -193,12 +143,12 @@ void Game::ProcessInput()
 
 void Game::ProcessMouseMovement(float xoffset, float yoffset)
 {
-    active_cam->ProcessMouseMovement(xoffset, yoffset);
+    rooms["start_room"]->active_cam->ProcessMouseMovement(xoffset, yoffset);
 }
 
 void Game::ProcessMouseScroll(float yoffset)
 {
-    active_cam->ProcessMouseScroll(yoffset);
+    rooms["start_room"]->active_cam->ProcessMouseScroll(yoffset);
 }
 
 void Game::Render()
@@ -212,13 +162,13 @@ void Game::Render()
 
     model_renderer->DrawCharacter(
         active_character,
-        active_cam,
+        rooms["start_room"]->active_cam,
         (float)Width/(float)Height
     );
 
     model_renderer->DrawSimpleModel(
         ResourceManager::GetModel("room"),
-        active_cam,
+        rooms["start_room"]->active_cam,
         (float)Width/(float)Height
     );
 
@@ -245,7 +195,7 @@ void Game::Render()
 void Game::PlayCameraThing()
 {
     //TODO camera is still targeting mona so it snips to her immidiatelly
-    active_cam = &look_at_camera_kitchen_start;
+    rooms["start_room"]->active_cam = rooms["start_room"]->cameras["look_at_camera_kitchen_start"].get();
 
     // start cam movement
     // final kitchen cam state: pos [    0.673,    2.138,    4.030] yaw -169.84 pitch 22.1999 zoom 35.8083

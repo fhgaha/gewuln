@@ -11,23 +11,30 @@
 class Room
 {
 public:
-	std::unordered_map<std::string, Camera*>	cameras;	//create using new i assume?
-	// Camera														*initial_cam;
-	// Camera														*active_cam;
+	std::unordered_map<std::string, std::unique_ptr<Camera>>	cameras;	//create using new i assume?
+	Camera														*initial_cam;
+	Camera														*active_cam;
 	
 	//TODO
 	//room exits
 	//initial_character_position
 	
 	~Room() {
-		for (auto& [name, cam] : cameras) {
-			delete cam;
-		}
+		// for (auto& [name, cam] : cameras) {
+		// 	delete cam;
+		// }
+		
+		delete initial_cam;
+		delete active_cam;
 	}
 	
+	
 	void Init(){
-		// auto uptr1 = std::make_unique<CameraFly>(
-		// 	CameraFly(glm::vec3(0.0f), glm::vec3(0.0f))
+		// cameras["fly_cam"] = std::make_unique<CameraFly>(
+		//     glm::vec3(-3.228f, 3.582f, 4.333f),
+		// 	glm::vec3(0.0f, 1.0f, 0.0f),
+		// 	-39.0f,
+		// 	41.0f
 		// );
 	}
 		

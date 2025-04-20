@@ -66,9 +66,7 @@ void CameraFly::ProcessMouseScroll(float yoffset)
         Zoom = 45.0f;
 }
 
-void CameraFly::LookAt(const glm::vec3 *target)
-{
-}
+void CameraFly::LookAt(const glm::vec3 *target){}
 
 void CameraFly::updateCameraVectors()
 {

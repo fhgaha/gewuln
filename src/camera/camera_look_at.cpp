@@ -17,6 +17,8 @@ Camera(
     updateCameraVectors();
 }
 
+// Camera::~Camera() {}
+
 glm::mat4 CameraLookAt::GetViewMatrix()
 {
     return glm::lookAt(Position, target, WorldUp);  //using WorldUp prevents camera rotation

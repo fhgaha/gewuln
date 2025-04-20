@@ -20,7 +20,7 @@ public:
 		float pitch = PITCH,
         float zoom = ZOOM
 	);
-
+    
     // returns the view matrix calculated using Euler Angles and the LookAt Matrix
     glm::mat4 GetViewMatrix() override;
     void ProcessKeyboard(Camera_Movement direction, float deltaTime) override;

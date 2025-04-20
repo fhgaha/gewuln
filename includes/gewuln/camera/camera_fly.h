@@ -25,7 +25,7 @@ public:
     void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true) override;
     void ProcessMouseScroll(float yoffset) override;
     void LookAt(const glm::vec3 *target) override;
-
+    
 private:
     // calculates the front vector from the Camera's (updated) Euler Angles
     void updateCameraVectors();

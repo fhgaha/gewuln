@@ -39,9 +39,6 @@ public:
     float MouseSensitivity;
     float Zoom;
 
-    //TODO try deleting this
-    // Camera(){}
-
     Camera(
     	glm::vec3 position,
     	glm::vec3 up,
@@ -59,7 +56,9 @@ public:
         Pitch = pitch;
         Zoom = zoom;
     }
-
+    
+    ~Camera(){}
+    
     // returns the view matrix calculated using Euler Angles and the LookAt Matrix
     virtual glm::mat4 GetViewMatrix() = 0;
     virtual void ProcessKeyboard(Camera_Movement direction, float deltaTime) = 0;

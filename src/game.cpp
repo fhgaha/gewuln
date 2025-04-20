@@ -1,9 +1,11 @@
 #include "game.h"
+#include <unordered_map>
 #include <gewuln/model_renderer.h>
 #include <gewuln/character.h>
 #include <gewuln/text_renderer.h>
-#include <map>
-
+#include <gewuln/room.h>
+#include <memory>
+#include <utility>
 
 ModelRenderer                               *model_renderer;
 TextRenderer                                *text_renderer;
@@ -14,12 +16,14 @@ Character                                   *active_character;
 bool                                        show_granny_text;
 
 //cameras
+//use unordered map maybe?
 CameraFly               free_look_camera = CameraFly(glm::vec3(0.0f, 0.0f, 3.0f));
 CameraLookAt            look_at_camera_corridor;
 CameraLookAt            look_at_camera_kitchen_start;
 CameraLookAt            look_at_camera_kitchen_end;
 Camera                  *active_cam;
 
+std::unordered_map<std::string, Room*>       rooms;
 
 Game::Game(unsigned int width, unsigned int height)
 : State(GAME_ACTIVE), Keys(), Width(width), Height(height)/*, free_look_camera(glm::vec3(0.0f, 0.0f, 3.0f))*/{}
@@ -101,6 +105,48 @@ void Game::Init()
         -263.88f,
         19.7599f
 	);
+    
+    // auto some_cam = std::make_unique<CameraFly>(
+    //     CameraFly(
+    //         glm::vec3(-3.228f, 3.582f, 4.333f),
+    //         glm::vec3(0.0f, 1.0f, 0.0f),
+    //         -39.0f,
+    //         41.0f
+    //     )
+    // );
+    
+    // auto some_room = new Room{
+    //     .cameras = {
+    //         {
+    //             "test", 
+    //             new CameraFly(
+    //                 glm::vec3(-3.228f, 3.582f, 4.333f),
+    //                 glm::vec3(0.0f, 1.0f, 0.0f),
+    //                 -39.0f,
+    //                 41.0f
+    //             )
+    //         }
+    //     }
+    // };
+            
+    rooms = {
+        {
+            "start_room", 
+            new Room{
+                .cameras = {
+                    {
+                        "some_camera", 
+                        new CameraFly(
+                            glm::vec3(-3.228f, 3.582f, 4.333f),
+                            glm::vec3(0.0f, 1.0f, 0.0f),
+                            -39.0f,
+                            41.0f
+                        )
+                    }
+                }
+            }
+        }
+    };
 
 
     active_cam = &look_at_camera_corridor;

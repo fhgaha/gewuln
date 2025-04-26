@@ -7,7 +7,7 @@
 #include <gewuln/animation.h>
 #include <gewuln/animator.h>
 #include <gewuln/model.h>
-#include <gewuln/gewuln_math.h>
+#include <gewuln/geometry_3d.h>
 #include <iostream>
 #include <map>
 
@@ -66,7 +66,7 @@ class Character {
 						
 						
 						
-						bool collider_intersects_an_interactable = GewulnMath::intersect(
+						bool collider_intersects_an_interactable = Geometry3d::intersect(
 							cldr_verts, 
 							intrcbl_mesh->vertices
 						);

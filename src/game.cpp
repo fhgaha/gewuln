@@ -1,21 +1,27 @@
 #include "game.h"
 #include <unordered_map>
+#include <memory>
+#include <utility>
 #include <gewuln/model_renderer.h>
 #include <gewuln/character.h>
 #include <gewuln/text_renderer.h>
 #include <gewuln/room.h>
-#include <memory>
-#include <utility>
+#include <gewuln/geometry_2d.h>
 
-ModelRenderer                               *model_renderer;
-TextRenderer                                *text_renderer;
+// settings
+bool show_fps = true;
 
-std::unordered_map<std::string, Character>  characters;
-Character                                   *active_character;
 
-bool                                        show_granny_text;
+ModelRenderer                                               *model_renderer;
+TextRenderer                                                *text_renderer;
+                
+std::unordered_map<std::string, Character>                  characters;
+std::unordered_map<std::string, std::unique_ptr<Room>>      rooms;
 
-std::unordered_map<std::string, std::unique_ptr<Room>>       rooms;
+Character                                                   *active_character;
+                
+bool                                                        show_granny_text;
+
 
 Game::Game(unsigned int width, unsigned int height)
 : State(GAME_ACTIVE), Keys(), Width(width), Height(height)/*, free_look_camera(glm::vec3(0.0f, 0.0f, 3.0f))*/{}
@@ -28,6 +34,13 @@ Game::~Game()
 
 void Game::Init()
 {
+
+    bool inside = Geometry2d::IsPolygonCompletelyInside(
+        {{{20,20},{80,20},{80,80},{20,80}}},
+        {{{100,50},{9.5,79.4},{65.5,2.4},{65.5,97.6},{9.5,20.7}}}
+    );
+    std::cout << "inside: " << inside << "\n";
+
 
     ResourceManager::LoadShader(
         "D:/MyProjects/cpp/gewuln/src/shaders/default/default.vert",
@@ -55,7 +68,6 @@ void Game::Init()
     }
 
     ResourceManager::LoadModel(
-        // "D:/MyProjects/cpp/gewuln/assets/models/room/gltf/applyed_transforms/room.gltf",
         "D:/MyProjects/cpp/gewuln/assets/models/room/gltf_2_cube_interactable/room.gltf",
         false,
         "room"
@@ -69,38 +81,44 @@ void Game::Init()
     }
 
     //setting up rooms
-    rooms["start_room"] = std::make_unique<Room>();
-    auto& start_room = rooms["start_room"];
-    start_room->cameras["cam_fly"] = std::make_unique<CameraFly>(
-        glm::vec3(-3.228f, 3.582f, 4.333f),
-        glm::vec3(0.0f, 1.0f, 0.0f),
-        -39.0f,
-        41.0f
-    );
-    
-    start_room->cameras["look_at_camera_corridor"] = std::make_unique<CameraLookAt>(
-		glm::vec3(-3.228f, 3.582f, 4.333f),
-		glm::vec3(0.0f, 1.0f, 0.0f),
-        -39.0f,
-        41.0f
-    );
+    {
+        rooms["start_room"] = std::make_unique<Room>();
+        
+        //start room cameras
+        {
+            auto& start_room = rooms["start_room"];
+            start_room->cameras["cam_fly"] = std::make_unique<CameraFly>(
+                glm::vec3(-3.228f, 3.582f, 4.333f),
+                glm::vec3(0.0f, 1.0f, 0.0f),
+                -39.0f,
+                41.0f
+            );
+            
+            start_room->cameras["look_at_camera_corridor"] = std::make_unique<CameraLookAt>(
+                glm::vec3(-3.228f, 3.582f, 4.333f),
+                glm::vec3(0.0f, 1.0f, 0.0f),
+                -39.0f,
+                41.0f
+            );
 
-    start_room->cameras["look_at_camera_kitchen_start"] = std::make_unique<CameraLookAt>(
-		glm::vec3(1.367f,    2.045f,    3.924f),
-		glm::vec3(0.0f, 1.0f, 0.0f),
-        -86.3601f,
-        16.0f
-    );
-    
-    start_room->cameras["look_at_camera_kitchen_end"] = std::make_unique<CameraLookAt>(
-		glm::vec3(0.673f, 2.138f, 4.030f),
-		glm::vec3(0.0f, 1.0f, 0.0f),
-        -263.88f,
-        19.7599f
-    );
+            start_room->cameras["look_at_camera_kitchen_start"] = std::make_unique<CameraLookAt>(
+                glm::vec3(1.367f, 2.045f, 3.924f),
+                glm::vec3(0.0f, 1.0f, 0.0f),
+                -86.3601f,
+                16.0f
+            );
+            
+            start_room->cameras["look_at_camera_kitchen_end"] = std::make_unique<CameraLookAt>(
+                glm::vec3(0.673f, 2.138f, 4.030f),
+                glm::vec3(0.0f, 1.0f, 0.0f),
+                -263.88f,
+                19.7599f
+            );
 
-    start_room->initial_cam = start_room->cameras["look_at_camera_corridor"].get();
-    start_room->active_cam = start_room->initial_cam;
+            start_room->initial_cam = start_room->cameras["look_at_camera_corridor"].get();
+            start_room->active_cam = start_room->initial_cam;
+        }
+    }
 }
 
 
@@ -174,8 +192,8 @@ void Game::Render()
 
 
     //fps
-    if (false) {
-        text_renderer->Draw("FPS: " + std::to_string(1/this->dt), this->Width/100.0f * 5.0f, this->Height/100.0f * 5.0f, 1.0f);
+    if (show_fps) {
+        text_renderer->Draw("FPS: " + std::to_string(1/this->dt), this->Width * 0.05f, this->Height * 0.05f, 1.0f);
     }
 
     //subtitles
@@ -185,10 +203,10 @@ void Game::Render()
         std::string line_2 = "though I'm not sure";
         std::string line_3 = "since there's no granny around";
 
-        //                                                        font height  scale  some height
-        text_renderer->Draw(line_1, this->Width/100.0f * 10.0f, this->Height - 24.0f *    2.0f *   4.0f, 1.5f);
-        text_renderer->Draw(line_2, this->Width/100.0f * 10.0f, this->Height - 24.0f *    2.0f *   3.0f, 1.5f);
-        text_renderer->Draw(line_3, this->Width/100.0f * 10.0f, this->Height - 24.0f *    2.0f *   2.0f, 1.5f);
+        //                                                                    font height, scale, line height
+        text_renderer->Draw(line_1, this->Width * 0.10f, this->Height - 24.0f * 2.0f * 4.0f, 1.5f);
+        text_renderer->Draw(line_2, this->Width * 0.10f, this->Height - 24.0f * 2.0f * 3.0f, 1.5f);
+        text_renderer->Draw(line_3, this->Width * 0.10f, this->Height - 24.0f * 2.0f * 2.0f, 1.5f);
     }
 }
 

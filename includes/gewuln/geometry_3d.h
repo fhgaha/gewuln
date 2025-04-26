@@ -7,9 +7,11 @@
 #include <limits>
 #include <array>
 
-class GewulnMath
+
+class Geometry3d
 {
 public:
+    // Uses GJK (Gilbert–Johnson–Keerthi distance) algorithm. pass in only vertex coords of box_lhs and box_rhs.
     static bool intersect(const std::vector<Vertex>& box_lhs, const std::vector<Vertex>& box_rhs) {
         glm::vec3 dir = computeCenter(box_rhs) - computeCenter(box_lhs);
         if (glm::length(dir) < 1e-6) dir = glm::vec3(1, 0, 0); // Avoid zero direction
@@ -161,5 +163,3 @@ private:
         return true;
     }
 };
-
-

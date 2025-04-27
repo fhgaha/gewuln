@@ -8,18 +8,19 @@
 #include <gewuln/room.h>
 #include <gewuln/geometry_2d.h>
 
+
 // settings
 bool show_fps = true;
 
 
 ModelRenderer                                               *model_renderer;
 TextRenderer                                                *text_renderer;
-                
+
 std::unordered_map<std::string, Character>                  characters;
 std::unordered_map<std::string, std::unique_ptr<Room>>      rooms;
 
 Character                                                   *active_character;
-                
+
 bool                                                        show_granny_text;
 
 
@@ -35,11 +36,13 @@ Game::~Game()
 void Game::Init()
 {
 
-    bool inside = Geometry2d::IsPolygonCompletelyInside(
-        {{{20,20},{80,20},{80,80},{20,80}}},
-        {{{100,50},{9.5,79.4},{65.5,2.4},{65.5,97.6},{9.5,20.7}}}
-    );
-    std::cout << "inside: " << inside << "\n";
+    // bool inside = Geometry2d::IsPolygonCompletelyInside(
+    //     // {{{20,20},{80,20},{80,80},{20,80}}},
+    //     // {{{100,50},{9.5,79.4},{65.5,2.4},{65.5,97.6},{9.5,20.7}}}
+    //     {{{1,1},{5,1},{5,5},{1,5}}},
+    //     {{{0,0},{10,0},{10,10},{0,10}}}
+    // );
+    // std::cout << "inside: " << inside << "\n";
 
 
     ResourceManager::LoadShader(
@@ -68,7 +71,8 @@ void Game::Init()
     }
 
     ResourceManager::LoadModel(
-        "D:/MyProjects/cpp/gewuln/assets/models/room/gltf_2_cube_interactable/room.gltf",
+        // "D:/MyProjects/cpp/gewuln/assets/models/room/gltf_2_cube_interactable/room.gltf",
+        "D:/MyProjects/cpp/gewuln/assets/models/room/gltf_3_walkable_area/room.gltf",
         false,
         "room"
     );
@@ -83,7 +87,7 @@ void Game::Init()
     //setting up rooms
     {
         rooms["start_room"] = std::make_unique<Room>();
-        
+
         //start room cameras
         {
             auto& start_room = rooms["start_room"];
@@ -93,7 +97,7 @@ void Game::Init()
                 -39.0f,
                 41.0f
             );
-            
+
             start_room->cameras["look_at_camera_corridor"] = std::make_unique<CameraLookAt>(
                 glm::vec3(-3.228f, 3.582f, 4.333f),
                 glm::vec3(0.0f, 1.0f, 0.0f),
@@ -107,7 +111,7 @@ void Game::Init()
                 -86.3601f,
                 16.0f
             );
-            
+
             start_room->cameras["look_at_camera_kitchen_end"] = std::make_unique<CameraLookAt>(
                 glm::vec3(0.673f, 2.138f, 4.030f),
                 glm::vec3(0.0f, 1.0f, 0.0f),
@@ -116,7 +120,8 @@ void Game::Init()
             );
 
             start_room->initial_cam = start_room->cameras["look_at_camera_corridor"].get();
-            start_room->active_cam = start_room->initial_cam;
+            // start_room->active_cam = start_room->initial_cam;
+            start_room->active_cam = start_room->cameras["cam_fly"].get();
         }
     }
 }

@@ -19,11 +19,11 @@ public:
 	// using PathD = Path<double>;
 	// using Path = std::vector<Point<T>>;
 	// struct Point {T x; T y;}
-	static bool IsPolygonCompletelyInside(const Clipper2Lib::PathsD& clip, const Clipper2Lib::PathsD& subject) 
+	static bool IsPolygonCompletelyInside(const Clipper2Lib::PathsD& small_polygon, const Clipper2Lib::PathsD& large_polygon) 
 	{
 		Clipper2Lib::ClipperD clipper;
-		clipper.AddSubject(subject);
-		clipper.AddClip(clip);
+		clipper.AddSubject(small_polygon);
+		clipper.AddClip(large_polygon);
 		Clipper2Lib::PathsD solution;
 		clipper.Execute(
 			Clipper2Lib::ClipType::Difference, 

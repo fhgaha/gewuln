@@ -25,6 +25,15 @@
 
 unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma = false);
 
+
+/*
+Custom properties:
+	"is_collider"
+	"is_interactable"
+	"is_walkable_area"
+*/
+
+
 /*
 For static models all their transformations should be "applied" in Blender, i.e. Location, Rotation and should be reseted to (0, 0, 0)
 and Scale to (1, 1, 1). This is achieved through `Ctrl + A -> All Transforms` in Blender. No position, rotation or scale data is stored
@@ -37,6 +46,7 @@ public:
 	std::vector<Mesh>	meshes;
 	std::optional<Mesh>	collider_mesh;
 	std::optional<Mesh>	interactable_mesh;
+	std::optional<Mesh>	walkable_area;
 
 	Model() {}
 	Model(std::string const &path, bool animated, glm::vec3 pos = glm::vec3(0.0f))
@@ -83,6 +93,8 @@ private:
 		// std::cout << "node: " << node->mName.data << "\n";
 		bool node_is_collider = false;
 		bool node_is_interactable = false;
+		bool node_is_walkable_area = false;
+
 		bool has_metadata = node->mMetaData != nullptr && node->mMetaData->mNumProperties > 0;
 		if (has_metadata) {
 			for (unsigned int i = 0; i < node->mMetaData->mNumProperties; i++)
@@ -116,6 +128,21 @@ private:
 
 					node_is_interactable = true;
 				}
+
+				//walking area
+				if (node->mMetaData->mKeys[i] == aiString("is_walkable_area")){
+					// if (node->mNumMeshes != 1) {
+					// 	std::cout << "INTERACTABLE NODE SHOULD HAVE ONE MESH. Having instead: "
+					// 		<< node->mNumMeshes << "\n";
+					// }
+
+					// std::cout << "!!found a walkable area " << node->mName.data
+					// << " in a node " << node->mName.data
+					// << " of a scene " << scene->mName.data
+					// << "\n";
+
+					node_is_walkable_area = true;
+				}
 			}
 		}
 
@@ -130,6 +157,9 @@ private:
 			} else if (node_is_interactable) {
 				interactable_mesh = processMesh(mesh, scene, false);
 				node_is_interactable = false;
+			} else if (node_is_walkable_area){
+				walkable_area = processMesh(mesh, scene, false);
+				node_is_walkable_area = false;
 			} else {
 				meshes.push_back(processMesh(mesh, scene, this->animated));
 			}

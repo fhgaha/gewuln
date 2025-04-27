@@ -9,6 +9,20 @@
 #include "stdio.h"
 #include "glm/ext.hpp"
 
+struct CashedGlState
+{
+	GLboolean cull_face;
+	
+	void make_it_like_before()
+	{
+		if (cull_face == GL_TRUE){
+			glEnable(GL_CULL_FACE);
+		} else {
+			glDisable(GL_CULL_FACE);
+		}
+	}
+};
+
 class ModelRenderer
 {
 
@@ -48,7 +62,7 @@ public:
 		glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f)
 	){
         shader.Use();
-        
+
         // scale -> rotate -> translate. with matrises multiplications it should be reversed. model mat is doing that.
         // Vclip = Mprojection * Mview * Mmodel * Vlocal
 
@@ -76,19 +90,34 @@ public:
 
 
 		//draw collider wireframe
-		if (draw_gizmos && loaded_model.collider_mesh.has_value())
+		if (draw_gizmos)
 		{
-			{	//set wireframe settings
-				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-				shader.SetBool("drawing_wireframe", true);
-				shader.SetVector3f("wireframe_color", 1.0f, 0.0f, 0.0f);
-			}
+			if (loaded_model.collider_mesh.has_value())
+			{
+				//cashed vals
+				GLboolean cashed_cull_face;
+				
+				{	//set desired settings
+					glGetBooleanv(GL_CULL_FACE, &cashed_cull_face);					
+					glDisable(GL_CULL_FACE);
+				
+					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+					shader.SetBool("drawing_wireframe", true);
+					shader.SetVector3f("wireframe_color", 0.0f, 1.0f, 0.0f);
+				}
 
-			loaded_model.collider_mesh.value().Draw(shader);
+				loaded_model.collider_mesh.value().Draw(shader);
 
-			{	//reset wireframe to textures
-				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-				shader.SetBool("drawing_wireframe", false);
+				{	//reset
+					if (cashed_cull_face == GL_TRUE){
+						glEnable(GL_CULL_FACE);
+					} else {
+						glDisable(GL_CULL_FACE);
+					}
+				
+					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+					shader.SetBool("drawing_wireframe", false);
+				}
 			}
 		}
 
@@ -127,19 +156,64 @@ public:
 		}
 
 		//draw interactable wireframe
-		if (draw_gizmos && loaded_model.interactable_mesh.has_value())
+		if (draw_gizmos)
 		{
-			{	//set wireframe settings
-				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-				shader.SetBool("drawing_wireframe", true);
-				shader.SetVector3f("wireframe_color", 0.0f, 1.0f, 1.0f);
+			if (loaded_model.interactable_mesh.has_value()) {
+				
+				//cashed gl settings
+				CashedGlState cashed_gl_state;
+				
+				{	//set wireframe settings
+
+					glGetBooleanv(GL_CULL_FACE, &cashed_gl_state.cull_face);
+					glDisable(GL_CULL_FACE);
+
+					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // wireframe
+					// glDisable(GL_DEPTH_TEST);
+
+					// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+					shader.SetBool("drawing_wireframe", true);
+					shader.SetVector3f("wireframe_color", 0.0f, 1.0f, 1.0f);
+				}
+
+				loaded_model.interactable_mesh.value().Draw(shader);
+
+				{	//reset
+					cashed_gl_state.make_it_like_before();
+					
+					// glEnable(GL_DEPTH_TEST);
+
+					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+					shader.SetBool("drawing_wireframe", false);
+				}
 			}
 
-			loaded_model.interactable_mesh.value().Draw(shader);
+			if (loaded_model.walkable_area.has_value()) {
+				GLboolean cashed_cull_face;
+				
+				{	//set desired settings
+					glGetBooleanv(GL_CULL_FACE, &cashed_cull_face);					
+					glDisable(GL_CULL_FACE);
+					glDisable(GL_DEPTH_TEST);
+				
+					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+					shader.SetBool("drawing_wireframe", true);
+					shader.SetVector3f("wireframe_color", 1.0f, 1.0f, 0.0f);
+				}
 
-			{	//reset
-				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-				shader.SetBool("drawing_wireframe", false);
+				loaded_model.walkable_area.value().Draw(shader);
+
+				{	//reset
+					if (cashed_cull_face == GL_TRUE){
+						glEnable(GL_CULL_FACE);
+					} else {
+						glDisable(GL_CULL_FACE);
+					}
+					glEnable(GL_DEPTH_TEST);
+				
+					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+					shader.SetBool("drawing_wireframe", false);
+				}
 			}
 		}
 	}

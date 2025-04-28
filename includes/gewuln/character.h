@@ -45,38 +45,23 @@ class Character {
 				for (const auto &[name, mdl] : *models)
 				{
 					if (mdl.interactable_mesh.has_value()) {
-						const Mesh *intrcbl_mesh = &mdl.interactable_mesh.value();
-						
+						const std::vector<Vertex> &interactable_verts = mdl.interactable_mesh.value().vertices;
 
-						//collider mesh is drawn properly, with updated position, but it still has zero based positions in log. why? how?
-						auto cldr_verts = this->model->collider_mesh.value().vertices;
-						// std::cout << "collider:\n";
-						for (size_t i = 0; i < cldr_verts.size(); i++)
-						{
-							cldr_verts[i].Position += this->position;
-						// 	std::cout << "\t" << i <<":\t" << cldr_verts[i].Position << "\n";
+						std::vector<Vertex> transformed_verts = this->model->collider_mesh.value().vertices;
+						for (size_t i = 0; i < transformed_verts.size(); i++){
+							transformed_verts[i].Position += this->position;
 						}
 						
-						// std::cout << "interactable:\n";
-						// for (size_t i = 0; i < intrcbl_mesh->vertices.size(); i++)
-						// {
-						// 	std::cout << "\t" << i <<":\t" << intrcbl_mesh->vertices[i].Position << "\n";
-						// }
-						// std::cout << "=======================\n";
-						
-						
-						
 						bool collider_intersects_an_interactable = Geometry3d::intersect(
-							cldr_verts, 
-							intrcbl_mesh->vertices
+							transformed_verts,
+							interactable_verts
 						);
 						
 						if (collider_intersects_an_interactable){
 							std::cout << "it intersects!\n";
 							game->PlayCameraThing();
 						}
-						else 
-						{
+						else {
 							std::cout << "it DOES NOT intersect!\n";
 						}
 						return;
@@ -109,6 +94,14 @@ class Character {
 
 			if (keys[GLFW_KEY_W]){
 			    velocity = forward * WALK_SPEED * dt;
+				
+				// //collider mesh is drawn properly, with updated position, but it still has zero based positions in log. why? how?
+				// auto &cldr_verts = this->model->collider_mesh.value().vertices;
+
+				// for (size_t i = 0; i < cldr_verts.size(); i++)
+				// {
+				// 	cldr_verts[i].Position += velocity;
+				// }
 			} else {
 				velocity = glm::vec3(0.0f);
 			}

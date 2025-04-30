@@ -35,14 +35,19 @@ Game::~Game()
 
 void Game::Init()
 {
-
-    // bool inside = Geometry2d::IsPolygonCompletelyInside(
-    //     // {{{20,20},{80,20},{80,80},{20,80}}},
-    //     // {{{100,50},{9.5,79.4},{65.5,2.4},{65.5,97.6},{9.5,20.7}}}
-    //     {{{1,1},{5,1},{5,5},{1,5}}},
-    //     {{{0,0},{10,0},{10,10},{0,10}}}
-    // );
-    // std::cout << "inside: " << inside << "\n";
+    {
+        Clipper2Lib::PathD clip = {{0.00340024,-0.276444}, {0.6034,-0.276444},     {0.6034,0.323556},      {0.00340024,0.323556}};
+        Clipper2Lib::PathD target = {{-1.175,1.575}, {1.175,1.575},  {1.175,-0.875}, {-1.175,-0.875}};
+        
+        Clipper2Lib::PathsD solution = Clipper2Lib::Intersect(
+			{target}, 
+			{clip}, 
+			Clipper2Lib::FillRule::NonZero
+		);
+		bool inside = !solution.empty() && std::abs(Clipper2Lib::Area(solution)) == std::abs(Clipper2Lib::Area(clip));
+        // bool inside = Geometry2d::is_polygon_inside({clip}, {target});
+        std::cout << "should be inside: " << inside << "\n";
+    }
 
 
     ResourceManager::LoadShader(
@@ -71,8 +76,9 @@ void Game::Init()
     }
 
     ResourceManager::LoadModel(
-        // "D:/MyProjects/cpp/gewuln/assets/models/room/gltf_2_cube_interactable/room.gltf",
-        "D:/MyProjects/cpp/gewuln/assets/models/room/gltf_3_walkable_area/room.gltf",
+        // "D:/MyProjects/cpp/gewuln/assets/models/room/gltf_3_walkable_area/room.gltf",
+        // "D:/MyProjects/cpp/gewuln/assets/models/room/gltf_4_walkable_area_merged_by_distance_removed_overlapping/room.gltf",
+        "D:/MyProjects/cpp/gewuln/assets/models/room/gltf_5_walkable_area_simple_square/room.gltf",
         false,
         "room"
     );

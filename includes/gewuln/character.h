@@ -8,6 +8,7 @@
 #include <gewuln/animator.h>
 #include <gewuln/model.h>
 #include <gewuln/geometry_3d.h>
+#include <gewuln/geometry_2d.h>
 #include <iostream>
 #include <map>
 
@@ -38,13 +39,16 @@ class Character {
 		void ProcessInput(const bool keys[], Game *game, const float dt) {
 
 			if (keys[GLFW_KEY_E]){
-				// get all the interactables
+				
+				assert(this->model->collider_mesh.has_value() && "Character must have collider mesh!");
 				
 				//TODO should iterate through not just all loaded models but only through all the currently instanced models
 				std::map<std::string, Model> *models = &ResourceManager::Models;
 				for (const auto &[name, mdl] : *models)
 				{
+					// check if this character is colliding with an interactable
 					if (mdl.interactable_mesh.has_value()) {
+						
 						const std::vector<Vertex> &interactable_verts = mdl.interactable_mesh.value().vertices;
 
 						std::vector<Vertex> transformed_verts = this->model->collider_mesh.value().vertices;
@@ -57,22 +61,18 @@ class Character {
 							interactable_verts
 						);
 						
-						if (collider_intersects_an_interactable){
-							std::cout << "it intersects!\n";
-							game->PlayCameraThing();
-						}
-						else {
-							std::cout << "it DOES NOT intersect!\n";
-						}
+						// if (collider_intersects_an_interactable){
+						// 	std::cout << "it intersects!\n";
+						// 	game->PlayCameraThing();
+						// }
+						// else {
+						// 	std::cout << "it DOES NOT intersect!\n";
+						// }
 						return;
 					}
 				}
 				
 
-				// check if collider intersects one of the interactables
-
-				//if does - run the cutscene
-				//if not - do nothing
 			}
 
 
@@ -95,13 +95,120 @@ class Character {
 			if (keys[GLFW_KEY_W]){
 			    velocity = forward * WALK_SPEED * dt;
 				
-				// //collider mesh is drawn properly, with updated position, but it still has zero based positions in log. why? how?
-				// auto &cldr_verts = this->model->collider_mesh.value().vertices;
+				{// check if this character is inside of walkable area
+				
+					std::map<std::string, Model> *models = &ResourceManager::Models;
+					for (const auto &[name, mdl] : *models)
+					{
+						if (mdl.walkable_area.has_value()) {
+							const std::vector<Vertex> &walkable_verts = mdl.walkable_area.value().vertices;
+							
+							//1. get characters 4 lowest pts of collider
+							
+							std::vector<Clipper2Lib::PointD> walkable_pts;
+							
+							std::ranges::transform(
+								walkable_verts,
+								std::back_inserter(walkable_pts),
+								// [this](const Vertex &v) {
+								[this](const auto &v) {
+									Vertex copy = v;
+									return Clipper2Lib::PointD(copy.Position.x, copy.Position.z);
+								}
+							);
+							
+							std::vector<glm::vec3> bottom_side_pts;
+							bottom_side_pts.resize(4);
+							
+							//there are 4*6 verts (4 per side, 6 sides of a cube)
+							auto &verts = this->model->collider_mesh.value().vertices;
+							for (size_t i = 0; i < verts.size(); i+=4)
+							{
+								Vertex copy = verts[i];
+								
+								// get the edge with normal = (0, -1, 0)
+								//a == b when `std::fabsf(a - b) < 1e-6`
+								bool copy_normal_is_minus_one = std::fabsf(copy.Normal.y - (-1.0f)) < 1e-6;
+								if (copy_normal_is_minus_one){
+									bottom_side_pts[0] = verts[i+0].Position + this->position;
+									bottom_side_pts[1] = verts[i+1].Position + this->position;
+									bottom_side_pts[2] = verts[i+2].Position + this->position;
+									bottom_side_pts[3] = verts[i+3].Position + this->position;
+									break;
+								}
+							}
+							
+							// for (auto &p : bottom_side_pts)
+							// {
+							// 	std::cout << p << "\t";
+							// }
+							// std::cout << "\n";
+							
+							
+							std::vector<Clipper2Lib::PointD> small_poly_path_d;
+							
+							std::ranges::transform(
+								bottom_side_pts,
+								std::back_inserter(small_poly_path_d),
+								[](const auto &v) {
+									glm::vec3 copy = v;
+									return Clipper2Lib::PointD(copy.x, copy.z);
+								}
+							);
+							
+							//2. check the intersection with walkable area
 
-				// for (size_t i = 0; i < cldr_verts.size(); i++)
-				// {
-				// 	cldr_verts[i].Position += velocity;
-				// }
+							// bool inside = Geometry2d::is_polygon_inside(
+							// 	{small_poly_path_d}, 
+							// 	{walkable_pts}
+							// );
+							
+							Clipper2Lib::PathsD large_paths;
+							
+							for (size_t i = 0; i < walkable_pts.size(); i+=4)
+							{
+								auto p0 = walkable_pts[i+0];
+								auto p1 = walkable_pts[i+1];
+								auto p2 = walkable_pts[i+2];
+								auto p3 = walkable_pts[i+3];
+								
+								large_paths.push_back({p0, p1, p2, p3});
+							}
+							
+							bool inside = Geometry2d::small_poly_inside_all_large_polys(
+								small_poly_path_d, 
+								large_paths
+							);
+							
+							
+							std::cout << "small poly: \n";
+							for (auto &pt_d : small_poly_path_d)
+							{
+								std::cout << "\t{" << pt_d << "},";
+							}
+							std::cout << "\n";
+							
+							std::cout << "walkable_pts:\n";
+							for (auto &pt_d : walkable_pts)
+							{
+								std::cout << "\t{" << pt_d << "},";
+							}
+							std::cout << "\ninside area: " << inside << "\n"; 
+							std::cout << "========================\n";
+							
+							
+							
+							if (!inside){
+								
+							}
+							
+						}
+					}	
+				
+					
+				}
+				
+				
 			} else {
 				velocity = glm::vec3(0.0f);
 			}

@@ -31,7 +31,7 @@ public:
 
         return false;
     }
-
+    
 private:
     static glm::vec3 computeCenter(const std::vector<Vertex>& box) {
         glm::vec3 center(0.0f);

@@ -15,22 +15,52 @@ public:
 		std::cout << std::setprecision(3) << solution << std::endl;
 	}
 
+	
 	// using PathsD = std::vector< PathD>;
 	// using PathD = Path<double>;
 	// using Path = std::vector<Point<T>>;
 	// struct Point {T x; T y;}
-	static bool IsPolygonCompletelyInside(const Clipper2Lib::PathsD& small_polygon, const Clipper2Lib::PathsD& large_polygon) 
+	static bool is_polygon_inside(const Clipper2Lib::PathsD& small_polygon, const Clipper2Lib::PathsD& large_polygon) 
 	{
-		Clipper2Lib::ClipperD clipper;
-		clipper.AddSubject(small_polygon);
-		clipper.AddClip(large_polygon);
-		Clipper2Lib::PathsD solution;
-		clipper.Execute(
-			Clipper2Lib::ClipType::Difference, 
-			Clipper2Lib::FillRule::EvenOdd, 
-			solution
+		// Clipper2Lib::PathsD solution = Clipper2Lib::Difference(
+		// 	large_polygon, 
+		// 	small_polygon, 
+		// 	Clipper2Lib::FillRule::NonZero
+		// );
+		// return solution.empty();
+		
+		Clipper2Lib::PathsD solution = Clipper2Lib::Intersect(
+			{large_polygon}, 
+			{small_polygon}, 
+			Clipper2Lib::FillRule::NonZero
 		);
-		return solution.empty();
+		bool inside = !solution.empty() && std::abs(Clipper2Lib::Area(small_polygon)) == std::abs(Clipper2Lib::Area(solution));
+		
+		// bool all_vertices_inside = true;
+		// auto small = small_polygon[0];
+		// for (const auto& pt : small) {
+		// 	if (Clipper2Lib::PointInPolygon(pt, large_polygon[0]) != Clipper2Lib::PointInPolygonResult::IsInside) {
+		// 		all_vertices_inside = false;
+		// 		break;
+		// 	}
+		// }
+		
+		return inside;
+	}
+	
+	static bool small_poly_inside_all_large_polys(const Clipper2Lib::PathD &small_polygon, const Clipper2Lib::PathsD &large_polygons) {
+		return std::ranges::all_of(
+			small_polygon, 
+			[large_polygons](const auto &pt){
+				return std::ranges::any_of(
+					large_polygons,
+					[pt](const auto &large_path) {
+						Clipper2Lib::PointInPolygonResult res = Clipper2Lib::PointInPolygon(pt, large_path);		
+						return res == Clipper2Lib::PointInPolygonResult::IsInside;
+					}
+				);
+			}
+		);
 	}
 	
 };

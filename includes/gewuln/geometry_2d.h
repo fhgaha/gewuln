@@ -1,66 +1,39 @@
 #pragma once
 
-#include "clipper2/clipper.h"
 #include <iomanip> 
 
 
 class Geometry2d
 {
 public:
-	static void foo() 
-	{
-		Clipper2Lib::PathsD subject = {{{100,50},{9.5,79.4},{65.5,2.4},{65.5,97.6},{9.5,20.7}}};
-		Clipper2Lib::PathsD clip = {{{20,20},{80,20},{80,80},{20,80}}};
-		Clipper2Lib::PathsD solution = Clipper2Lib::Intersect(subject, clip, Clipper2Lib::FillRule::NonZero);
-		std::cout << std::setprecision(3) << solution << std::endl;
-	}
 
-	
-	// using PathsD = std::vector< PathD>;
-	// using PathD = Path<double>;
-	// using Path = std::vector<Point<T>>;
-	// struct Point {T x; T y;}
-	static bool is_polygon_inside(const Clipper2Lib::PathsD& small_polygon, const Clipper2Lib::PathsD& large_polygon) 
-	{
-		// Clipper2Lib::PathsD solution = Clipper2Lib::Difference(
-		// 	large_polygon, 
-		// 	small_polygon, 
-		// 	Clipper2Lib::FillRule::NonZero
-		// );
-		// return solution.empty();
-		
-		Clipper2Lib::PathsD solution = Clipper2Lib::Intersect(
-			{large_polygon}, 
-			{small_polygon}, 
-			Clipper2Lib::FillRule::NonZero
-		);
-		bool inside = !solution.empty() && std::abs(Clipper2Lib::Area(small_polygon)) == std::abs(Clipper2Lib::Area(solution));
-		
-		// bool all_vertices_inside = true;
-		// auto small = small_polygon[0];
-		// for (const auto& pt : small) {
-		// 	if (Clipper2Lib::PointInPolygon(pt, large_polygon[0]) != Clipper2Lib::PointInPolygonResult::IsInside) {
-		// 		all_vertices_inside = false;
-		// 		break;
-		// 	}
-		// }
-		
-		return inside;
-	}
-	
-	static bool small_poly_inside_all_large_polys(const Clipper2Lib::PathD &small_polygon, const Clipper2Lib::PathsD &large_polygons) {
+	static bool rect_inside_area_of_tris(
+		const std::array<glm::vec2, 4> 				&small_rect, 
+		const std::vector<std::array<glm::vec2, 3>> &tris
+	) {
 		return std::ranges::all_of(
-			small_polygon, 
-			[large_polygons](const auto &pt){
+			small_rect, 
+			[tris](const auto &pt){
 				return std::ranges::any_of(
-					large_polygons,
-					[pt](const auto &large_path) {
-						Clipper2Lib::PointInPolygonResult res = Clipper2Lib::PointInPolygon(pt, large_path);		
-						return res == Clipper2Lib::PointInPolygonResult::IsInside;
+					tris,
+					[pt](const auto &tri) {
+						bool inside = point_in_triangle(pt, tri[0], tri[1], tri[2]);
+						return inside;
 					}
 				);
 			}
 		);
 	}
 	
+	static bool point_in_triangle(glm::vec2 p, glm::vec2 p0, glm::vec2 p1, glm::vec2 p2)
+	{
+		float s = (p0.x - p2.x) * (p.y - p2.y) - (p0.y - p2.y) * (p.x - p2.x);
+		float t = (p1.x - p0.x) * (p.y - p0.y) - (p1.y - p0.y) * (p.x - p0.x);
+
+		if ((s < 0) != (t < 0) && s != 0 && t != 0){
+			return false;
+		}
+		float d = (p2.x - p1.x) * (p.y - p1.y) - (p2.y - p1.y) * (p.x - p1.x);
+		return d == 0 || (d < 0) == (s + t <= 0);
+	}
 };

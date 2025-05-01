@@ -101,24 +101,10 @@ class Character {
 					for (const auto &[name, mdl] : *models)
 					{
 						if (mdl.walkable_area.has_value()) {
-							const std::vector<Vertex> &walkable_verts = mdl.walkable_area.value().vertices;
 							
 							//1. get characters 4 lowest pts of collider
 							
-							std::vector<Clipper2Lib::PointD> walkable_pts;
-							
-							std::ranges::transform(
-								walkable_verts,
-								std::back_inserter(walkable_pts),
-								// [this](const Vertex &v) {
-								[this](const auto &v) {
-									Vertex copy = v;
-									return Clipper2Lib::PointD(copy.Position.x, copy.Position.z);
-								}
-							);
-							
-							std::vector<glm::vec3> bottom_side_pts;
-							bottom_side_pts.resize(4);
+							std::array<glm::vec2, 4> small_square;
 							
 							//there are 4*6 verts (4 per side, 6 sides of a cube)
 							auto &verts = this->model->collider_mesh.value().vertices;
@@ -130,71 +116,60 @@ class Character {
 								//a == b when `std::fabsf(a - b) < 1e-6`
 								bool copy_normal_is_minus_one = std::fabsf(copy.Normal.y - (-1.0f)) < 1e-6;
 								if (copy_normal_is_minus_one){
-									bottom_side_pts[0] = verts[i+0].Position + this->position;
-									bottom_side_pts[1] = verts[i+1].Position + this->position;
-									bottom_side_pts[2] = verts[i+2].Position + this->position;
-									bottom_side_pts[3] = verts[i+3].Position + this->position;
+									glm::vec3 p0 = verts[i+0].Position + this->position;
+									glm::vec3 p1 = verts[i+1].Position + this->position;
+									glm::vec3 p2 = verts[i+2].Position + this->position;
+									glm::vec3 p3 = verts[i+3].Position + this->position;
+									
+									small_square = {
+										glm::vec2(p0.x, p0.z),
+										glm::vec2(p1.x, p1.z),
+										glm::vec2(p2.x, p2.z),
+										glm::vec2(p3.x, p3.z),	
+									};
+									
 									break;
 								}
 							}
 							
-							// for (auto &p : bottom_side_pts)
+							
+							//2. get all walkable areas triangles and their points
+							
+							std::vector<std::array<glm::vec2, 3>> walkable_area_tris;	
+													
+							const std::vector<Vertex> 		&walkable_verts 	= mdl.walkable_area.value().vertices;
+							const std::vector<unsigned int> &walkable_indeces 	= mdl.walkable_area.value().indices;
+							
+							//0 1 2, 0 2 3
+							for (size_t i = 0; i < walkable_indeces.size(); i+=3)
+							{
+								glm::vec3 p0 = walkable_verts[walkable_indeces[i+0]].Position;
+								glm::vec3 p1 = walkable_verts[walkable_indeces[i+1]].Position;
+								glm::vec3 p2 = walkable_verts[walkable_indeces[i+2]].Position;
+								
+								std::array<glm::vec2, 3> tri = {glm::vec2(p0.x, p0.z), glm::vec2(p1.x, p1.z), glm::vec2(p2.x, p2.z)};
+								walkable_area_tris.push_back(tri);
+							}
+							
+
+							//3. check the intersection with walkable area
+
+							bool inside = Geometry2d::rect_inside_area_of_tris(
+								small_square,
+								walkable_area_tris
+							);
+							
+							// std::cout << "small poly: \n";
+							// for (auto &pt_d : small_square)
 							// {
-							// 	std::cout << p << "\t";
+							// 	std::cout << "\t{" << pt_d << "},";
 							// }
 							// std::cout << "\n";
 							
-							
-							std::vector<Clipper2Lib::PointD> small_poly_path_d;
-							
-							std::ranges::transform(
-								bottom_side_pts,
-								std::back_inserter(small_poly_path_d),
-								[](const auto &v) {
-									glm::vec3 copy = v;
-									return Clipper2Lib::PointD(copy.x, copy.z);
-								}
-							);
-							
-							//2. check the intersection with walkable area
-
-							// bool inside = Geometry2d::is_polygon_inside(
-							// 	{small_poly_path_d}, 
-							// 	{walkable_pts}
-							// );
-							
-							Clipper2Lib::PathsD large_paths;
-							
-							for (size_t i = 0; i < walkable_pts.size(); i+=4)
-							{
-								auto p0 = walkable_pts[i+0];
-								auto p1 = walkable_pts[i+1];
-								auto p2 = walkable_pts[i+2];
-								auto p3 = walkable_pts[i+3];
-								
-								large_paths.push_back({p0, p1, p2, p3});
-							}
-							
-							bool inside = Geometry2d::small_poly_inside_all_large_polys(
-								small_poly_path_d, 
-								large_paths
-							);
-							
-							
-							std::cout << "small poly: \n";
-							for (auto &pt_d : small_poly_path_d)
-							{
-								std::cout << "\t{" << pt_d << "},";
-							}
-							std::cout << "\n";
-							
-							std::cout << "walkable_pts:\n";
-							for (auto &pt_d : walkable_pts)
-							{
-								std::cout << "\t{" << pt_d << "},";
-							}
+							// std::cout << "walkable_pts:\n";
+							//...
 							std::cout << "\ninside area: " << inside << "\n"; 
-							std::cout << "========================\n";
+							// std::cout << "========================\n";
 							
 							
 							

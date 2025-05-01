@@ -13,7 +13,6 @@ set sources=^
 ../src/game.cpp ^
 ../src/camera/camera_look_at.cpp ^
 ../src/camera/camera_fly.cpp ^
-../src/clipper2/clipper.engine.cpp ../src/clipper2/clipper.offset.cpp ../src/clipper2/clipper.rectclip.cpp
 
 pushd build
 

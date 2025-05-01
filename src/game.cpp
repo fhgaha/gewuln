@@ -35,19 +35,49 @@ Game::~Game()
 
 void Game::Init()
 {
-    {
-        Clipper2Lib::PathD clip = {{0.00340024,-0.276444}, {0.6034,-0.276444},     {0.6034,0.323556},      {0.00340024,0.323556}};
-        Clipper2Lib::PathD target = {{-1.175,1.575}, {1.175,1.575},  {1.175,-0.875}, {-1.175,-0.875}};
+    // {
+    //     std::cout << "inside test 1, should be 0: " 
+    //     << Geometry2d::point_in_triangle(
+    //         glm::vec2(0.2f, 0.2f), 
+    //         glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 1.0f), glm::vec2(1.0f, 0.0f)
+    //     )
+    //     << "\n";
         
-        Clipper2Lib::PathsD solution = Clipper2Lib::Intersect(
-			{target}, 
-			{clip}, 
-			Clipper2Lib::FillRule::NonZero
-		);
-		bool inside = !solution.empty() && std::abs(Clipper2Lib::Area(solution)) == std::abs(Clipper2Lib::Area(clip));
-        // bool inside = Geometry2d::is_polygon_inside({clip}, {target});
-        std::cout << "should be inside: " << inside << "\n";
-    }
+    //     std::cout << "inside test 2, should be 1: " 
+    //     << Geometry2d::point_in_triangle(
+    //         glm::vec2(0.2f, 0.2f), 
+    //         glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f), glm::vec2(0.0f, 1.0f)
+    //     )
+    //     << "\n";
+
+    //     std::cout << "inside test 3, should be 0: " 
+    //     << Geometry2d::point_in_triangle(
+    //         glm::vec2(-0.2f, -0.2f), 
+    //         glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f), glm::vec2(0.0f, 1.0f)
+    //     )
+    //     << "\n";
+        
+    //     std::cout << "inside test 3, should be 0: " 
+    //     << Geometry2d::point_in_triangle(
+    //         glm::vec2(1.0f, 1.0f), 
+    //         glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f), glm::vec2(0.0f, 1.0f)
+    //     )
+    //     << "\n";
+    // }
+    
+    // {
+    //     Clipper2Lib::PathD clip = {{0.00340024,-0.276444}, {0.6034,-0.276444},     {0.6034,0.323556},      {0.00340024,0.323556}};
+    //     Clipper2Lib::PathD target = {{-1.175,1.575}, {1.175,1.575},  {1.175,-0.875}, {-1.175,-0.875}};
+        
+    //     Clipper2Lib::PathsD solution = Clipper2Lib::Intersect(
+	// 		{target}, 
+	// 		{clip}, 
+	// 		Clipper2Lib::FillRule::NonZero
+	// 	);
+	// 	bool inside = !solution.empty() && std::abs(Clipper2Lib::Area(solution)) == std::abs(Clipper2Lib::Area(clip));
+    //     // bool inside = Geometry2d::is_polygon_inside({clip}, {target});
+    //     std::cout << "should be inside: " << inside << "\n";
+    // }
 
 
     ResourceManager::LoadShader(
@@ -77,8 +107,8 @@ void Game::Init()
 
     ResourceManager::LoadModel(
         // "D:/MyProjects/cpp/gewuln/assets/models/room/gltf_3_walkable_area/room.gltf",
-        // "D:/MyProjects/cpp/gewuln/assets/models/room/gltf_4_walkable_area_merged_by_distance_removed_overlapping/room.gltf",
-        "D:/MyProjects/cpp/gewuln/assets/models/room/gltf_5_walkable_area_simple_square/room.gltf",
+        "D:/MyProjects/cpp/gewuln/assets/models/room/gltf_4_walkable_area_merged_by_distance_removed_overlapping/room.gltf",
+        // "D:/MyProjects/cpp/gewuln/assets/models/room/gltf_5_walkable_area_simple_square/room.gltf",
         false,
         "room"
     );

@@ -12,7 +12,7 @@ set sources=^
 ../includes/gewuln/mesh.cpp ^
 ../src/game.cpp ^
 ../src/camera/camera_look_at.cpp ^
-../src/camera/camera_fly.cpp ^
+../src/camera/camera_fly.cpp
 
 pushd build
 

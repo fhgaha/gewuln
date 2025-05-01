@@ -65,20 +65,6 @@ void Game::Init()
     //     << "\n";
     // }
     
-    // {
-    //     Clipper2Lib::PathD clip = {{0.00340024,-0.276444}, {0.6034,-0.276444},     {0.6034,0.323556},      {0.00340024,0.323556}};
-    //     Clipper2Lib::PathD target = {{-1.175,1.575}, {1.175,1.575},  {1.175,-0.875}, {-1.175,-0.875}};
-        
-    //     Clipper2Lib::PathsD solution = Clipper2Lib::Intersect(
-	// 		{target}, 
-	// 		{clip}, 
-	// 		Clipper2Lib::FillRule::NonZero
-	// 	);
-	// 	bool inside = !solution.empty() && std::abs(Clipper2Lib::Area(solution)) == std::abs(Clipper2Lib::Area(clip));
-    //     // bool inside = Geometry2d::is_polygon_inside({clip}, {target});
-    //     std::cout << "should be inside: " << inside << "\n";
-    // }
-
 
     ResourceManager::LoadShader(
         "D:/MyProjects/cpp/gewuln/src/shaders/default/default.vert",

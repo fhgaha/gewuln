@@ -14,31 +14,40 @@ public:
 	std::unordered_map<std::string, std::unique_ptr<Camera>>	cameras;	//create using new i assume?
 	Camera														*initial_cam;
 	Camera														*active_cam;
-	
+	std::optional<Mesh>											*walkable_area;
+	Model														*model;
+
 	//TODO
 	//room exits
 	//initial_character_position
-	
+
 	~Room() {
 		// for (auto& [name, cam] : cameras) {
 		// 	delete cam;
 		// }
-		
+
 		delete initial_cam;
 		delete active_cam;
+		delete walkable_area;
+		delete model;
 	}
-	
-	
-	void Init(){
+
+
+	void Init(Model *model)
+	{
+		this->model = model;
+		this->walkable_area = &model->walkable_area;	
+		
 		// cameras["fly_cam"] = std::make_unique<CameraFly>(
 		//     glm::vec3(-3.228f, 3.582f, 4.333f),
 		// 	glm::vec3(0.0f, 1.0f, 0.0f),
 		// 	-39.0f,
 		// 	41.0f
 		// );
-	}
 		
-	
+	}
+
+
 };
 
 #endif

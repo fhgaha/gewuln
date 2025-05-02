@@ -7,6 +7,8 @@
 #include <gewuln/resource_manager.h>
 #include <gewuln/camera/camera_look_at.h>
 #include <gewuln/camera/camera_fly.h>
+#include <gewuln/room.h>
+
 
 // Represents the current state of the game
 enum GameState {
@@ -26,6 +28,9 @@ public:
     bool                    Keys[1024];
     unsigned int            Width, Height;
     float                   dt;
+    
+    Room                    *start_room;
+    Room                    *current_room;
 
 
     // constructor/destructor

@@ -72,7 +72,6 @@ class Character {
 					}
 				}
 
-
 			}
 
 
@@ -96,19 +95,15 @@ class Character {
 			if (keys[GLFW_KEY_W]){
 			    velocity = forward * WALK_SPEED * dt;
 
-				std::map<std::string, Model> *models = &ResourceManager::Models;
-				for (const auto &[name, mdl] : *models) {
-					if (mdl.walkable_area.has_value()) {
-
-						inside = inside_walkable_area(
-							this->model->collider_mesh.value(),
-							mdl.walkable_area.value(),
-							this->position + velocity
-						);
-
-					}
+				//check that the character won't leave walkable area on the next frame
+				if (game->current_room->walkable_area->has_value()) {
+					inside = inside_walkable_area(
+						this->model->collider_mesh.value(),
+						game->current_room->walkable_area->value(),
+						this->position + velocity
+					);
 				}
-
+				
 			} else {
 				velocity = glm::vec3(0.0f);
 			}
@@ -118,9 +113,9 @@ class Character {
 
 		}
 
+
 		bool inside_walkable_area(const Mesh &character_collider, const Mesh &walkable_area, const glm::vec3 position_to_test)
 		{
-						
 			//1. get character's 4 lowest pts of collider
 
 			std::array<glm::vec2, 4> small_square;

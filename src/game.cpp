@@ -5,7 +5,6 @@
 #include <gewuln/model_renderer.h>
 #include <gewuln/character.h>
 #include <gewuln/text_renderer.h>
-#include <gewuln/room.h>
 #include <gewuln/geometry_2d.h>
 
 
@@ -19,6 +18,7 @@ TextRenderer                                                *text_renderer;
 std::unordered_map<std::string, Character>                  characters;
 std::unordered_map<std::string, std::unique_ptr<Room>>      rooms;
 
+
 Character                                                   *active_character;
 
 bool                                                        show_granny_text;
@@ -31,41 +31,13 @@ Game::~Game()
 {
     delete model_renderer;
     delete text_renderer;
+    delete start_room;
+    delete current_room;
+    delete active_character;
 }
 
 void Game::Init()
 {
-    // {
-    //     std::cout << "inside test 1, should be 0: " 
-    //     << Geometry2d::point_in_triangle(
-    //         glm::vec2(0.2f, 0.2f), 
-    //         glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 1.0f), glm::vec2(1.0f, 0.0f)
-    //     )
-    //     << "\n";
-        
-    //     std::cout << "inside test 2, should be 1: " 
-    //     << Geometry2d::point_in_triangle(
-    //         glm::vec2(0.2f, 0.2f), 
-    //         glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f), glm::vec2(0.0f, 1.0f)
-    //     )
-    //     << "\n";
-
-    //     std::cout << "inside test 3, should be 0: " 
-    //     << Geometry2d::point_in_triangle(
-    //         glm::vec2(-0.2f, -0.2f), 
-    //         glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f), glm::vec2(0.0f, 1.0f)
-    //     )
-    //     << "\n";
-        
-    //     std::cout << "inside test 3, should be 0: " 
-    //     << Geometry2d::point_in_triangle(
-    //         glm::vec2(1.0f, 1.0f), 
-    //         glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f), glm::vec2(0.0f, 1.0f)
-    //     )
-    //     << "\n";
-    // }
-    
-
     ResourceManager::LoadShader(
         "D:/MyProjects/cpp/gewuln/src/shaders/default/default.vert",
         "D:/MyProjects/cpp/gewuln/src/shaders/default/default.frag",
@@ -100,19 +72,17 @@ void Game::Init()
     );
 
 
-    //text renderer
-    {
+    {//text renderer
         text_renderer = new TextRenderer(this->Width, this->Height);
         text_renderer->Load("D:/MyProjects/cpp/gewuln/assets/fonts/arial/arial.ttf", 24);
     }
 
-    //setting up rooms
-    {
+    
+    {//setting up rooms
         rooms["start_room"] = std::make_unique<Room>();
+        start_room = rooms["start_room"].get();
 
-        //start room cameras
-        {
-            auto& start_room = rooms["start_room"];
+        {//start room cameras
             start_room->cameras["cam_fly"] = std::make_unique<CameraFly>(
                 glm::vec3(-3.228f, 3.582f, 4.333f),
                 glm::vec3(0.0f, 1.0f, 0.0f),
@@ -145,6 +115,11 @@ void Game::Init()
             // start_room->active_cam = start_room->initial_cam;
             start_room->active_cam = start_room->cameras["cam_fly"].get();
         }
+
+        start_room->Init(&ResourceManager::GetModel("room"));
+        
+        current_room = start_room;
+        
     }
 }
 
@@ -158,7 +133,7 @@ void Game::Update(float dt)
 
         //tmp
         glm::vec3 trg = active_character->position + glm::vec3(0.0f, 1.5f, 0.0f);
-        rooms["start_room"]->active_cam->LookAt(&trg);
+        current_room->active_cam->LookAt(&trg);
     }
 
 }
@@ -168,16 +143,16 @@ void Game::ProcessInput()
 {
     // if (Keys[GLFW_KEY_W])
     if (Keys[GLFW_KEY_UP])
-        rooms["start_room"]->active_cam->ProcessKeyboard(FORWARD, dt);
+        current_room->active_cam->ProcessKeyboard(FORWARD, dt);
     // if (Keys[GLFW_KEY_S])
     if (Keys[GLFW_KEY_DOWN])
-        rooms["start_room"]->active_cam->ProcessKeyboard(BACKWARD, dt);
+        current_room->active_cam->ProcessKeyboard(BACKWARD, dt);
     // if (Keys[GLFW_KEY_A])
     if (Keys[GLFW_KEY_LEFT])
-        rooms["start_room"]->active_cam->ProcessKeyboard(LEFT, dt);
+        current_room->active_cam->ProcessKeyboard(LEFT, dt);
     // if (Keys[GLFW_KEY_D])
     if (Keys[GLFW_KEY_RIGHT])
-        rooms["start_room"]->active_cam->ProcessKeyboard(RIGHT, dt);
+        current_room->active_cam->ProcessKeyboard(RIGHT, dt);
 
 
     if (active_character) {
@@ -188,12 +163,12 @@ void Game::ProcessInput()
 
 void Game::ProcessMouseMovement(float xoffset, float yoffset)
 {
-    rooms["start_room"]->active_cam->ProcessMouseMovement(xoffset, yoffset);
+    current_room->active_cam->ProcessMouseMovement(xoffset, yoffset);
 }
 
 void Game::ProcessMouseScroll(float yoffset)
 {
-    rooms["start_room"]->active_cam->ProcessMouseScroll(yoffset);
+    current_room->active_cam->ProcessMouseScroll(yoffset);
 }
 
 void Game::Render()
@@ -207,13 +182,13 @@ void Game::Render()
 
     model_renderer->DrawCharacter(
         active_character,
-        rooms["start_room"]->active_cam,
+        current_room->active_cam,
         (float)Width/(float)Height
     );
 
     model_renderer->DrawSimpleModel(
         ResourceManager::GetModel("room"),
-        rooms["start_room"]->active_cam,
+        current_room->active_cam,
         (float)Width/(float)Height
     );
 

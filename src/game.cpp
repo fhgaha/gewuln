@@ -65,60 +65,88 @@ void Game::Init()
 
     ResourceManager::LoadModel(
         // "D:/MyProjects/cpp/gewuln/assets/models/room/gltf_3_walkable_area/room.gltf",
-        "D:/MyProjects/cpp/gewuln/assets/models/room/gltf_4_walkable_area_merged_by_distance_removed_overlapping/room.gltf",
+        // "D:/MyProjects/cpp/gewuln/assets/models/room/gltf_4_walkable_area_merged_by_distance_removed_overlapping/room.gltf",
         // "D:/MyProjects/cpp/gewuln/assets/models/room/gltf_5_walkable_area_simple_square/room.gltf",
+        "D:/MyProjects/cpp/gewuln/assets/models/room/gltf_6_room_exit/room.gltf",
         false,
         "room"
     );
+    
 
 
     {//text renderer
         text_renderer = new TextRenderer(this->Width, this->Height);
         text_renderer->Load("D:/MyProjects/cpp/gewuln/assets/fonts/arial/arial.ttf", 24);
     }
-
+    
     
     {//setting up rooms
-        rooms["start_room"] = std::make_unique<Room>();
-        start_room = rooms["start_room"].get();
+        {//first room
+            rooms["start_room"] = std::make_unique<Room>();
+            start_room = rooms["start_room"].get();
 
-        {//start room cameras
-            start_room->cameras["cam_fly"] = std::make_unique<CameraFly>(
-                glm::vec3(-3.228f, 3.582f, 4.333f),
-                glm::vec3(0.0f, 1.0f, 0.0f),
-                -39.0f,
-                41.0f
-            );
+            {//start room cameras
 
-            start_room->cameras["look_at_camera_corridor"] = std::make_unique<CameraLookAt>(
-                glm::vec3(-3.228f, 3.582f, 4.333f),
-                glm::vec3(0.0f, 1.0f, 0.0f),
-                -39.0f,
-                41.0f
-            );
+                start_room->cameras["cam_fly"] = std::make_unique<CameraFly>(
+                    glm::vec3(-3.228f, 3.582f, 4.333f),
+                    glm::vec3(0.0f, 1.0f, 0.0f),
+                    -39.0f,
+                    41.0f
+                );
 
-            start_room->cameras["look_at_camera_kitchen_start"] = std::make_unique<CameraLookAt>(
-                glm::vec3(1.367f, 2.045f, 3.924f),
-                glm::vec3(0.0f, 1.0f, 0.0f),
-                -86.3601f,
-                16.0f
-            );
+                start_room->cameras["look_at_camera_corridor"] = std::make_unique<CameraLookAt>(
+                    glm::vec3(-3.228f, 3.582f, 4.333f),
+                    glm::vec3(0.0f, 1.0f, 0.0f),
+                    -39.0f,
+                    41.0f
+                );
 
-            start_room->cameras["look_at_camera_kitchen_end"] = std::make_unique<CameraLookAt>(
-                glm::vec3(0.673f, 2.138f, 4.030f),
-                glm::vec3(0.0f, 1.0f, 0.0f),
-                -263.88f,
-                19.7599f
-            );
+                start_room->cameras["look_at_camera_kitchen_start"] = std::make_unique<CameraLookAt>(
+                    glm::vec3(1.367f, 2.045f, 3.924f),
+                    glm::vec3(0.0f, 1.0f, 0.0f),
+                    -86.3601f,
+                    16.0f
+                );
 
-            start_room->initial_cam = start_room->cameras["look_at_camera_corridor"].get();
-            // start_room->active_cam = start_room->initial_cam;
-            start_room->active_cam = start_room->cameras["cam_fly"].get();
+                start_room->cameras["look_at_camera_kitchen_end"] = std::make_unique<CameraLookAt>(
+                    glm::vec3(0.673f, 2.138f, 4.030f),
+                    glm::vec3(0.0f, 1.0f, 0.0f),
+                    -263.88f,
+                    19.7599f
+                );
+                
+                start_room->initial_cam = start_room->cameras["look_at_camera_corridor"].get();
+                // start_room->active_cam = start_room->initial_cam;
+                start_room->active_cam = start_room->cameras["cam_fly"].get();
+            }
+
+            start_room->Init(&ResourceManager::GetModel("room"));
+            
+            current_room = start_room;
         }
 
-        start_room->Init(&ResourceManager::GetModel("room"));
         
-        current_room = start_room;
+        {//second room
+            ResourceManager::LoadModel(
+                "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/test_floor/gltf/test_floor.gltf",
+                false,
+                "another_room"
+            );
+        
+            rooms["another_room"] = std::make_unique<Room>();
+            rooms["another_room"]->Init(&ResourceManager::GetModel("another_room"));
+            rooms["another_room"]->cameras["cam_fly"] = std::make_unique<CameraFly>(
+                glm::vec3(-3.228f, 3.582f, 4.333f),
+                glm::vec3(0.0f, 1.0f, 0.0f),
+                -39.0f,
+                41.0f
+            );
+        }
+        
+        //TODO
+        //need a way to switch from one room to another
+        //configure it somehow
+        
         
     }
 }
@@ -173,13 +201,6 @@ void Game::ProcessMouseScroll(float yoffset)
 
 void Game::Render()
 {
-
-    // std::cout << "camera pos " << active_cam->Position
-    // << " yaw " << active_cam->Yaw
-    // << " pitch " << active_cam->Pitch
-    // << " zoom " << active_cam->Zoom
-    // << "\n";
-
     model_renderer->DrawCharacter(
         active_character,
         current_room->active_cam,
@@ -187,7 +208,7 @@ void Game::Render()
     );
 
     model_renderer->DrawSimpleModel(
-        ResourceManager::GetModel("room"),
+        *current_room->model,
         current_room->active_cam,
         (float)Width/(float)Height
     );
@@ -215,11 +236,14 @@ void Game::Render()
 void Game::PlayCameraThing()
 {
     //TODO camera is still targeting mona so it snips to her immidiatelly
-    rooms["start_room"]->active_cam = rooms["start_room"]->cameras["look_at_camera_kitchen_start"].get();
-
     // start cam movement
     // final kitchen cam state: pos [    0.673,    2.138,    4.030] yaw -169.84 pitch 22.1999 zoom 35.8083
 
-    show_granny_text = true;
+    //below works
+    // rooms["start_room"]->active_cam = rooms["start_room"]->cameras["look_at_camera_kitchen_start"].get();
+    // show_granny_text = true;
+}
 
+void Game::switch_rooms() {
+    std::cout << "trying to switch rooms\n";
 }

@@ -46,6 +46,7 @@ public:
     void Render();
 
     void PlayCameraThing();
+    void switch_rooms();
 };
 
 #endif

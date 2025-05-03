@@ -12,6 +12,7 @@
 #include <iostream>
 #include <map>
 
+
 class Character {
 	public:
 		float WALK_SPEED = 1.2f;
@@ -36,40 +37,83 @@ class Character {
 		}
 
 
-		void ProcessInput(const bool keys[], Game *game, const float dt) {
+		void ProcessInput(const bool keys[], Game *game, const float dt) 
+		{
 
 			if (keys[GLFW_KEY_E]){
 
 				assert(this->model->collider_mesh.has_value() && "Character must have collider mesh!");
 
-				//TODO should iterate through not just all loaded models but only through all the currently instanced models
-				std::map<std::string, Model> *models = &ResourceManager::Models;
-				for (const auto &[name, mdl] : *models)
-				{
-					// check if this character is colliding with an interactable
-					if (mdl.interactable_mesh.has_value()) {
+				{//interactable
+					//TODO should iterate through not just all loaded models but only through all the currently instanced models
+					std::map<std::string, Model> *models = &ResourceManager::Models;
+					for (const auto &[name, mdl] : *models)
+					{
+						// check if this character is colliding with an interactable
+						if (mdl.interactable_mesh.has_value()) {
 
-						const std::vector<Vertex> &interactable_verts = mdl.interactable_mesh.value().vertices;
+							const std::vector<Vertex> &interactable_verts = mdl.interactable_mesh.value().vertices;
 
-						std::vector<Vertex> transformed_verts = this->model->collider_mesh.value().vertices;
-						for (size_t i = 0; i < transformed_verts.size(); i++){
-							transformed_verts[i].Position += this->position;
+							std::vector<Vertex> transformed_verts = this->model->collider_mesh.value().vertices;
+							for (size_t i = 0; i < transformed_verts.size(); i++){
+								transformed_verts[i].Position += this->position;
+							}
+
+							bool collider_intersects_an_interactable = Geometry3d::intersect(
+								transformed_verts,
+								interactable_verts
+							);
+
+							std::cout << "collider_intersects_an_interactable: " << collider_intersects_an_interactable << "\n";
+							if (collider_intersects_an_interactable){
+								game->PlayCameraThing();
+							}
+							return;
 						}
-
-						bool collider_intersects_an_interactable = Geometry3d::intersect(
-							transformed_verts,
-							interactable_verts
-						);
-
-						// if (collider_intersects_an_interactable){
-						// 	std::cout << "it intersects!\n";
-						// 	game->PlayCameraThing();
-						// }
-						// else {
-						// 	std::cout << "it DOES NOT intersect!\n";
-						// }
-						return;
 					}
+				}
+				
+				{//switch rooms
+
+					// //TODO should iterate through not just all loaded models but only through all the currently instanced models
+					// std::map<std::string, Model> *models = &ResourceManager::Models;
+					// for (const auto &[name, mdl] : *models)
+					// {
+					// 	// check if this character is colliding with an interactable
+					// 	if (mdl.room_exit.has_value()) {
+
+					// 		const std::vector<Vertex> &room_exit_verts = mdl.room_exit.value().vertices;
+
+					// 		std::vector<Vertex> transformed_verts = this->model->room_exit.value().vertices;
+					// 		for (size_t i = 0; i < transformed_verts.size(); i++){
+					// 			transformed_verts[i].Position += this->position;
+					// 		}
+
+					// 		bool collider_intersects_room_exit = Geometry3d::intersect(
+					// 			transformed_verts,
+					// 			room_exit_verts
+					// 		);
+							
+					// 		std::cout << "collider transformed verts\n";
+					// 		for (auto &v : transformed_verts){
+					// 			std::cout << "\t" << v.Position;
+					// 		}
+					// 		std::cout << "\n===========\n";
+							
+					// 		std::cout << "room exit verts\n";
+					// 		for (auto &v : room_exit_verts){
+					// 			std::cout << "\t" << v.Position;
+					// 		}
+					// 		std::cout << "\n===========\n";
+							
+							
+					// 		if (collider_intersects_room_exit){
+					// 			std::cout << "collider_intersects_room_exit: " << collider_intersects_room_exit <<"\n";
+					// 			game->switch_rooms();
+					// 		}
+					// 		return;
+					// 	}
+					// }
 				}
 
 			}
@@ -96,13 +140,10 @@ class Character {
 			    velocity = forward * WALK_SPEED * dt;
 
 				//check that the character won't leave walkable area on the next frame
-				if (game->current_room->walkable_area->has_value()) {
-					inside = inside_walkable_area(
-						this->model->collider_mesh.value(),
-						game->current_room->walkable_area->value(),
-						this->position + velocity
-					);
-				}
+				inside = game->current_room->inside_walkable_area(
+					this->model->collider_mesh.value(),
+					this->position + velocity
+				);
 				
 			} else {
 				velocity = glm::vec3(0.0f);
@@ -114,79 +155,79 @@ class Character {
 		}
 
 
-		bool inside_walkable_area(const Mesh &character_collider, const Mesh &walkable_area, const glm::vec3 position_to_test)
-		{
-			//1. get character's 4 lowest pts of collider
+		// bool inside_walkable_area(const Mesh &character_collider, const Mesh &walkable_area, const glm::vec3 position_to_test)
+		// {
+		// 	//1. get character's 4 lowest pts of collider
 
-			std::array<glm::vec2, 4> small_square;
+		// 	std::array<glm::vec2, 4> small_square;
 
-			//there are 4*6 small_verts (4 per side, 6 sides of a cube)
-			const std::vector<Vertex> &small_verts = character_collider.vertices;
-			for (size_t i = 0; i < small_verts.size(); i+=4)
-			{
-				Vertex copy = small_verts[i];
+		// 	//there are 4*6 small_verts (4 per side, 6 sides of a cube)
+		// 	const std::vector<Vertex> &small_verts = character_collider.vertices;
+		// 	for (size_t i = 0; i < small_verts.size(); i+=4)
+		// 	{
+		// 		Vertex copy = small_verts[i];
 
-				// get the edge with normal = (0, -1, 0)
-				//a == b when `std::fabsf(a - b) < 1e-6`
-				bool copy_normal_is_minus_one = std::fabsf(copy.Normal.y - (-1.0f)) < 1e-6;
-				if (copy_normal_is_minus_one){
-					glm::vec3 p0 = small_verts[i+0].Position + position_to_test;
-					glm::vec3 p1 = small_verts[i+1].Position + position_to_test;
-					glm::vec3 p2 = small_verts[i+2].Position + position_to_test;
-					glm::vec3 p3 = small_verts[i+3].Position + position_to_test;
+		// 		// get the edge with normal = (0, -1, 0)
+		// 		//a == b when `std::fabsf(a - b) < 1e-6`
+		// 		bool copy_normal_is_minus_one = std::fabsf(copy.Normal.y - (-1.0f)) < 1e-6;
+		// 		if (copy_normal_is_minus_one){
+		// 			glm::vec3 p0 = small_verts[i+0].Position + position_to_test;
+		// 			glm::vec3 p1 = small_verts[i+1].Position + position_to_test;
+		// 			glm::vec3 p2 = small_verts[i+2].Position + position_to_test;
+		// 			glm::vec3 p3 = small_verts[i+3].Position + position_to_test;
 
-					small_square = {
-						glm::vec2(p0.x, p0.z),
-						glm::vec2(p1.x, p1.z),
-						glm::vec2(p2.x, p2.z),
-						glm::vec2(p3.x, p3.z),
-					};
+		// 			small_square = {
+		// 				glm::vec2(p0.x, p0.z),
+		// 				glm::vec2(p1.x, p1.z),
+		// 				glm::vec2(p2.x, p2.z),
+		// 				glm::vec2(p3.x, p3.z),
+		// 			};
 
-					break;
-				}
-			}
+		// 			break;
+		// 		}
+		// 	}
 
 
-			//2. get all walkable areas triangles and their points
+		// 	//2. get all walkable areas triangles and their points
 
-			std::vector<std::array<glm::vec2, 3>> walkable_area_tris;
+		// 	std::vector<std::array<glm::vec2, 3>> walkable_area_tris;
 			
-			const std::vector<Vertex> 		&walkable_verts 	= walkable_area.vertices;
-			const std::vector<unsigned int> &walkable_indeces 	= walkable_area.indices;
+		// 	const std::vector<Vertex> 		&walkable_verts 	= walkable_area.vertices;
+		// 	const std::vector<unsigned int> &walkable_indeces 	= walkable_area.indices;
 
-			//0 1 2, 0 2 3
-			for (size_t i = 0; i < walkable_indeces.size(); i+=3)
-			{
-				glm::vec3 p0 = walkable_verts[walkable_indeces[i+0]].Position;
-				glm::vec3 p1 = walkable_verts[walkable_indeces[i+1]].Position;
-				glm::vec3 p2 = walkable_verts[walkable_indeces[i+2]].Position;
+		// 	//0 1 2, 0 2 3
+		// 	for (size_t i = 0; i < walkable_indeces.size(); i+=3)
+		// 	{
+		// 		glm::vec3 p0 = walkable_verts[walkable_indeces[i+0]].Position;
+		// 		glm::vec3 p1 = walkable_verts[walkable_indeces[i+1]].Position;
+		// 		glm::vec3 p2 = walkable_verts[walkable_indeces[i+2]].Position;
 
-				std::array<glm::vec2, 3> tri = {glm::vec2(p0.x, p0.z), glm::vec2(p1.x, p1.z), glm::vec2(p2.x, p2.z)};
-				walkable_area_tris.push_back(tri);
-			}
+		// 		std::array<glm::vec2, 3> tri = {glm::vec2(p0.x, p0.z), glm::vec2(p1.x, p1.z), glm::vec2(p2.x, p2.z)};
+		// 		walkable_area_tris.push_back(tri);
+		// 	}
 
 
-			//3. check the intersection with walkable area
+		// 	//3. check the intersection with walkable area
 
-			bool inside = Geometry2d::rect_inside_area_of_tris(
-				small_square,
-				walkable_area_tris
-			);
+		// 	bool inside = Geometry2d::rect_inside_area_of_tris(
+		// 		small_square,
+		// 		walkable_area_tris
+		// 	);
 
-			// std::cout << "small poly: \n";
-			// for (auto &pt_d : small_square)
-			// {
-			// 	std::cout << "\t{" << pt_d << "},";
-			// }
-			// std::cout << "\n";
+		// 	// std::cout << "small poly: \n";
+		// 	// for (auto &pt_d : small_square)
+		// 	// {
+		// 	// 	std::cout << "\t{" << pt_d << "},";
+		// 	// }
+		// 	// std::cout << "\n";
 
-			// std::cout << "walkable_pts:\n";
-			//...
-			// std::cout << "inside area: " << inside << "\n";
-			// std::cout << "========================\n";
+		// 	// std::cout << "walkable_pts:\n";
+		// 	//...
+		// 	// std::cout << "inside area: " << inside << "\n";
+		// 	// std::cout << "========================\n";
 
-			return inside;
-		}
+		// 	return inside;
+		// }
 
 		void Update(const float dt) {
 			if (glm::length2(velocity) > 0) {

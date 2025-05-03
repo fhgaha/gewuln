@@ -47,6 +47,7 @@ public:
 	std::optional<Mesh>	collider_mesh;
 	std::optional<Mesh>	interactable_mesh;
 	std::optional<Mesh>	walkable_area;
+	std::optional<Mesh>	room_exit;
 
 	Model() {}
 	Model(std::string const &path, bool animated, glm::vec3 pos = glm::vec3(0.0f))
@@ -92,9 +93,10 @@ private:
 		//Usage: in Blender create a cube, select the Cube object, create custom property "is_collider".
 
 		// std::cout << "node: " << node->mName.data << "\n";
-		bool node_is_collider = false;
-		bool node_is_interactable = false;
-		bool node_is_walkable_area = false;
+		bool node_is_collider 		= false;
+		bool node_is_interactable 	= false;
+		bool node_is_walkable_area 	= false;
+		bool node_is_room_exit 		= false;
 
 		bool has_metadata = node->mMetaData != nullptr && node->mMetaData->mNumProperties > 0;
 		if (has_metadata) {
@@ -144,6 +146,10 @@ private:
 
 					node_is_walkable_area = true;
 				}
+				
+				if (node->mMetaData->mKeys[i] == aiString("is_room_exit")){
+					node_is_room_exit = true;
+				}
 			}
 		}
 
@@ -161,6 +167,10 @@ private:
 			} else if (node_is_walkable_area){
 				walkable_area = processMesh(mesh, scene, false);
 				node_is_walkable_area = false;
+			} else if (node_is_room_exit){
+				//TODO should be able to have multiple room exits
+				room_exit = processMesh(mesh, scene, false);
+				node_is_room_exit = false;
 			} else {
 				meshes.push_back(processMesh(mesh, scene, this->animated));
 			}

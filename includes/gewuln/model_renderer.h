@@ -204,6 +204,33 @@ public:
 					shader.SetBool("drawing_wireframe", false);
 				}
 			}
+			
+			if (loaded_model.room_exit.has_value()) {
+				GLboolean cashed_cull_face;
+				
+				{	//set desired settings
+					glGetBooleanv(GL_CULL_FACE, &cashed_cull_face);					
+					glDisable(GL_CULL_FACE);
+					glDisable(GL_DEPTH_TEST);
+					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+					shader.SetBool("drawing_wireframe", true);
+					shader.SetVector3f("wireframe_color", 0.0f, 0.0f, 1.0f);
+				}
+
+				loaded_model.room_exit.value().Draw(shader);
+
+				{	//reset
+					if (cashed_cull_face == GL_TRUE){
+						glEnable(GL_CULL_FACE);
+					} else {
+						glDisable(GL_CULL_FACE);
+					}
+					glEnable(GL_DEPTH_TEST);
+					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+					shader.SetBool("drawing_wireframe", false);
+				}
+			}
+
 		}
 	}
 

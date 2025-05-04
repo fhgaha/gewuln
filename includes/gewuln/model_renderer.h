@@ -151,7 +151,7 @@ public:
 		//draw interactable wireframe
 		if (draw_gizmos)
 		{
-			if (loaded_model.interactable_mesh.has_value()) {
+			// if (loaded_model.interactable_mesh.has_value()) {
 				
 				//cashed gl settings
 				GLboolean cashed_cull_face;
@@ -165,7 +165,12 @@ public:
 					shader.SetVector3f("wireframe_color", 0.0f, 1.0f, 1.0f);
 				}
 
-				loaded_model.interactable_mesh.value().Draw(shader);
+				// loaded_model.interactable_mesh.value().Draw(shader);
+				
+				for (auto &im : loaded_model.interactiable_meshes)
+				{
+					im.Draw(shader);
+				}
 
 				{	//reset
 					if (cashed_cull_face == GL_TRUE){
@@ -177,7 +182,7 @@ public:
 					// glEnable(GL_DEPTH_TEST);
 					shader.SetBool("drawing_wireframe", false);
 				}
-			}
+			// }
 
 			if (loaded_model.walkable_area.has_value()) {
 				GLboolean cashed_cull_face;
@@ -211,7 +216,7 @@ public:
 				{	//set desired settings
 					glGetBooleanv(GL_CULL_FACE, &cashed_cull_face);					
 					glDisable(GL_CULL_FACE);
-					glDisable(GL_DEPTH_TEST);
+					// glDisable(GL_DEPTH_TEST);
 					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 					shader.SetBool("drawing_wireframe", true);
 					shader.SetVector3f("wireframe_color", 0.0f, 0.0f, 1.0f);
@@ -225,7 +230,7 @@ public:
 					} else {
 						glDisable(GL_CULL_FACE);
 					}
-					glEnable(GL_DEPTH_TEST);
+					// glEnable(GL_DEPTH_TEST);
 					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 					shader.SetBool("drawing_wireframe", false);
 				}

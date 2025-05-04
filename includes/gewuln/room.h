@@ -11,16 +11,30 @@
 #include <memory>
 #include <utility>
 #include <array>
+#include <functional>
+
+
 
 class Room
 {
 public:
-	std::unordered_map<std::string, std::unique_ptr<Camera>>	cameras;
+
+	struct Interactable
+	{
+		Mesh *mesh;
+		int glfw_key;
+		std::function<void()> action;
+	};
 	
+	std::unordered_map<std::string, std::unique_ptr<Camera>>	cameras;
+	std::vector<Interactable>	 								interactables;
+	
+	Model														*model;
 	Camera														*initial_cam;
 	Camera														*active_cam;
+	
 	std::optional<Mesh>											*walkable_area;
-	Model														*model;
+
 
 	//TODO
 	//room exits
@@ -42,6 +56,21 @@ public:
 	{
 		this->model = model;
 		this->walkable_area = &model->walkable_area;	
+		
+		for (auto &mesh : model->interactiable_meshes)
+		{
+			interactables.push_back(
+				Interactable
+				{
+					.mesh = &mesh,
+					.glfw_key = GLFW_KEY_E,
+					.action = []{
+						std::cout << "hello from action\n";
+					}
+				}
+			);
+		}
+		
 		
 		// cameras["fly_cam"] = std::make_unique<CameraFly>(
 		//     glm::vec3(-3.228f, 3.582f, 4.333f),

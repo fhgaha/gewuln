@@ -123,6 +123,12 @@ void Game::Init()
             start_room->Init(&ResourceManager::GetModel("room"));
             
             current_room = start_room;
+            
+            
+            //TODO
+            //need a way to switch from one room to another
+            //configure it somehow
+            
         }
 
         
@@ -142,10 +148,6 @@ void Game::Init()
                 41.0f
             );
         }
-        
-        //TODO
-        //need a way to switch from one room to another
-        //configure it somehow
         
         
     }

@@ -46,6 +46,9 @@ public:
 	std::vector<Mesh>	meshes;
 	std::optional<Mesh>	collider_mesh;
 	std::optional<Mesh>	interactable_mesh;
+	
+	std::vector<Mesh> 	interactiable_meshes;
+	
 	std::optional<Mesh>	walkable_area;
 	std::optional<Mesh>	room_exit;
 
@@ -162,7 +165,8 @@ private:
 				collider_mesh = processMesh(mesh, scene, false);
 				node_is_collider = false;
 			} else if (node_is_interactable) {
-				interactable_mesh = processMesh(mesh, scene, false);
+				// interactable_mesh = processMesh(mesh, scene, false);
+				interactiable_meshes.push_back(processMesh(mesh, scene, false));
 				node_is_interactable = false;
 			} else if (node_is_walkable_area){
 				walkable_area = processMesh(mesh, scene, false);

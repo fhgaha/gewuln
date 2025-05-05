@@ -14,20 +14,19 @@
 #include <functional>
 
 
-
 class Room
 {
 public:
 
 	struct Interactable
 	{
-		Mesh *mesh;
-		int glfw_key;
-		std::function<void()> action;
+		Mesh 					*mesh;
+		int 					glfw_key;
+		std::function<void()> 	action;
 	};
 	
 	std::unordered_map<std::string, std::unique_ptr<Camera>>	cameras;
-	std::vector<Interactable>	 								interactables;
+	std::unordered_map<std::string, Interactable>				interactables;
 	
 	Model														*model;
 	Camera														*initial_cam;
@@ -55,29 +54,27 @@ public:
 	void Init(Model *model)
 	{
 		this->model = model;
-		this->walkable_area = &model->walkable_area;	
+		this->walkable_area = &model->walkable_area;
+	}
+	
+	void init_interactable(const char* name, const Interactable interactable)
+	{
+		interactables[name] = interactable;
 		
-		for (auto &mesh : model->interactiable_meshes)
-		{
-			interactables.push_back(
-				Interactable
-				{
-					.mesh = &mesh,
-					.glfw_key = GLFW_KEY_E,
-					.action = []{
-						std::cout << "hello from action\n";
-					}
-				}
-			);
-		}
-		
-		
-		// cameras["fly_cam"] = std::make_unique<CameraFly>(
-		//     glm::vec3(-3.228f, 3.582f, 4.333f),
-		// 	glm::vec3(0.0f, 1.0f, 0.0f),
-		// 	-39.0f,
-		// 	41.0f
-		// );
+		// for (auto &mesh : model->interactiable_meshes)
+		// {
+		// 	interactables.push_back(
+		// 		Interactable
+		// 		{
+		// 			.mesh = &mesh,
+		// 			.glfw_key = GLFW_KEY_E,
+		// 			.action = []{
+		// 				//TODO how tf do i configure this?
+		// 				std::cout << "hello from action\n";
+		// 			}
+		// 		}
+		// 	);
+		// }
 		
 	}
 
@@ -124,7 +121,7 @@ public:
 		const std::vector<Vertex> 		&walkable_verts 	= this->walkable_area->value().vertices;
 		const std::vector<unsigned int> &walkable_indeces 	= this->walkable_area->value().indices;
 
-		//0 1 2, 0 2 3
+		//for a square indeces are: 0 1 2, 0 2 3
 		for (size_t i = 0; i < walkable_indeces.size(); i+=3)
 		{
 			glm::vec3 p0 = walkable_verts[walkable_indeces[i+0]].Position;

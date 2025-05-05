@@ -3,7 +3,6 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
 #include <gewuln/resource_manager.h>
 #include <gewuln/camera/camera_look_at.h>
 #include <gewuln/camera/camera_fly.h>

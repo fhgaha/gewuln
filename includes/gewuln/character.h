@@ -52,7 +52,7 @@ class Character {
 							transformed_verts[i].Position += this->position;
 						}
 						
-						const std::vector<Vertex> &interactable_verts = room_interactable.mesh->vertices;
+						const std::vector<Vertex> &interactable_verts = room_interactable.second.mesh->vertices;
 						
 						bool collider_intersects_an_interactable = Geometry3d::intersect(
 							transformed_verts,
@@ -62,7 +62,7 @@ class Character {
 						std::cout << "collider_intersects_an_interactable: " << collider_intersects_an_interactable << "\n";
 						if (collider_intersects_an_interactable){
 							//TODO should be configurable action
-							room_interactable.action();
+							room_interactable.second.action();
 							// game->PlayCameraThing();
 						}
 						

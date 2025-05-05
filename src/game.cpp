@@ -10,6 +10,7 @@
 
 // settings
 bool show_fps = true;
+bool show_granny_text;
 
 
 ModelRenderer                                               *model_renderer;
@@ -18,10 +19,8 @@ TextRenderer                                                *text_renderer;
 std::unordered_map<std::string, Character>                  characters;
 std::unordered_map<std::string, std::unique_ptr<Room>>      rooms;
 
-
 Character                                                   *active_character;
 
-bool                                                        show_granny_text;
 
 
 Game::Game(unsigned int width, unsigned int height)
@@ -121,6 +120,30 @@ void Game::Init()
             }
 
             start_room->Init(&ResourceManager::GetModel("room"));
+            
+            start_room->init_interactable(
+                "kitchen_inter", 
+                Room::Interactable{
+                    //TODO hardcoded garbage shit
+                    .mesh = &start_room->model->interactiable_meshes[0],
+                    .glfw_key = GLFW_KEY_E,
+                    .action = []{
+                        std::cout << "hello action\n";
+                    }
+                }
+            );
+            
+            // start_room->Init(
+            //     &ResourceManager::GetModel("room")
+            //     /*room transition {
+            //         this room: &ResourceManager::GetModel("room"),
+            //         go to room: &ResourceManager::GetModel("another_room"),
+            //         press key: E
+            //         on room enter: {}
+            //         on room exit: {}
+            //     }
+            //     */
+            // );
             
             current_room = start_room;
             

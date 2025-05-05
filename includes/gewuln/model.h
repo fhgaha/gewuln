@@ -45,7 +45,6 @@ public:
 	glm::vec3			position;
 	std::vector<Mesh>	meshes;
 	std::optional<Mesh>	collider_mesh;
-	std::optional<Mesh>	interactable_mesh;
 	
 	std::vector<Mesh> 	interactiable_meshes;
 	

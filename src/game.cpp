@@ -158,6 +158,16 @@ void Game::Init()
                 -39.0f,
                 41.0f
             );
+            
+            rooms["another_room"]->cameras["cam_fly"] = std::make_unique<CameraFly>(
+                glm::vec3(-3.228f, 3.582f, 4.333f),
+                glm::vec3(0.0f, 1.0f, 0.0f),
+                -39.0f,
+                41.0f
+            );
+            
+            rooms["another_room"].get()->initial_cam = rooms["another_room"].get()->cameras["cam_fly"].get();
+            rooms["another_room"].get()->active_cam = rooms["another_room"].get()->initial_cam;
         }
 
         //TODO forced to do this shit after creating "another room"
@@ -199,7 +209,6 @@ void Game::Update(float dt)
 
 }
 
-
 void Game::ProcessInput()
 {
     // if (Keys[GLFW_KEY_W])
@@ -218,6 +227,12 @@ void Game::ProcessInput()
 
     if (active_character) {
         active_character->ProcessInput(Keys, this, dt);
+    }
+    
+    if (Keys[GLFW_KEY_1]) {
+        current_room = rooms["another_room"].get();
+    } else {
+        current_room = rooms["start_room"].get();
     }
 
 }

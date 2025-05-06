@@ -44,25 +44,23 @@ class Character {
 
 				assert(this->model->collider_mesh.has_value() && "Character must have collider mesh!");
 
-				{//interactable
-					for (auto &room_interactable : game->current_room->interactables)
+				{//interactables
+					for (auto &[room_name, interactable] : game->current_room->interactables)
 					{
 						std::vector<Vertex> transformed_verts = this->model->collider_mesh.value().vertices;
 						for (size_t i = 0; i < transformed_verts.size(); i++){
 							transformed_verts[i].Position += this->position;
 						}
 						
-						const std::vector<Vertex> &interactable_verts = room_interactable.second.mesh->vertices;
-						
 						bool collider_intersects_an_interactable = Geometry3d::intersect(
 							transformed_verts,
-							interactable_verts
+							interactable.mesh->vertices
 						);
 
 						std::cout << "collider_intersects_an_interactable: " << collider_intersects_an_interactable << "\n";
 						if (collider_intersects_an_interactable){
 							//TODO should be configurable action
-							room_interactable.second.action();
+							interactable.action();
 							// game->PlayCameraThing();
 						}
 						
@@ -72,7 +70,29 @@ class Character {
 				
 				{//switch rooms
 
-					// //TODO should iterate through not just all loaded models but only through all the currently instanced models
+					for (auto &[room_name, room_exit] : game->current_room->exits)
+					{
+						std::vector<Vertex> transformed_verts = this->model->collider_mesh.value().vertices;
+						for (size_t i = 0; i < transformed_verts.size(); i++){
+							transformed_verts[i].Position += this->position;
+						}
+						
+						bool collider_intersects_room_exit = Geometry3d::intersect(
+							transformed_verts,
+							room_exit.mesh->vertices
+						);
+						
+						std::cout << "collider_intersects_room_exit: " << collider_intersects_room_exit <<"\n";
+						if (collider_intersects_room_exit){
+							// game->switch_rooms();
+							room_exit.on_room_exit();
+						}
+					}
+					
+					//=====================
+					
+
+					//TODO should iterate through not just all loaded models but only through all the currently instanced models
 					// std::map<std::string, Model> *models = &ResourceManager::Models;
 					// for (const auto &[name, mdl] : *models)
 					// {

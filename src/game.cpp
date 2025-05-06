@@ -121,6 +121,13 @@ void Game::Init()
 
             start_room->Init(&ResourceManager::GetModel("room"));
             
+            current_room = start_room;
+            
+            
+            //TODO
+            //need a way to switch from one room to another
+            //configure it somehow
+            
             start_room->init_interactable(
                 "kitchen_inter", 
                 Room::Interactable{
@@ -132,25 +139,6 @@ void Game::Init()
                     }
                 }
             );
-            
-            // start_room->Init(
-            //     &ResourceManager::GetModel("room")
-            //     /*room transition {
-            //         this room: &ResourceManager::GetModel("room"),
-            //         go to room: &ResourceManager::GetModel("another_room"),
-            //         press key: E
-            //         on room enter: {}
-            //         on room exit: {}
-            //     }
-            //     */
-            // );
-            
-            current_room = start_room;
-            
-            
-            //TODO
-            //need a way to switch from one room to another
-            //configure it somehow
             
         }
 
@@ -171,8 +159,28 @@ void Game::Init()
                 41.0f
             );
         }
+
+        //TODO forced to do this shit after creating "another room"
+        {//start room exits
+            
+            start_room->init_exit(
+                "exit",
+                Room::Exit {
+                    //TODO hardcoded garbage code
+                    .mesh           = &rooms["start_room"].get()->model->room_exit_meshes[0],
+                    .this_room      = rooms["start_room"].get(),
+                    .go_to_room     = rooms["another_room"].get(),
+                    .glfw_key       = GLFW_KEY_E,
+                    .on_room_enter  = []{
+                        std::cout << "start room: on room enter\n";
+                    },
+                    .on_room_exit   = []{
+                        std::cout << "start room: on room exit\n";
+                    }
+                }
+            );
         
-        
+        }        
     }
 }
 

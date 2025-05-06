@@ -25,8 +25,20 @@ public:
 		std::function<void()> 	action;
 	};
 	
+	struct Exit
+	{
+		Mesh					*mesh;
+		Room					*this_room;
+		Room					*go_to_room;
+		int						glfw_key;
+		std::function<void()> 	on_room_enter;
+		std::function<void()> 	on_room_exit;
+	};
+	
 	std::unordered_map<std::string, std::unique_ptr<Camera>>	cameras;
 	std::unordered_map<std::string, Interactable>				interactables;
+	std::unordered_map<std::string, Exit>						exits;
+	
 	
 	Model														*model;
 	Camera														*initial_cam;
@@ -34,16 +46,11 @@ public:
 	
 	std::optional<Mesh>											*walkable_area;
 
-
 	//TODO
-	//room exits
 	//initial_character_position
+	//cameras
 
 	~Room() {
-		// for (auto& [name, cam] : cameras) {
-		// 	delete cam;
-		// }
-
 		delete initial_cam;
 		delete active_cam;
 		delete walkable_area;
@@ -60,22 +67,11 @@ public:
 	void init_interactable(const char* name, const Interactable interactable)
 	{
 		interactables[name] = interactable;
-		
-		// for (auto &mesh : model->interactiable_meshes)
-		// {
-		// 	interactables.push_back(
-		// 		Interactable
-		// 		{
-		// 			.mesh = &mesh,
-		// 			.glfw_key = GLFW_KEY_E,
-		// 			.action = []{
-		// 				//TODO how tf do i configure this?
-		// 				std::cout << "hello from action\n";
-		// 			}
-		// 		}
-		// 	);
-		// }
-		
+	}
+	
+	void init_exit(const char* name, const Exit exit)
+	{
+		exits[name] = exit;
 	}
 
 

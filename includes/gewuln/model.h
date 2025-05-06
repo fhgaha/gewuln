@@ -50,6 +50,9 @@ public:
 	
 	std::optional<Mesh>	walkable_area;
 	std::optional<Mesh>	room_exit;
+	
+	std::vector<Mesh> 	room_exit_meshes;
+
 
 	Model() {}
 	Model(std::string const &path, bool animated, glm::vec3 pos = glm::vec3(0.0f))
@@ -171,8 +174,8 @@ private:
 				walkable_area = processMesh(mesh, scene, false);
 				node_is_walkable_area = false;
 			} else if (node_is_room_exit){
-				//TODO should be able to have multiple room exits
-				room_exit = processMesh(mesh, scene, false);
+				// room_exit = processMesh(mesh, scene, false);
+				room_exit_meshes.push_back(processMesh(mesh, scene, false));
 				node_is_room_exit = false;
 			} else {
 				meshes.push_back(processMesh(mesh, scene, this->animated));

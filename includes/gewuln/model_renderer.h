@@ -151,7 +151,7 @@ public:
 		//draw interactable wireframe
 		if (draw_gizmos)
 		{
-			// if (loaded_model.interactable_mesh.has_value()) {
+			{//draw all the interactable meshes
 				
 				//cashed gl settings
 				GLboolean cashed_cull_face;
@@ -165,11 +165,9 @@ public:
 					shader.SetVector3f("wireframe_color", 0.0f, 1.0f, 1.0f);
 				}
 
-				// loaded_model.interactable_mesh.value().Draw(shader);
-				
-				for (auto &im : loaded_model.interactiable_meshes)
+				for (auto &mesh : loaded_model.interactiable_meshes)
 				{
-					im.Draw(shader);
+					mesh.Draw(shader);
 				}
 
 				{	//reset
@@ -182,7 +180,7 @@ public:
 					// glEnable(GL_DEPTH_TEST);
 					shader.SetBool("drawing_wireframe", false);
 				}
-			// }
+			}
 
 			if (loaded_model.walkable_area.has_value()) {
 				GLboolean cashed_cull_face;
@@ -210,7 +208,7 @@ public:
 				}
 			}
 			
-			if (loaded_model.room_exit.has_value()) {
+			{//draw all the room exits
 				GLboolean cashed_cull_face;
 				
 				{	//set desired settings
@@ -222,8 +220,11 @@ public:
 					shader.SetVector3f("wireframe_color", 0.0f, 0.0f, 1.0f);
 				}
 
-				loaded_model.room_exit.value().Draw(shader);
-
+				for (auto &mesh : loaded_model.room_exit_meshes)
+				{
+					mesh.Draw(shader);
+				}
+				
 				{	//reset
 					if (cashed_cull_face == GL_TRUE){
 						glEnable(GL_CULL_FACE);

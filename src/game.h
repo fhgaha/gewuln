@@ -3,10 +3,11 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
 #include <gewuln/resource_manager.h>
-#include <gewuln/camera_look_at.h>
-#include <gewuln/camera_fly.h>
+#include <gewuln/camera/camera_look_at.h>
+#include <gewuln/camera/camera_fly.h>
+#include <gewuln/room.h>
+
 
 // Represents the current state of the game
 enum GameState {
@@ -26,13 +27,9 @@ public:
     bool                    Keys[1024];
     unsigned int            Width, Height;
     float                   dt;
-
-    //cameras
-    CameraFly               free_look_camera;
-    CameraLookAt            look_at_camera_corridor;
-    CameraLookAt            look_at_camera_kitchen_start;
-    CameraLookAt            look_at_camera_kitchen_end;
-    Camera                  *active_cam;
+    
+    Room                    *start_room;
+    Room                    *current_room;
 
 
     // constructor/destructor
@@ -48,6 +45,7 @@ public:
     void Render();
 
     void PlayCameraThing();
+    void switch_rooms();
 };
 
 #endif

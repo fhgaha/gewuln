@@ -7,9 +7,11 @@
 #include <gewuln/animation.h>
 #include <gewuln/animator.h>
 #include <gewuln/model.h>
-#include <gewuln/gewuln_math.h>
+#include <gewuln/geometry_3d.h>
+#include <gewuln/geometry_2d.h>
 #include <iostream>
 #include <map>
+
 
 class Character {
 	public:
@@ -35,59 +37,102 @@ class Character {
 		}
 
 
-		void ProcessInput(const bool keys[], Game *game, const float dt) {
+		void ProcessInput(const bool keys[], Game *game, const float dt) 
+		{
 
 			if (keys[GLFW_KEY_E]){
-				// get all the interactables
-				
-				//TODO should iterate through not just all loaded models but only through all the currently instanced models
-				std::map<std::string, Model> *models = &ResourceManager::Models;
-				for (const auto &[name, mdl] : *models)
-				{
-					if (mdl.interactable_mesh.has_value()) {
-						const Mesh *intrcbl_mesh = &mdl.interactable_mesh.value();
-						
 
-						//collider mesh is drawn properly, with updated position, but it still has zero based positions in log. why? how?
-						auto cldr_verts = this->model->collider_mesh.value().vertices;
-						// std::cout << "collider:\n";
-						for (size_t i = 0; i < cldr_verts.size(); i++)
-						{
-							cldr_verts[i].Position += this->position;
-						// 	std::cout << "\t" << i <<":\t" << cldr_verts[i].Position << "\n";
+				assert(this->model->collider_mesh.has_value() && "Character must have collider mesh!");
+
+				{//interactables
+					for (auto &[room_name, interactable] : game->current_room->interactables)
+					{
+						std::vector<Vertex> transformed_verts = this->model->collider_mesh.value().vertices;
+						for (size_t i = 0; i < transformed_verts.size(); i++){
+							transformed_verts[i].Position += this->position;
 						}
 						
-						// std::cout << "interactable:\n";
-						// for (size_t i = 0; i < intrcbl_mesh->vertices.size(); i++)
-						// {
-						// 	std::cout << "\t" << i <<":\t" << intrcbl_mesh->vertices[i].Position << "\n";
-						// }
-						// std::cout << "=======================\n";
-						
-						
-						
-						bool collider_intersects_an_interactable = GewulnMath::intersect(
-							cldr_verts, 
-							intrcbl_mesh->vertices
+						bool collider_intersects_an_interactable = Geometry3d::intersect(
+							transformed_verts,
+							interactable.mesh->vertices
 						);
-						
+
+						std::cout << "collider_intersects_an_interactable: " << collider_intersects_an_interactable << "\n";
 						if (collider_intersects_an_interactable){
-							std::cout << "it intersects!\n";
-							game->PlayCameraThing();
+							//TODO should be configurable action
+							interactable.action();
+							// game->PlayCameraThing();
 						}
-						else 
-						{
-							std::cout << "it DOES NOT intersect!\n";
-						}
-						return;
+						
 					}
+					
 				}
 				
+				{//switch rooms
 
-				// check if collider intersects one of the interactables
+					for (auto &[room_name, room_exit] : game->current_room->exits)
+					{
+						std::vector<Vertex> transformed_verts = this->model->collider_mesh.value().vertices;
+						for (size_t i = 0; i < transformed_verts.size(); i++){
+							transformed_verts[i].Position += this->position;
+						}
+						
+						bool collider_intersects_room_exit = Geometry3d::intersect(
+							transformed_verts,
+							room_exit.mesh->vertices
+						);
+						
+						std::cout << "collider_intersects_room_exit: " << collider_intersects_room_exit <<"\n";
+						if (collider_intersects_room_exit){
+							// game->switch_rooms();
+							room_exit.on_room_exit();
+						}
+					}
+					
+					//=====================
+					
 
-				//if does - run the cutscene
-				//if not - do nothing
+					//TODO should iterate through not just all loaded models but only through all the currently instanced models
+					// std::map<std::string, Model> *models = &ResourceManager::Models;
+					// for (const auto &[name, mdl] : *models)
+					// {
+					// 	// check if this character is colliding with an interactable
+					// 	if (mdl.room_exit.has_value()) {
+
+					// 		const std::vector<Vertex> &room_exit_verts = mdl.room_exit.value().vertices;
+
+					// 		std::vector<Vertex> transformed_verts = this->model->room_exit.value().vertices;
+					// 		for (size_t i = 0; i < transformed_verts.size(); i++){
+					// 			transformed_verts[i].Position += this->position;
+					// 		}
+
+					// 		bool collider_intersects_room_exit = Geometry3d::intersect(
+					// 			transformed_verts,
+					// 			room_exit_verts
+					// 		);
+							
+					// 		std::cout << "collider transformed verts\n";
+					// 		for (auto &v : transformed_verts){
+					// 			std::cout << "\t" << v.Position;
+					// 		}
+					// 		std::cout << "\n===========\n";
+							
+					// 		std::cout << "room exit verts\n";
+					// 		for (auto &v : room_exit_verts){
+					// 			std::cout << "\t" << v.Position;
+					// 		}
+					// 		std::cout << "\n===========\n";
+							
+							
+					// 		if (collider_intersects_room_exit){
+					// 			std::cout << "collider_intersects_room_exit: " << collider_intersects_room_exit <<"\n";
+					// 			game->switch_rooms();
+					// 		}
+					// 		return;
+					// 	}
+					// }
+				}
+
 			}
 
 
@@ -107,12 +152,22 @@ class Character {
 				rot_rad += 2.0f * glm::pi<float>();
 			}
 
+			bool inside = false;
 			if (keys[GLFW_KEY_W]){
 			    velocity = forward * WALK_SPEED * dt;
+
+				//check that the character won't leave walkable area on the next frame
+				inside = game->current_room->inside_walkable_area(
+					this->model->collider_mesh.value(),
+					this->position + velocity
+				);
+				
 			} else {
 				velocity = glm::vec3(0.0f);
 			}
-		    position += velocity;
+			if (inside) {
+				this->position += velocity;
+			} 
 
 		}
 

@@ -25,6 +25,15 @@
 
 unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma = false);
 
+
+/*
+Custom properties:
+	"is_collider"
+	"is_interactable"
+	"is_walkable_area"
+*/
+
+
 /*
 For static models all their transformations should be "applied" in Blender, i.e. Location, Rotation and should be reseted to (0, 0, 0)
 and Scale to (1, 1, 1). This is achieved through `Ctrl + A -> All Transforms` in Blender. No position, rotation or scale data is stored
@@ -35,8 +44,15 @@ class Model
 public:
 	glm::vec3			position;
 	std::vector<Mesh>	meshes;
-	std::optional<Mesh>	collider_mesh;	
-	std::optional<Mesh>	interactable_mesh;
+	std::optional<Mesh>	collider_mesh;
+	
+	std::vector<Mesh> 	interactiable_meshes;
+	
+	std::optional<Mesh>	walkable_area;
+	std::optional<Mesh>	room_exit;
+	
+	std::vector<Mesh> 	room_exit_meshes;
+
 
 	Model() {}
 	Model(std::string const &path, bool animated, glm::vec3 pos = glm::vec3(0.0f))
@@ -64,6 +80,7 @@ private:
 			path,
 			aiProcess_Triangulate |	aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices
 		);
+		
 		bool error = !scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode;
 		if(error)
 		{
@@ -81,17 +98,20 @@ private:
 		//Usage: in Blender create a cube, select the Cube object, create custom property "is_collider".
 
 		// std::cout << "node: " << node->mName.data << "\n";
-		bool node_is_collider = false;
-		bool node_is_interactable = false;
+		bool node_is_collider 		= false;
+		bool node_is_interactable 	= false;
+		bool node_is_walkable_area 	= false;
+		bool node_is_room_exit 		= false;
+
 		bool has_metadata = node->mMetaData != nullptr && node->mMetaData->mNumProperties > 0;
 		if (has_metadata) {
 			for (unsigned int i = 0; i < node->mMetaData->mNumProperties; i++)
 			{
 				//collider
 				if (node->mMetaData->mKeys[i] == aiString("is_collider")){
-					// std::cout << "!!found a collider " << node->mName.data 
+					// std::cout << "!!found a collider " << node->mName.data
 					// << " in a node " << node->mName.data
-					// << " of a scene " << scene->mName.data 
+					// << " of a scene " << scene->mName.data
 					// << "\n";
 
 					if (node->mNumMeshes != 1) {
@@ -106,7 +126,7 @@ private:
 				if (node->mMetaData->mKeys[i] == aiString("is_interactable")){
 					// std::cout << "!!found an interactable " << node->mName.data
 					// << " in a node " << node->mName.data
-					// << " of a scene " << scene->mName.data 
+					// << " of a scene " << scene->mName.data
 					// << "\n";
 
 					if (node->mNumMeshes != 1) {
@@ -116,6 +136,25 @@ private:
 
 					node_is_interactable = true;
 				}
+
+				//walking area
+				if (node->mMetaData->mKeys[i] == aiString("is_walkable_area")){
+					// if (node->mNumMeshes != 1) {
+					// 	std::cout << "INTERACTABLE NODE SHOULD HAVE ONE MESH. Having instead: "
+					// 		<< node->mNumMeshes << "\n";
+					// }
+
+					// std::cout << "!!found a walkable area " << node->mName.data
+					// << " in a node " << node->mName.data
+					// << " of a scene " << scene->mName.data
+					// << "\n";
+
+					node_is_walkable_area = true;
+				}
+				
+				if (node->mMetaData->mKeys[i] == aiString("is_room_exit")){
+					node_is_room_exit = true;
+				}
 			}
 		}
 
@@ -123,13 +162,21 @@ private:
 		for(unsigned int i = 0; i < node->mNumMeshes; i++)
 		{
 			aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-			
+
 			if (node_is_collider) {
 				collider_mesh = processMesh(mesh, scene, false);
 				node_is_collider = false;
 			} else if (node_is_interactable) {
-				interactable_mesh = processMesh(mesh, scene, false);
+				// interactable_mesh = processMesh(mesh, scene, false);
+				interactiable_meshes.push_back(processMesh(mesh, scene, false));
 				node_is_interactable = false;
+			} else if (node_is_walkable_area){
+				walkable_area = processMesh(mesh, scene, false);
+				node_is_walkable_area = false;
+			} else if (node_is_room_exit){
+				// room_exit = processMesh(mesh, scene, false);
+				room_exit_meshes.push_back(processMesh(mesh, scene, false));
+				node_is_room_exit = false;
 			} else {
 				meshes.push_back(processMesh(mesh, scene, this->animated));
 			}
@@ -194,7 +241,7 @@ private:
 			std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
 			textures.insert(textures.end(), specularMaps.begin(),	specularMaps.end());
 		}
-		
+
 		ExtractBoneWeightForVertices(vertices, mesh, scene);
 
 		return Mesh(vertices, indices, textures, animated);
@@ -330,8 +377,14 @@ inline unsigned int TextureFromFile(const char *path, const std::string &directo
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		//filtered
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		// unfiltered
+		// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
         stbi_image_free(data);
     }

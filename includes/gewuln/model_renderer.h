@@ -9,6 +9,7 @@
 #include "stdio.h"
 #include "glm/ext.hpp"
 
+
 class ModelRenderer
 {
 
@@ -74,21 +75,42 @@ public:
 			loaded_model.meshes[i].Draw(shader);
 		}
 
-
 		//draw collider wireframe
-		if (draw_gizmos && loaded_model.collider_mesh.has_value())
+		if (draw_gizmos)
 		{
-			{	//set wireframe settings
-				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-				shader.SetBool("drawing_wireframe", true);
-				shader.SetVector3f("wireframe_color", 1.0f, 0.0f, 0.0f);
-			}
+			if (loaded_model.collider_mesh.has_value())
+			{
+				//cashed vals
+				GLboolean cashed_cull_face;
+				
+				//reset gl model for collider mesh
+				glm::mat4 mesh_model(1.0f);
+				mesh_model = glm::translate(mesh_model, pos);	//cheat shit. works but does not actually uses points as is.
+				// mesh_model = glm::rotate(mesh_model, glm::radians(rot_deg), rot_axis);
+				mesh_model = glm::scale(mesh_model, scale);
+				shader.SetMatrix4("model", mesh_model);
+				
+				{	//set desired settings
+					glGetBooleanv(GL_CULL_FACE, &cashed_cull_face);					
+					glDisable(GL_CULL_FACE);
+				
+					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+					shader.SetBool("drawing_wireframe", true);
+					shader.SetVector3f("wireframe_color", 0.0f, 1.0f, 0.0f);
+				}
+				
+				loaded_model.collider_mesh.value().Draw(shader);
 
-			loaded_model.collider_mesh.value().Draw(shader);
-
-			{	//reset wireframe to textures
-				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-				shader.SetBool("drawing_wireframe", false);
+				{	//reset
+					if (cashed_cull_face == GL_TRUE){
+						glEnable(GL_CULL_FACE);
+					} else {
+						glDisable(GL_CULL_FACE);
+					}
+				
+					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+					shader.SetBool("drawing_wireframe", false);
+				}
 			}
 		}
 
@@ -127,20 +149,94 @@ public:
 		}
 
 		//draw interactable wireframe
-		if (draw_gizmos && loaded_model.interactable_mesh.has_value())
+		if (draw_gizmos)
 		{
-			{	//set wireframe settings
-				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-				shader.SetBool("drawing_wireframe", true);
-				shader.SetVector3f("wireframe_color", 0.0f, 1.0f, 1.0f);
+			{//draw all the interactable meshes
+				
+				//cashed gl settings
+				GLboolean cashed_cull_face;
+				
+				{	//set desired settings
+					glGetBooleanv(GL_CULL_FACE, &cashed_cull_face);
+					glDisable(GL_CULL_FACE);
+					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // wireframe
+					// glDisable(GL_DEPTH_TEST);
+					shader.SetBool("drawing_wireframe", true);
+					shader.SetVector3f("wireframe_color", 0.0f, 1.0f, 1.0f);
+				}
+
+				for (auto &mesh : loaded_model.interactiable_meshes)
+				{
+					mesh.Draw(shader);
+				}
+
+				{	//reset
+					if (cashed_cull_face == GL_TRUE){
+						glEnable(GL_CULL_FACE);
+					} else {
+						glDisable(GL_CULL_FACE);
+					}
+					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+					// glEnable(GL_DEPTH_TEST);
+					shader.SetBool("drawing_wireframe", false);
+				}
 			}
 
-			loaded_model.interactable_mesh.value().Draw(shader);
+			if (loaded_model.walkable_area.has_value()) {
+				GLboolean cashed_cull_face;
+				
+				{	//set desired settings
+					glGetBooleanv(GL_CULL_FACE, &cashed_cull_face);					
+					glDisable(GL_CULL_FACE);
+					glDisable(GL_DEPTH_TEST);
+					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+					shader.SetBool("drawing_wireframe", true);
+					shader.SetVector3f("wireframe_color", 1.0f, 1.0f, 0.0f);
+				}
 
-			{	//reset
-				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-				shader.SetBool("drawing_wireframe", false);
+				loaded_model.walkable_area.value().Draw(shader);
+
+				{	//reset
+					if (cashed_cull_face == GL_TRUE){
+						glEnable(GL_CULL_FACE);
+					} else {
+						glDisable(GL_CULL_FACE);
+					}
+					glEnable(GL_DEPTH_TEST);
+					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+					shader.SetBool("drawing_wireframe", false);
+				}
 			}
+			
+			{//draw all the room exits
+				GLboolean cashed_cull_face;
+				
+				{	//set desired settings
+					glGetBooleanv(GL_CULL_FACE, &cashed_cull_face);					
+					glDisable(GL_CULL_FACE);
+					// glDisable(GL_DEPTH_TEST);
+					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+					shader.SetBool("drawing_wireframe", true);
+					shader.SetVector3f("wireframe_color", 0.0f, 0.0f, 1.0f);
+				}
+
+				for (auto &mesh : loaded_model.room_exit_meshes)
+				{
+					mesh.Draw(shader);
+				}
+				
+				{	//reset
+					if (cashed_cull_face == GL_TRUE){
+						glEnable(GL_CULL_FACE);
+					} else {
+						glDisable(GL_CULL_FACE);
+					}
+					// glEnable(GL_DEPTH_TEST);
+					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+					shader.SetBool("drawing_wireframe", false);
+				}
+			}
+
 		}
 	}
 

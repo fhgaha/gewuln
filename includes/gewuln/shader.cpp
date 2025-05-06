@@ -1,6 +1,6 @@
 #include "shader.h"
-
 #include <iostream>
+
 
 Shader &Shader::Use()
 {

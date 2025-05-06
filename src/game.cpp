@@ -48,7 +48,8 @@ void Game::Init()
     model_renderer->draw_gizmos = true;
 
     {
-        auto mona_path = "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf_3_cube_collider/mona.gltf";
+        // auto mona_path = "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf_3_cube_collider/mona.gltf";
+        auto mona_path = "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/export/gltf_3_cube_collider/mona.gltf";
         ResourceManager::LoadModel(mona_path, true, "mona");
 
         characters["mona"] = Character(
@@ -66,7 +67,8 @@ void Game::Init()
         // "D:/MyProjects/cpp/gewuln/assets/models/room/gltf_3_walkable_area/room.gltf",
         // "D:/MyProjects/cpp/gewuln/assets/models/room/gltf_4_walkable_area_merged_by_distance_removed_overlapping/room.gltf",
         // "D:/MyProjects/cpp/gewuln/assets/models/room/gltf_5_walkable_area_simple_square/room.gltf",
-        "D:/MyProjects/cpp/gewuln/assets/models/room/gltf_6_room_exit/room.gltf",
+        // "D:/MyProjects/cpp/gewuln/assets/models/room/gltf_6_room_exit/room.gltf",
+        "D:/MyProjects/cpp/gewuln/assets/models/room/export/gltf_6_room_exit/room.gltf",
         false,
         "room"
     );
@@ -145,7 +147,8 @@ void Game::Init()
         
         {//second room
             ResourceManager::LoadModel(
-                "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/test_floor/gltf/test_floor.gltf",
+                // "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/test_floor/gltf/test_floor.gltf",
+                "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/export/test_floor/gltf/test_floor.gltf",
                 false,
                 "another_room"
             );

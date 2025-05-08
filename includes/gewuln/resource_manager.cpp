@@ -3,6 +3,7 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <filesystem>
 
 #include <stb/stb_image.h>
 #include <assimp/Importer.hpp>
@@ -140,5 +141,6 @@ Texture2D ResourceManager::loadTextureFromFile(const char *file, bool alpha)
 
 Model ResourceManager::loadModelFromFile(const char *file, bool animated)
 {
+    assert(std::filesystem::exists(file) && "File does not exists");
     return Model(file, animated);
 }

@@ -12,7 +12,6 @@
 bool show_fps = true;
 bool show_granny_text;
 
-
 ModelRenderer                                               *model_renderer;
 TextRenderer                                                *text_renderer;
 
@@ -122,13 +121,7 @@ void Game::Init()
             }
 
             start_room->Init(&ResourceManager::GetModel("room"));
-            
             current_room = start_room;
-            
-            
-            //TODO
-            //need a way to switch from one room to another
-            //configure it somehow
             
             start_room->init_interactable(
                 "kitchen_inter", 
@@ -148,29 +141,24 @@ void Game::Init()
         {//second room
             ResourceManager::LoadModel(
                 // "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/test_floor/gltf/test_floor.gltf",
-                "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/export/test_floor/gltf/test_floor.gltf",
+                // "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/export/test_floor/gltf/test_floor.gltf",
+                // "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/export/test_floor/gltf_2_tiling_texture/test_rooms.gltf",
+                "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/export/test_floor/gltf_2_tiling_texture/test_rooms.gltf",
                 false,
                 "another_room"
             );
-        
+            
             rooms["another_room"] = std::make_unique<Room>();
-            rooms["another_room"]->Init(&ResourceManager::GetModel("another_room"));
-            rooms["another_room"]->cameras["cam_fly"] = std::make_unique<CameraFly>(
+            auto another_room = rooms["another_room"].get();
+            another_room->Init(&ResourceManager::GetModel("another_room"));
+            another_room->cameras["cam_fly"] = std::make_unique<CameraFly>(
                 glm::vec3(-3.228f, 3.582f, 4.333f),
                 glm::vec3(0.0f, 1.0f, 0.0f),
                 -39.0f,
                 41.0f
             );
-            
-            rooms["another_room"]->cameras["cam_fly"] = std::make_unique<CameraFly>(
-                glm::vec3(-3.228f, 3.582f, 4.333f),
-                glm::vec3(0.0f, 1.0f, 0.0f),
-                -39.0f,
-                41.0f
-            );
-            
-            rooms["another_room"].get()->initial_cam = rooms["another_room"].get()->cameras["cam_fly"].get();
-            rooms["another_room"].get()->active_cam = rooms["another_room"].get()->initial_cam;
+            another_room->initial_cam = another_room->cameras["cam_fly"].get();
+            another_room->active_cam = another_room->initial_cam;
         }
 
         //TODO forced to do this shit after creating "another room"
@@ -212,6 +200,7 @@ void Game::Update(float dt)
 
 }
 
+bool one_was_pressed = false;
 void Game::ProcessInput()
 {
     // if (Keys[GLFW_KEY_W])
@@ -232,10 +221,11 @@ void Game::ProcessInput()
         active_character->ProcessInput(Keys, this, dt);
     }
     
-    if (Keys[GLFW_KEY_1]) {
-        current_room = rooms["another_room"].get();
-    } else {
-        current_room = rooms["start_room"].get();
+    if (!one_was_pressed) {
+        if (Keys[GLFW_KEY_1]) {
+            one_was_pressed = true;
+            current_room = rooms["another_room"].get();
+        } 
     }
 
 }

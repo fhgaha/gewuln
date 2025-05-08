@@ -88,49 +88,6 @@ class Character {
 							room_exit.on_room_exit();
 						}
 					}
-					
-					//=====================
-					
-
-					//TODO should iterate through not just all loaded models but only through all the currently instanced models
-					// std::map<std::string, Model> *models = &ResourceManager::Models;
-					// for (const auto &[name, mdl] : *models)
-					// {
-					// 	// check if this character is colliding with an interactable
-					// 	if (mdl.room_exit.has_value()) {
-
-					// 		const std::vector<Vertex> &room_exit_verts = mdl.room_exit.value().vertices;
-
-					// 		std::vector<Vertex> transformed_verts = this->model->room_exit.value().vertices;
-					// 		for (size_t i = 0; i < transformed_verts.size(); i++){
-					// 			transformed_verts[i].Position += this->position;
-					// 		}
-
-					// 		bool collider_intersects_room_exit = Geometry3d::intersect(
-					// 			transformed_verts,
-					// 			room_exit_verts
-					// 		);
-							
-					// 		std::cout << "collider transformed verts\n";
-					// 		for (auto &v : transformed_verts){
-					// 			std::cout << "\t" << v.Position;
-					// 		}
-					// 		std::cout << "\n===========\n";
-							
-					// 		std::cout << "room exit verts\n";
-					// 		for (auto &v : room_exit_verts){
-					// 			std::cout << "\t" << v.Position;
-					// 		}
-					// 		std::cout << "\n===========\n";
-							
-							
-					// 		if (collider_intersects_room_exit){
-					// 			std::cout << "collider_intersects_room_exit: " << collider_intersects_room_exit <<"\n";
-					// 			game->switch_rooms();
-					// 		}
-					// 		return;
-					// 	}
-					// }
 				}
 
 			}

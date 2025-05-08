@@ -31,6 +31,7 @@ Custom properties:
 	"is_collider"
 	"is_interactable"
 	"is_walkable_area"
+	"is_room_exit"
 */
 
 
@@ -44,16 +45,13 @@ class Model
 public:
 	glm::vec3			position;
 	std::vector<Mesh>	meshes;
+
+	//optional meshes that are imported from blender using custom properties	
 	std::optional<Mesh>	collider_mesh;
-	
-	std::vector<Mesh> 	interactiable_meshes;
-	
 	std::optional<Mesh>	walkable_area;
-	std::optional<Mesh>	room_exit;
-	
+	std::vector<Mesh> 	interactiable_meshes;
 	std::vector<Mesh> 	room_exit_meshes;
-
-
+	
 	Model() {}
 	Model(std::string const &path, bool animated, glm::vec3 pos = glm::vec3(0.0f))
 	{
@@ -162,19 +160,17 @@ private:
 		for(unsigned int i = 0; i < node->mNumMeshes; i++)
 		{
 			aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-
+			
 			if (node_is_collider) {
 				collider_mesh = processMesh(mesh, scene, false);
 				node_is_collider = false;
 			} else if (node_is_interactable) {
-				// interactable_mesh = processMesh(mesh, scene, false);
 				interactiable_meshes.push_back(processMesh(mesh, scene, false));
 				node_is_interactable = false;
 			} else if (node_is_walkable_area){
 				walkable_area = processMesh(mesh, scene, false);
 				node_is_walkable_area = false;
 			} else if (node_is_room_exit){
-				// room_exit = processMesh(mesh, scene, false);
 				room_exit_meshes.push_back(processMesh(mesh, scene, false));
 				node_is_room_exit = false;
 			} else {

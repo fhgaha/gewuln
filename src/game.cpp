@@ -47,7 +47,6 @@ void Game::Init()
     model_renderer->draw_gizmos = true;
 
     {
-        // auto mona_path = "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf_3_cube_collider/mona.gltf";
         auto mona_path = "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/export/gltf_3_cube_collider/mona.gltf";
         ResourceManager::LoadModel(mona_path, true, "mona");
 
@@ -62,18 +61,6 @@ void Game::Init()
         active_character = &characters["mona"];
     }
 
-    ResourceManager::LoadModel(
-        // "D:/MyProjects/cpp/gewuln/assets/models/room/gltf_3_walkable_area/room.gltf",
-        // "D:/MyProjects/cpp/gewuln/assets/models/room/gltf_4_walkable_area_merged_by_distance_removed_overlapping/room.gltf",
-        // "D:/MyProjects/cpp/gewuln/assets/models/room/gltf_5_walkable_area_simple_square/room.gltf",
-        // "D:/MyProjects/cpp/gewuln/assets/models/room/gltf_6_room_exit/room.gltf",
-        "D:/MyProjects/cpp/gewuln/assets/models/room/export/gltf_6_room_exit/room.gltf",
-        false,
-        "room"
-    );
-    
-
-
     {//text renderer
         text_renderer = new TextRenderer(this->Width, this->Height);
         text_renderer->Load("D:/MyProjects/cpp/gewuln/assets/fonts/arial/arial.ttf", 24);
@@ -82,6 +69,12 @@ void Game::Init()
     
     {//setting up rooms
         {//first room
+            ResourceManager::LoadModel(
+                "D:/MyProjects/cpp/gewuln/assets/models/room/export/gltf_6_room_exit/room.gltf",
+                false,
+                "room"
+            );
+            
             rooms["start_room"] = std::make_unique<Room>();
             start_room = rooms["start_room"].get();
 
@@ -140,9 +133,6 @@ void Game::Init()
         
         {//second room
             ResourceManager::LoadModel(
-                // "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/test_floor/gltf/test_floor.gltf",
-                // "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/export/test_floor/gltf/test_floor.gltf",
-                // "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/export/test_floor/gltf_2_tiling_texture/test_rooms.gltf",
                 "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/export/test_floor/gltf_2_tiling_texture/test_rooms.gltf",
                 false,
                 "another_room"
@@ -184,6 +174,8 @@ void Game::Init()
         }        
     }
 }
+
+
 
 
 void Game::Update(float dt)

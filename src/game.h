@@ -50,8 +50,6 @@ public:
     void ProcessMouseScroll(float yoffset);
     void Render();
 
-    void PlayCameraThing();
-    void switch_rooms();
 };
 
 #endif

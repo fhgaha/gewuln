@@ -14,11 +14,9 @@ bool show_granny_text;
 
 ModelRenderer                                               *model_renderer;
 TextRenderer                                                *text_renderer;
-
-std::unordered_map<std::string, Character>                  characters;
-
 Character                                                   *active_character;
 
+std::unordered_map<std::string, Character>                  characters;
 
 
 Game::Game(unsigned int width, unsigned int height)
@@ -158,15 +156,17 @@ void Game::Init()
                 Room::Exit {
                     //TODO hardcoded garbage code
                     .mesh           = &rooms["start_room"].get()->model->room_exit_meshes[0],
+                    .glfw_key       = GLFW_KEY_E,
+                    .action = [this]{
+                        this->current_room = this->rooms["another_room"].get();
+                    },
                     .this_room      = rooms["start_room"].get(),
                     .go_to_room     = rooms["another_room"].get(),
-                    .glfw_key       = GLFW_KEY_E,
                     .on_room_enter  = []{
                         std::cout << "start room: on room enter\n";
                     },
-                    .on_room_exit   = [this]{
+                    .on_room_exit   = []{
                         std::cout << "start room: on room exit\n";
-                        this->current_room = this->rooms["another_room"].get();
                     }
                 }
             );
@@ -192,34 +192,20 @@ void Game::Update(float dt)
 
 }
 
-bool one_was_pressed = false;
 void Game::ProcessInput()
 {
-    // if (Keys[GLFW_KEY_W])
     if (Keys[GLFW_KEY_UP])
         current_room->active_cam->ProcessKeyboard(FORWARD, dt);
-    // if (Keys[GLFW_KEY_S])
     if (Keys[GLFW_KEY_DOWN])
         current_room->active_cam->ProcessKeyboard(BACKWARD, dt);
-    // if (Keys[GLFW_KEY_A])
     if (Keys[GLFW_KEY_LEFT])
         current_room->active_cam->ProcessKeyboard(LEFT, dt);
-    // if (Keys[GLFW_KEY_D])
     if (Keys[GLFW_KEY_RIGHT])
         current_room->active_cam->ProcessKeyboard(RIGHT, dt);
-
 
     if (active_character) {
         active_character->ProcessInput( this, dt);
     }
-    
-    if (!one_was_pressed) {
-        if (Keys[GLFW_KEY_1]) {
-            one_was_pressed = true;
-            // current_room = rooms["another_room"].get();
-        } 
-    }
-
 }
 
 void Game::ProcessMouseMovement(float xoffset, float yoffset)
@@ -264,19 +250,4 @@ void Game::Render()
         text_renderer->Draw(line_2, this->Width * 0.10f, this->Height - 24.0f * 2.0f * 3.0f, 1.5f);
         text_renderer->Draw(line_3, this->Width * 0.10f, this->Height - 24.0f * 2.0f * 2.0f, 1.5f);
     }
-}
-
-void Game::PlayCameraThing()
-{
-    //TODO camera is still targeting mona so it snips to her immidiatelly
-    // start cam movement
-    // final kitchen cam state: pos [    0.673,    2.138,    4.030] yaw -169.84 pitch 22.1999 zoom 35.8083
-
-    //below works
-    // rooms["start_room"]->active_cam = rooms["start_room"]->cameras["look_at_camera_kitchen_start"].get();
-    // show_granny_text = true;
-}
-
-void Game::switch_rooms() {
-    std::cout << "trying to switch rooms\n";
 }

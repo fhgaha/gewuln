@@ -84,8 +84,8 @@ class Character {
 						
 						std::cout << "collider_intersects_room_exit: " << collider_intersects_room_exit <<"\n";
 						if (collider_intersects_room_exit){
-							// game->switch_rooms();
 							room_exit.on_room_exit();
+							room_exit.action();
 						}
 					}
 				}

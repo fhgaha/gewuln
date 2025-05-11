@@ -28,11 +28,19 @@ public:
 	struct Exit
 	{
 		Mesh					*mesh;
+		int						glfw_key;
+		std::function<void()> 	action;
 		Room					*this_room;
 		Room					*go_to_room;
-		int						glfw_key;
 		std::function<void()> 	on_room_enter;
 		std::function<void()> 	on_room_exit;
+		
+		// auto ScanHardware = [&](HWButton* pKeys, bool* pStateOld, bool* pStateNew, uint32_t nKeyCount)
+		// void action()
+		// {
+			// assert(go_to_room && "Go to room is indefined");
+			// game->current_room = go_to_room;
+		// }
 	};
 	
 	std::unordered_map<std::string, std::unique_ptr<Camera>>	cameras;

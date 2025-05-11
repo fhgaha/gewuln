@@ -37,10 +37,10 @@ class Character {
 		}
 
 
-		void ProcessInput(const bool keys[], Game *game, const float dt) 
+		void ProcessInput(Game *game, const float dt) 
 		{
 
-			if (keys[GLFW_KEY_E]){
+			if (game->Keys[GLFW_KEY_E] && !game->KeysProcessed[GLFW_KEY_E]){
 
 				assert(this->model->collider_mesh.has_value() && "Character must have collider mesh!");
 
@@ -89,15 +89,16 @@ class Character {
 						}
 					}
 				}
-
+				
+				game->KeysProcessed[GLFW_KEY_E] = true;
 			}
 
 
-			if (keys[GLFW_KEY_A]){
+			if (game->Keys[GLFW_KEY_A]){
 				rot_rad += ROT_SPEED * dt;
 				forward = glm::rotate(forward, ROT_SPEED * dt, glm::vec3(0.0f, 1.0f, 0.0f));
 			}
-			if (keys[GLFW_KEY_D]){
+			if (game->Keys[GLFW_KEY_D]){
 				rot_rad -= ROT_SPEED * dt;
 				forward = glm::rotate(forward, -ROT_SPEED * dt, glm::vec3(0.0f, 1.0f, 0.0f));
 			}
@@ -110,7 +111,7 @@ class Character {
 			}
 
 			bool inside = false;
-			if (keys[GLFW_KEY_W]){
+			if (game->Keys[GLFW_KEY_W]){
 			    velocity = forward * WALK_SPEED * dt;
 
 				//check that the character won't leave walkable area on the next frame

@@ -210,7 +210,7 @@ void Game::ProcessInput()
 
 
     if (active_character) {
-        active_character->ProcessInput(Keys, this, dt);
+        active_character->ProcessInput( this, dt);
     }
     
     if (!one_was_pressed) {

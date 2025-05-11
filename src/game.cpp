@@ -16,7 +16,6 @@ ModelRenderer                                               *model_renderer;
 TextRenderer                                                *text_renderer;
 
 std::unordered_map<std::string, Character>                  characters;
-std::unordered_map<std::string, std::unique_ptr<Room>>      rooms;
 
 Character                                                   *active_character;
 
@@ -165,8 +164,9 @@ void Game::Init()
                     .on_room_enter  = []{
                         std::cout << "start room: on room enter\n";
                     },
-                    .on_room_exit   = []{
+                    .on_room_exit   = [this]{
                         std::cout << "start room: on room exit\n";
+                        this->current_room = this->rooms["another_room"].get();
                     }
                 }
             );
@@ -216,7 +216,7 @@ void Game::ProcessInput()
     if (!one_was_pressed) {
         if (Keys[GLFW_KEY_1]) {
             one_was_pressed = true;
-            current_room = rooms["another_room"].get();
+            // current_room = rooms["another_room"].get();
         } 
     }
 

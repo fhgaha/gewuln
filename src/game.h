@@ -34,6 +34,8 @@ public:
     
     Room                    *start_room;
     Room                    *current_room;
+    
+    std::unordered_map<std::string, std::unique_ptr<Room>>      rooms;
 
 
     // constructor/destructor

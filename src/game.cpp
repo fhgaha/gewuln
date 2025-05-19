@@ -206,6 +206,12 @@ void Game::ProcessInput()
     if (active_character) {
         active_character->ProcessInput( this, dt);
     }
+    
+    if (Keys[GLFW_KEY_GRAVE_ACCENT] && !KeysProcessed[GLFW_KEY_GRAVE_ACCENT]) { /* ` */
+        model_renderer->draw_gizmos = !model_renderer->draw_gizmos;
+        KeysProcessed[GLFW_KEY_GRAVE_ACCENT] = true;
+    }
+    
 }
 
 void Game::ProcessMouseMovement(float xoffset, float yoffset)

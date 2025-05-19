@@ -27,8 +27,7 @@ public:
     //check keys processed and set it to true after when you want to be act only once on held.
     //you press, it stays pressed between frames, on release it resets both keys and keys pressed to false.
     //behaves as `act on press` or `just pressed`
-    bool                    Keys[1024];
-    bool                    KeysProcessed[1024];
+    bool                    Keys[1024], KeysProcessed[1024];
     unsigned int            Width, Height;
     float                   dt;
     

@@ -80,3 +80,13 @@ void CameraFly::updateCameraVectors()
     Right = glm::normalize(glm::cross(Front, WorldUp));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
     Up    = glm::normalize(glm::cross(Right, Front));
 }
+
+void CameraFly::print_state()
+{
+    std::cout << "CameraFly state:\n"
+    << "\tposition: "   << glm::to_string(Position)  << "\n"
+    << "\tup: "         << glm::to_string(Up)        << "\n" 
+    << "\tyaw: "        << Yaw                          << "\n"
+    << "\tpitch: "      << Pitch                        << "\n"
+    << "\tzoom: "       << Zoom                         << "\n";
+}

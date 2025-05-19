@@ -12,6 +12,7 @@
 bool show_fps = true;
 bool show_granny_text;
 
+
 ModelRenderer                                               *model_renderer;
 TextRenderer                                                *text_renderer;
 Character                                                   *active_character;
@@ -41,9 +42,9 @@ void Game::Init()
     );
 
     model_renderer = new ModelRenderer(ResourceManager::GetShader("model_shader"));
-    model_renderer->draw_gizmos = true;
+    model_renderer->draw_gizmos = false;
 
-    {
+    {//main character
         auto mona_path = "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/export/gltf_3_cube_collider/mona.gltf";
         ResourceManager::LoadModel(mona_path, true, "mona");
 
@@ -76,12 +77,23 @@ void Game::Init()
             start_room = rooms["start_room"].get();
 
             {//start room cameras
-
+                
+                // //kitchen corner
+                // start_room->cameras["cam_fly"] = std::make_unique<CameraFly>(
+                //     glm::vec3(-3.228f, 3.582f, 4.333f),
+                //     glm::vec3(0.0f, 1.0f, 0.0f),
+                //     -39.0f,
+                //     41.0f
+                // );
+                
+                //close to mona
                 start_room->cameras["cam_fly"] = std::make_unique<CameraFly>(
-                    glm::vec3(-3.228f, 3.582f, 4.333f),
-                    glm::vec3(0.0f, 1.0f, 0.0f),
-                    -39.0f,
-                    41.0f
+                    CameraFly(
+                        glm::vec3(-1.152526f, 1.611192f, 1.471875f),
+                        glm::vec3(0.037262f, 0.972938f, -0.228044f),
+                        -80.7201f,
+                        13.36f
+                    )
                 );
 
                 start_room->cameras["look_at_camera_corridor"] = std::make_unique<CameraLookAt>(
@@ -176,8 +188,6 @@ void Game::Init()
 }
 
 
-
-
 void Game::Update(float dt)
 {
     this->dt = dt;
@@ -211,6 +221,12 @@ void Game::ProcessInput()
         model_renderer->draw_gizmos = !model_renderer->draw_gizmos;
         KeysProcessed[GLFW_KEY_GRAVE_ACCENT] = true;
     }
+    
+    if (Keys[GLFW_KEY_1] && !KeysProcessed[GLFW_KEY_1]) {
+        current_room->active_cam->print_state();
+        KeysProcessed[GLFW_KEY_1] = true;
+    }
+    
     
 }
 

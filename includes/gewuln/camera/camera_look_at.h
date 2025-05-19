@@ -1,9 +1,6 @@
 #ifndef CAMERA_LOOK_AT_H
 #define CAMERA_LOOK_AT_H
 
-#include <glad/glad.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include <gewuln/camera/camera.h>
 
 // An abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL
@@ -27,7 +24,8 @@ public:
     void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true) override;
     void ProcessMouseScroll(float yoffset) override;
     void LookAt(const glm::vec3 *target) override;
-
+    void print_state() override;
+    
 private:
     // calculates the front vector from the Camera's (updated) Euler Angles
     void updateCameraVectors();

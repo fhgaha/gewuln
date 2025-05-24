@@ -11,6 +11,17 @@
 class Geometry3d
 {
 public:
+    
+    static glm::vec3 mat4_to_translation(glm::mat4 mat)
+    {
+        return glm::vec3((float)mat[3][0], (float)mat[3][1], (float)mat[3][2]);
+    }
+    
+    
+    //-------------------------------------------------------------------------------
+    //TODO gjk stuff below, should be separated
+    //-------------------------------------------------------------------------------
+    
     // Uses GJK (Gilbert–Johnson–Keerthi distance) algorithm. pass in only vertex coords of box_lhs and box_rhs.
     static bool intersect(const std::vector<Vertex>& box_lhs, const std::vector<Vertex>& box_rhs) {
         glm::vec3 dir = computeCenter(box_rhs) - computeCenter(box_lhs);

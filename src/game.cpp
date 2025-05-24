@@ -193,9 +193,14 @@ void Game::Update(float dt)
     this->dt = dt;
 
     if (active_character) {
+        if (true){
+            active_character->enableHeadLook = true;
+            active_character->headLookTarget = glm::vec3(1.0f);
+        }
+        
         active_character->Update(dt);
 
-        //tmp
+        //look at cam looks at character, fly cam does nothing
         glm::vec3 trg = active_character->position + glm::vec3(0.0f, 1.5f, 0.0f);
         current_room->active_cam->LookAt(&trg);
     }

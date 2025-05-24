@@ -25,6 +25,12 @@ class Character {
 		float		rot_rad;
 		glm::vec3	forward  = glm::vec3(0.0f, 0.0f, 1.0f);
 		glm::vec3	velocity = glm::vec3(0.0f);
+		
+		
+		bool 		enableHeadLook = true;
+		glm::vec3 	headLookTarget;
+		std::string headBoneName = "mixamorig:Head"; 
+		
 
 		Character(){};
 
@@ -126,6 +132,14 @@ class Character {
 			if (inside) {
 				this->position += velocity;
 			} 
+			
+			if (game->Keys[GLFW_KEY_1]){
+				//auto head_bone = model.boneinfo["mixamorig:HeadTop_End"].offset = mat4x4
+				//rotate head_bone
+				
+				// glm::mat4 head_bone_offset = model->GetBoneInfoMap()["mixamorig:HeadTop_End"].offset;
+				
+			}
 
 		}
 
@@ -136,6 +150,9 @@ class Character {
 			else {
 				animator.PlayAnimation("idle");
 			}
+			
+			animator.forward_tmp = this->forward;
+			
 			animator.UpdateAnimation(dt);
 		}
 };

@@ -83,6 +83,14 @@ public:
 		localTransform = translation * rotation * scale;
 	}
 	
+	void Update_with_rotation(float animationTime, glm::mat4 rotation)
+	{
+		glm::mat4 translation 	= InterpolatePosition(animationTime);
+		glm::mat4 scale 		= InterpolateScaling(animationTime);
+		localTransform = translation * rotation * scale;
+	}
+	
+	
 	glm::mat4 GetLocalTransform() { return localTransform; }
 	std::string GetBoneName() const { return name; }
 	int GetBoneID() { return id; }
@@ -179,7 +187,8 @@ private:
 		glm::quat finalRotation = glm::slerp(
 			rotations[p0Index].orientation, 
 			rotations[p1Index].orientation, 
-			scaleFactor);
+			scaleFactor
+		);
 		finalRotation = glm::normalize(finalRotation);
 		return glm::toMat4(finalRotation);
 	}

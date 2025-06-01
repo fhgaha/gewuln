@@ -24,12 +24,17 @@ class Game
 public:
     // game state
     GameState               State;
-    bool                    Keys[1024];
+    //check keys processed and set it to true after when you want to be act only once on held.
+    //you press, it stays pressed between frames, on release it resets both keys and keys pressed to false.
+    //behaves as `act on press` or `just pressed`
+    bool                    Keys[1024], KeysProcessed[1024];
     unsigned int            Width, Height;
     float                   dt;
     
     Room                    *start_room;
     Room                    *current_room;
+    
+    std::unordered_map<std::string, std::unique_ptr<Room>>      rooms;
 
 
     // constructor/destructor
@@ -44,8 +49,6 @@ public:
     void ProcessMouseScroll(float yoffset);
     void Render();
 
-    void PlayCameraThing();
-    void switch_rooms();
 };
 
 #endif

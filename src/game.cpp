@@ -15,12 +15,9 @@ bool show_granny_text;
 
 ModelRenderer                                               *model_renderer;
 TextRenderer                                                *text_renderer;
-
-std::unordered_map<std::string, Character>                  characters;
-std::unordered_map<std::string, std::unique_ptr<Room>>      rooms;
-
 Character                                                   *active_character;
 
+std::unordered_map<std::string, Character>                  characters;
 
 
 Game::Game(unsigned int width, unsigned int height)
@@ -45,10 +42,9 @@ void Game::Init()
     );
 
     model_renderer = new ModelRenderer(ResourceManager::GetShader("model_shader"));
-    model_renderer->draw_gizmos = true;
+    model_renderer->draw_gizmos = false;
 
-    {
-        // auto mona_path = "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/gltf_3_cube_collider/mona.gltf";
+    {//main character
         auto mona_path = "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/export/gltf_3_cube_collider/mona.gltf";
         ResourceManager::LoadModel(mona_path, true, "mona");
 
@@ -58,22 +54,10 @@ void Game::Init()
                 mona_path,
                 ResourceManager::GetModel("mona")
             ),
-            glm::vec3(-1.0f, 0.0f, 0.0f)
+            glm::vec3(0.0f)
         );
         active_character = &characters["mona"];
     }
-
-    ResourceManager::LoadModel(
-        // "D:/MyProjects/cpp/gewuln/assets/models/room/gltf_3_walkable_area/room.gltf",
-        // "D:/MyProjects/cpp/gewuln/assets/models/room/gltf_4_walkable_area_merged_by_distance_removed_overlapping/room.gltf",
-        // "D:/MyProjects/cpp/gewuln/assets/models/room/gltf_5_walkable_area_simple_square/room.gltf",
-        // "D:/MyProjects/cpp/gewuln/assets/models/room/gltf_6_room_exit/room.gltf",
-        "D:/MyProjects/cpp/gewuln/assets/models/room/export/gltf_6_room_exit/room.gltf",
-        false,
-        "room"
-    );
-    
-
 
     {//text renderer
         text_renderer = new TextRenderer(this->Width, this->Height);
@@ -83,16 +67,33 @@ void Game::Init()
     
     {//setting up rooms
         {//first room
+            ResourceManager::LoadModel(
+                "D:/MyProjects/cpp/gewuln/assets/models/room/export/gltf_6_room_exit/room.gltf",
+                false,
+                "room"
+            );
+            
             rooms["start_room"] = std::make_unique<Room>();
             start_room = rooms["start_room"].get();
 
             {//start room cameras
-
+                
+                // //kitchen corner
+                // start_room->cameras["cam_fly"] = std::make_unique<CameraFly>(
+                //     glm::vec3(-3.228f, 3.582f, 4.333f),
+                //     glm::vec3(0.0f, 1.0f, 0.0f),
+                //     -39.0f,
+                //     41.0f
+                // );
+                
+                //close to mona
                 start_room->cameras["cam_fly"] = std::make_unique<CameraFly>(
-                    glm::vec3(-3.228f, 3.582f, 4.333f),
-                    glm::vec3(0.0f, 1.0f, 0.0f),
-                    -39.0f,
-                    41.0f
+                    CameraFly(
+                        glm::vec3(-1.152526f, 1.611192f, 1.471875f),
+                        glm::vec3(0.0f, 1.0f, 0.0f), //this garbage thing should be always up on start
+                        -80.7201f,
+                        13.36f
+                    )
                 );
 
                 start_room->cameras["look_at_camera_corridor"] = std::make_unique<CameraLookAt>(
@@ -123,13 +124,6 @@ void Game::Init()
 
             start_room->Init(&ResourceManager::GetModel("room"));
             
-            current_room = start_room;
-            
-            
-            //TODO
-            //need a way to switch from one room to another
-            //configure it somehow
-            
             start_room->init_interactable(
                 "kitchen_inter", 
                 Room::Interactable{
@@ -147,30 +141,34 @@ void Game::Init()
         
         {//second room
             ResourceManager::LoadModel(
-                // "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/test_floor/gltf/test_floor.gltf",
-                "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/export/test_floor/gltf/test_floor.gltf",
+                // "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/export/test_floor/gltf_2_tiling_texture/test_rooms.gltf",
+                "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/export/test_floor/gltf_3_added_interactable/test_rooms.gltf",
                 false,
                 "another_room"
             );
-        
+            
             rooms["another_room"] = std::make_unique<Room>();
-            rooms["another_room"]->Init(&ResourceManager::GetModel("another_room"));
-            rooms["another_room"]->cameras["cam_fly"] = std::make_unique<CameraFly>(
+            auto another_room = rooms["another_room"].get();
+            another_room->Init(&ResourceManager::GetModel("another_room"));
+            another_room->cameras["cam_fly"] = std::make_unique<CameraFly>(
                 glm::vec3(-3.228f, 3.582f, 4.333f),
                 glm::vec3(0.0f, 1.0f, 0.0f),
                 -39.0f,
                 41.0f
             );
-            
-            rooms["another_room"]->cameras["cam_fly"] = std::make_unique<CameraFly>(
-                glm::vec3(-3.228f, 3.582f, 4.333f),
-                glm::vec3(0.0f, 1.0f, 0.0f),
-                -39.0f,
-                41.0f
+            another_room->init_interactable(
+                "some_interactable", 
+                Room::Interactable{
+                    //TODO hardcoded garbage shit
+                    .mesh = &another_room->model->interactiable_meshes[0],
+                    .glfw_key = GLFW_KEY_E,
+                    .action = []{
+                        std::cout << "hello action\n";
+                    }
+                }
             );
-            
-            rooms["another_room"].get()->initial_cam = rooms["another_room"].get()->cameras["cam_fly"].get();
-            rooms["another_room"].get()->active_cam = rooms["another_room"].get()->initial_cam;
+            another_room->initial_cam = another_room->cameras["cam_fly"].get();
+            another_room->active_cam = another_room->initial_cam;
         }
 
         //TODO forced to do this shit after creating "another room"
@@ -181,9 +179,12 @@ void Game::Init()
                 Room::Exit {
                     //TODO hardcoded garbage code
                     .mesh           = &rooms["start_room"].get()->model->room_exit_meshes[0],
+                    .glfw_key       = GLFW_KEY_E,
+                    .action = [this]{
+                        this->current_room = this->rooms["another_room"].get();
+                    },
                     .this_room      = rooms["start_room"].get(),
                     .go_to_room     = rooms["another_room"].get(),
-                    .glfw_key       = GLFW_KEY_E,
                     .on_room_enter  = []{
                         std::cout << "start room: on room enter\n";
                     },
@@ -194,6 +195,9 @@ void Game::Init()
             );
         
         }        
+        
+        current_room = rooms["another_room"].get();
+        
     }
 }
 
@@ -203,9 +207,15 @@ void Game::Update(float dt)
     this->dt = dt;
 
     if (active_character) {
+        if (true){
+            active_character->enableHeadLook = true;
+            active_character->headLookTarget = glm::vec3(1.0f);
+        }
+        
+        active_character->room_interactables_tmp = &current_room->interactables;
         active_character->Update(dt);
 
-        //tmp
+        //look at cam looks at character, fly cam does nothing
         glm::vec3 trg = active_character->position + glm::vec3(0.0f, 1.5f, 0.0f);
         current_room->active_cam->LookAt(&trg);
     }
@@ -214,30 +224,30 @@ void Game::Update(float dt)
 
 void Game::ProcessInput()
 {
-    // if (Keys[GLFW_KEY_W])
     if (Keys[GLFW_KEY_UP])
         current_room->active_cam->ProcessKeyboard(FORWARD, dt);
-    // if (Keys[GLFW_KEY_S])
     if (Keys[GLFW_KEY_DOWN])
         current_room->active_cam->ProcessKeyboard(BACKWARD, dt);
-    // if (Keys[GLFW_KEY_A])
     if (Keys[GLFW_KEY_LEFT])
         current_room->active_cam->ProcessKeyboard(LEFT, dt);
-    // if (Keys[GLFW_KEY_D])
     if (Keys[GLFW_KEY_RIGHT])
         current_room->active_cam->ProcessKeyboard(RIGHT, dt);
 
-
     if (active_character) {
-        active_character->ProcessInput(Keys, this, dt);
+        active_character->ProcessInput( this, dt);
     }
     
-    if (Keys[GLFW_KEY_1]) {
-        current_room = rooms["another_room"].get();
-    } else {
-        current_room = rooms["start_room"].get();
+    if (Keys[GLFW_KEY_GRAVE_ACCENT] && !KeysProcessed[GLFW_KEY_GRAVE_ACCENT]) { /* ` */
+        model_renderer->draw_gizmos = !model_renderer->draw_gizmos;
+        KeysProcessed[GLFW_KEY_GRAVE_ACCENT] = true;
     }
-
+    
+    if (Keys[GLFW_KEY_1] && !KeysProcessed[GLFW_KEY_1]) {
+        current_room->active_cam->print_state();
+        KeysProcessed[GLFW_KEY_1] = true;
+    }
+    
+    
 }
 
 void Game::ProcessMouseMovement(float xoffset, float yoffset)
@@ -282,19 +292,4 @@ void Game::Render()
         text_renderer->Draw(line_2, this->Width * 0.10f, this->Height - 24.0f * 2.0f * 3.0f, 1.5f);
         text_renderer->Draw(line_3, this->Width * 0.10f, this->Height - 24.0f * 2.0f * 2.0f, 1.5f);
     }
-}
-
-void Game::PlayCameraThing()
-{
-    //TODO camera is still targeting mona so it snips to her immidiatelly
-    // start cam movement
-    // final kitchen cam state: pos [    0.673,    2.138,    4.030] yaw -169.84 pitch 22.1999 zoom 35.8083
-
-    //below works
-    // rooms["start_room"]->active_cam = rooms["start_room"]->cameras["look_at_camera_kitchen_start"].get();
-    // show_granny_text = true;
-}
-
-void Game::switch_rooms() {
-    std::cout << "trying to switch rooms\n";
 }

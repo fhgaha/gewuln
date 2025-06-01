@@ -28,9 +28,10 @@ public:
 	struct Exit
 	{
 		Mesh					*mesh;
+		int						glfw_key;
+		std::function<void()> 	action;
 		Room					*this_room;
 		Room					*go_to_room;
-		int						glfw_key;
 		std::function<void()> 	on_room_enter;
 		std::function<void()> 	on_room_exit;
 	};

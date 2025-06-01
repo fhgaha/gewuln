@@ -160,7 +160,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
             break;
         case GLFW_RELEASE:
             game.Keys[key] = false;
-            // game.KeysProcessed[key] = false;
+            game.KeysProcessed[key] = false;
             break;
         default:
             break;

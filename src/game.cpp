@@ -54,7 +54,7 @@ void Game::Init()
                 mona_path,
                 ResourceManager::GetModel("mona")
             ),
-            glm::vec3(-1.0f, 0.0f, 0.0f)
+            glm::vec3(0.0f)
         );
         active_character = &characters["mona"];
     }
@@ -90,7 +90,7 @@ void Game::Init()
                 start_room->cameras["cam_fly"] = std::make_unique<CameraFly>(
                     CameraFly(
                         glm::vec3(-1.152526f, 1.611192f, 1.471875f),
-                        glm::vec3(0.037262f, 0.972938f, -0.228044f),
+                        glm::vec3(0.0f, 1.0f, 0.0f), //this garbage thing should be always up on start
                         -80.7201f,
                         13.36f
                     )
@@ -123,7 +123,6 @@ void Game::Init()
             }
 
             start_room->Init(&ResourceManager::GetModel("room"));
-            current_room = start_room;
             
             start_room->init_interactable(
                 "kitchen_inter", 
@@ -142,7 +141,8 @@ void Game::Init()
         
         {//second room
             ResourceManager::LoadModel(
-                "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/export/test_floor/gltf_2_tiling_texture/test_rooms.gltf",
+                // "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/export/test_floor/gltf_2_tiling_texture/test_rooms.gltf",
+                "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/export/test_floor/gltf_3_added_interactable/test_rooms.gltf",
                 false,
                 "another_room"
             );
@@ -155,6 +155,17 @@ void Game::Init()
                 glm::vec3(0.0f, 1.0f, 0.0f),
                 -39.0f,
                 41.0f
+            );
+            another_room->init_interactable(
+                "some_interactable", 
+                Room::Interactable{
+                    //TODO hardcoded garbage shit
+                    .mesh = &another_room->model->interactiable_meshes[0],
+                    .glfw_key = GLFW_KEY_E,
+                    .action = []{
+                        std::cout << "hello action\n";
+                    }
+                }
             );
             another_room->initial_cam = another_room->cameras["cam_fly"].get();
             another_room->active_cam = another_room->initial_cam;
@@ -184,6 +195,9 @@ void Game::Init()
             );
         
         }        
+        
+        current_room = rooms["another_room"].get();
+        
     }
 }
 
@@ -198,6 +212,7 @@ void Game::Update(float dt)
             active_character->headLookTarget = glm::vec3(1.0f);
         }
         
+        active_character->room_interactables_tmp = &current_room->interactables;
         active_character->Update(dt);
 
         //look at cam looks at character, fly cam does nothing

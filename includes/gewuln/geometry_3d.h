@@ -24,7 +24,7 @@ public:
     
     // Uses GJK (Gilbert–Johnson–Keerthi distance) algorithm. pass in only vertex coords of box_lhs and box_rhs.
     static bool intersect(const std::vector<Vertex>& box_lhs, const std::vector<Vertex>& box_rhs) {
-        glm::vec3 dir = computeCenter(box_rhs) - computeCenter(box_lhs);
+        glm::vec3 dir = compute_box_center(box_rhs) - compute_box_center(box_lhs);
         if (glm::length(dir) < 1e-6) dir = glm::vec3(1, 0, 0); // Avoid zero direction
 
         std::vector<glm::vec3> simplex;
@@ -43,12 +43,15 @@ public:
         return false;
     }
     
-private:
-    static glm::vec3 computeCenter(const std::vector<Vertex>& box) {
+    static glm::vec3 compute_box_center(const std::vector<Vertex>& box) {
         glm::vec3 center(0.0f);
-        for (const auto& v : box) center += v.Position;
+        for (const auto& v : box) {
+            center += v.Position;
+        }
         return center / static_cast<float>(box.size());
     }
+
+private:
 
     static glm::vec3 support(const std::vector<Vertex>& shape, const glm::vec3& d) {
         glm::vec3 result = shape[0].Position;

@@ -123,6 +123,7 @@ public:
 	glm::vec3 char_forward 	= glm::vec3(1.0f);
 	glm::vec3 char_pos 		= glm::vec3(0.0f);
 	
+	//failed attempt on head rotation
 	void calculate_bone_transform_with_look_at(const AssimpNodeData* node, glm::mat4 parentTransform)
 	{
 		std::string desired_name = "mixamorig:Head";
@@ -134,40 +135,36 @@ public:
 			Bone* bone = currentAnimation->FindBone(nodeName);
 			if (bone)
 			{
-				{ //failed attempt on head rotation
-					glm::vec3 up(0.0f, 1.0f, 0.0f);
-					glm::mat4 head_pos_mat = parentTransform * bone->GetLocalTransform();
-					glm::vec3 head_pos = glm::vec3(head_pos_mat[3]) + char_pos;
-					glm::vec3 direction = glm::normalize(target - head_pos);
-					direction = glm::normalize(direction);
-					float angle_rad = glm::angle(direction, char_forward);
-					// direction = glm::rotateY(direction, angle_rad);
-					// direction = glm::rotateY(direction, -angle_rad);
-					
-					glm::mat4 rotation = glm::mat4(1.0f);
+				glm::vec3 up(0.0f, 1.0f, 0.0f);
+				glm::mat4 head_pos_mat = parentTransform * bone->GetLocalTransform();
+				glm::vec3 head_pos = glm::vec3(head_pos_mat[3]) + char_pos;
+				glm::vec3 direction = glm::normalize(target - head_pos);
+				direction = glm::normalize(direction);
+				float angle_rad = glm::angle(direction, char_forward);
+				// direction = glm::rotateY(direction, angle_rad);
+				// direction = glm::rotateY(direction, -angle_rad);
+				
+				glm::mat4 rotation = glm::mat4(1.0f);
 
-					// couldnt solve these piece of shit angles 				
-					float angle_x_rad;
-					float angle_y_rad;
-					
-					// angle_x_rad = glm::radians(45.0f);
-					// angle_y_rad = glm::radians(45.0f);
-					
-					// angle_x_rad = glm::asin(direction.x);
-					angle_x_rad = 0.0f;
-					angle_y_rad = glm::asin(direction.z);
-					
-					// glm::vec3 char_right = glm::normalize(glm::cross(char_forward, up));
-					// bool is_to_right = glm::dot(direction, char_right) >= 0.0f;
-					// if(is_to_right) {
-					// 	angle_y_rad = -angle_y_rad;
-					// }
+				// couldnt solve these piece of shit angles 				
+				float angle_x_rad;
+				float angle_y_rad;
+				
+				// angle_x_rad = glm::radians(45.0f);
+				// angle_y_rad = glm::radians(45.0f);
+				
+				// angle_x_rad = glm::asin(direction.x);
+				angle_x_rad = 0.0f;
+				angle_y_rad = glm::asin(direction.z);
+				
+				// glm::vec3 char_right = glm::normalize(glm::cross(char_forward, up));
+				// bool is_to_right = glm::dot(direction, char_right) >= 0.0f;
+				// if(is_to_right) {
+				// 	angle_y_rad = -angle_y_rad;
+				// }
 
-					std::cout << glm::degrees(angle_y_rad) << "\n";
-
-					rotation = glm::rotate(rotation, angle_x_rad, glm::vec3(1.0f, 0.0f, 0.0f));
-					rotation = glm::rotate(rotation, angle_y_rad, up);
-				}
+				rotation = glm::rotate(rotation, angle_x_rad, glm::vec3(1.0f, 0.0f, 0.0f));
+				rotation = glm::rotate(rotation, angle_y_rad, up);
 				
 				// bone->Update_with_rotation(currentTime, rotation);
 				bone->Update(currentTime);

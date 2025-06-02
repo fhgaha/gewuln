@@ -41,13 +41,13 @@ public:
     Game(unsigned int width, unsigned int height);
     ~Game();
     // initialize game state (load all shaders/textures/levels)
-    void Init();
+    void init();
     // game loop
-    void Update(float dt);
-    void ProcessInput();
-    void ProcessMouseMovement(float xoffset, float yoffset);
-    void ProcessMouseScroll(float yoffset);
-    void Render();
+    void update(float dt);
+    void process_input();
+    void process_mouse_movement(float xoffset, float yoffset);
+    void process_mouse_scroll(float yoffset);
+    void render();
 
 };
 

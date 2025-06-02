@@ -21,19 +21,10 @@
 #include <map>
 #include <vector>
 #include <optional>
-
+#include <unordered_map>
+#include <format>
 
 unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma = false);
-
-
-/*
-Custom properties:
-	"is_collider"
-	"is_interactable"
-	"is_walkable_area"
-	"is_room_exit"
-*/
-
 
 /*
 For static models all their transformations should be "applied" in Blender, i.e. Location, Rotation and should be reseted to (0, 0, 0)
@@ -43,6 +34,24 @@ once model loading process is finished. Blender's description: https://docs.blen
 class Model
 {
 public:
+	enum class BlenderCustomProps {
+		Regular,
+		Collider,
+		Interactable,
+		Walkable,
+		RoomExit
+	};
+	
+    static const std::unordered_map<std::string, BlenderCustomProps>& get_blender_custom_props() {
+        static const std::unordered_map<std::string, BlenderCustomProps> mapping = {
+            {"is_collider",      BlenderCustomProps::Collider},
+            {"is_interactable",  BlenderCustomProps::Interactable},
+            {"is_walkable_area", BlenderCustomProps::Walkable},
+            {"is_room_exit",     BlenderCustomProps::RoomExit}
+        };
+        return mapping;
+    }
+	
 	glm::vec3			position;
 	std::vector<Mesh>	meshes;
 
@@ -95,63 +104,34 @@ private:
 		//looking for a collider
 		//Usage: in Blender create a cube, select the Cube object, create custom property "is_collider".
 
-		// std::cout << "node: " << node->mName.data << "\n";
-		bool node_is_collider 		= false;
-		bool node_is_interactable 	= false;
-		bool node_is_walkable_area 	= false;
-		bool node_is_room_exit 		= false;
+		BlenderCustomProps cur_custom_prop = BlenderCustomProps::Regular;
 
 		bool has_metadata = node->mMetaData != nullptr && node->mMetaData->mNumProperties > 0;
 		if (has_metadata) {
 			for (unsigned int i = 0; i < node->mMetaData->mNumProperties; i++)
 			{
-				//collider
-				if (node->mMetaData->mKeys[i] == aiString("is_collider")){
-					// std::cout << "!!found a collider " << node->mName.data
-					// << " in a node " << node->mName.data
-					// << " of a scene " << scene->mName.data
-					// << "\n";
-
-					if (node->mNumMeshes != 1) {
-						std::cout << "COLLIDER NODE SHOULD HAVE ONE MESH. Having instead: "
-							<< node->mNumMeshes << "\n";
-					}
-
-					node_is_collider = true;
-				}
-
-				//interactable
-				if (node->mMetaData->mKeys[i] == aiString("is_interactable")){
-					// std::cout << "!!found an interactable " << node->mName.data
-					// << " in a node " << node->mName.data
-					// << " of a scene " << scene->mName.data
-					// << "\n";
-
-					if (node->mNumMeshes != 1) {
-						std::cout << "INTERACTABLE NODE SHOULD HAVE ONE MESH. Having instead: "
-							<< node->mNumMeshes << "\n";
-					}
-
-					node_is_interactable = true;
-				}
-
-				//walking area
-				if (node->mMetaData->mKeys[i] == aiString("is_walkable_area")){
-					// if (node->mNumMeshes != 1) {
-					// 	std::cout << "INTERACTABLE NODE SHOULD HAVE ONE MESH. Having instead: "
-					// 		<< node->mNumMeshes << "\n";
-					// }
-
-					// std::cout << "!!found a walkable area " << node->mName.data
-					// << " in a node " << node->mName.data
-					// << " of a scene " << scene->mName.data
-					// << "\n";
-
-					node_is_walkable_area = true;
+				const aiString& key = node->mMetaData->mKeys[i];
+				const auto &strings_as_bender_custom_types = Model::get_blender_custom_props();	//what is going on?
+        		auto it = strings_as_bender_custom_types.find(key.C_Str());
+				if (it != strings_as_bender_custom_types.end()){
+					cur_custom_prop = it->second;
 				}
 				
-				if (node->mMetaData->mKeys[i] == aiString("is_room_exit")){
-					node_is_room_exit = true;
+				switch (cur_custom_prop)
+				{
+					case BlenderCustomProps::Regular:
+					case BlenderCustomProps::Walkable:
+					case BlenderCustomProps::RoomExit:
+						break;
+					case BlenderCustomProps::Collider:
+						assert(node->mNumMeshes == 1 && "COLLIDER NODE SHOULD HAVE ONE MESH");
+						break;
+					case BlenderCustomProps::Interactable:
+						assert(node->mNumMeshes == 1 && "INTERACTABLE NODE SHOULD HAVE ONE MESH");
+						break;
+					default:
+						assert(false && "!Should not be reachable");
+						break;
 				}
 			}
 		}
@@ -160,21 +140,30 @@ private:
 		for(unsigned int i = 0; i < node->mNumMeshes; i++)
 		{
 			aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-			
-			if (node_is_collider) {
-				collider_mesh = processMesh(mesh, scene, false);
-				node_is_collider = false;
-			} else if (node_is_interactable) {
-				interactiable_meshes.push_back(processMesh(mesh, scene, false));
-				node_is_interactable = false;
-			} else if (node_is_walkable_area){
-				walkable_area = processMesh(mesh, scene, false);
-				node_is_walkable_area = false;
-			} else if (node_is_room_exit){
-				room_exit_meshes.push_back(processMesh(mesh, scene, false));
-				node_is_room_exit = false;
-			} else {
-				meshes.push_back(processMesh(mesh, scene, this->animated));
+			switch (cur_custom_prop)
+			{
+				case BlenderCustomProps::Regular:
+					meshes.push_back(processMesh(mesh, scene, this->animated));
+					break;
+				case BlenderCustomProps::Collider:
+					collider_mesh = processMesh(mesh, scene, false);
+					cur_custom_prop = BlenderCustomProps::Regular;
+					break;
+				case BlenderCustomProps::Interactable:
+					interactiable_meshes.push_back(processMesh(mesh, scene, false));
+					cur_custom_prop = BlenderCustomProps::Regular;
+					break;
+				case BlenderCustomProps::Walkable:
+					walkable_area = processMesh(mesh, scene, false);
+					cur_custom_prop = BlenderCustomProps::Regular;
+					break;
+				case BlenderCustomProps::RoomExit:
+					room_exit_meshes.push_back(processMesh(mesh, scene, false));
+					cur_custom_prop = BlenderCustomProps::Regular;
+					break;
+				default:
+					assert(false && "!Should not be reachable");
+					break;
 			}
 		}
 

@@ -144,6 +144,14 @@ public:
 				// direction = glm::rotateY(direction, angle_rad);
 				// direction = glm::rotateY(direction, -angle_rad);
 				
+				// auto dir = glm::normalize(target - head_pos);
+				auto dir = glm::normalize(target - char_pos);
+				auto or_angle = glm::orientedAngle(
+					glm::normalize(glm::vec2(char_forward.x, char_forward.z)), 
+					glm::normalize(glm::vec2(dir.x, dir.z))
+				);
+				printf("or angle: %f\n", glm::degrees(or_angle));
+				
 				glm::mat4 rotation = glm::mat4(1.0f);
 
 				// couldnt solve these piece of shit angles 				
@@ -153,9 +161,8 @@ public:
 				// angle_x_rad = glm::radians(45.0f);
 				// angle_y_rad = glm::radians(45.0f);
 				
-				// angle_x_rad = glm::asin(direction.x);
 				angle_x_rad = 0.0f;
-				angle_y_rad = glm::asin(direction.z);
+				angle_y_rad = -or_angle;
 				
 				// glm::vec3 char_right = glm::normalize(glm::cross(char_forward, up));
 				// bool is_to_right = glm::dot(direction, char_right) >= 0.0f;
@@ -166,8 +173,8 @@ public:
 				rotation = glm::rotate(rotation, angle_x_rad, glm::vec3(1.0f, 0.0f, 0.0f));
 				rotation = glm::rotate(rotation, angle_y_rad, up);
 				
-				// bone->Update_with_rotation(currentTime, rotation);
-				bone->Update(currentTime);
+				bone->Update_with_rotation(currentTime, rotation);
+				// bone->Update(currentTime);
 				nodeTransform = bone->GetLocalTransform();
 			}
 

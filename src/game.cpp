@@ -55,7 +55,7 @@ void Game::init()
                     mona_path,
                     ResourceManager::GetModel("mona")
                 ),
-                glm::vec3(-1.0f, 0.0f, 0.0f)
+                glm::vec3(0.0f, 0.0f, 0.0f)
             );
             active_character = &characters["mona"];
         }
@@ -197,7 +197,7 @@ void Game::init()
             );
         }
         
-        current_room = rooms["test_kitchen_room"].get();
+        current_room = rooms["test_room"].get();
         
     }
 }

@@ -146,11 +146,10 @@ public:
 				
 				// auto dir = glm::normalize(target - head_pos);
 				auto dir = glm::normalize(target - char_pos);
-				auto or_angle = glm::orientedAngle(
+				auto angle_around_up = glm::orientedAngle(
 					glm::normalize(glm::vec2(char_forward.x, char_forward.z)), 
 					glm::normalize(glm::vec2(dir.x, dir.z))
 				);
-				printf("or angle: %f\n", glm::degrees(or_angle));
 				
 				glm::mat4 rotation = glm::mat4(1.0f);
 
@@ -158,11 +157,33 @@ public:
 				float angle_x_rad;
 				float angle_y_rad;
 				
-				// angle_x_rad = glm::radians(45.0f);
+				
+				glm::vec3 dir2 = glm::normalize(target - head_pos);
+				glm::vec2 dir2_norm = glm::normalize(glm::vec2(dir2.z, dir2.y));
+				float angle_around_x = glm::orientedAngle(
+					// glm::normalize(glm::vec2(char_forward.z, char_forward.y)), 
+					glm::vec2(1.0f, 0.0f),
+					dir2_norm
+				);
+				
+				angle_around_x = glm::acos(dir2.y);	//[0, pi]
+				angle_around_x -= glm::half_pi<float>();
+				// printf("angle around x: %f\n", glm::degrees(angle_around_x));
+				
+				// if (target.y > head_pos.y) {
+				// 	angle_around_x *= -1.0f;
+				// }
+
+				// angle_x_rad = glm::radians(30.0f);
 				// angle_y_rad = glm::radians(45.0f);
 				
-				angle_x_rad = 0.0f;
-				angle_y_rad = -or_angle;
+				angle_x_rad = angle_around_x;
+				angle_y_rad = -angle_around_up;
+				
+				
+				//angre around x jumps from 33 deg to -146 deg and back. why?
+				
+				// printf("angle around x: %f, angle around y: %f\n", glm::degrees(angle_x_rad), glm::degrees(angle_y_rad));
 				
 				// glm::vec3 char_right = glm::normalize(glm::cross(char_forward, up));
 				// bool is_to_right = glm::dot(direction, char_right) >= 0.0f;
@@ -170,8 +191,8 @@ public:
 				// 	angle_y_rad = -angle_y_rad;
 				// }
 
-				rotation = glm::rotate(rotation, angle_x_rad, glm::vec3(1.0f, 0.0f, 0.0f));
 				rotation = glm::rotate(rotation, angle_y_rad, up);
+				rotation = glm::rotate(rotation, angle_x_rad, glm::vec3(1.0f, 0.0f, 0.0f));
 				
 				bone->Update_with_rotation(currentTime, rotation);
 				// bone->Update(currentTime);

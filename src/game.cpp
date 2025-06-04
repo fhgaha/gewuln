@@ -68,7 +68,7 @@ void Game::init()
     
     
     {//setting up rooms
-        {//first room
+        {//kitchen room
             ResourceManager::LoadModel(
                 "D:/MyProjects/cpp/gewuln/assets/models/room/export/gltf_6_room_exit/room.gltf",
                 false,
@@ -141,7 +141,7 @@ void Game::init()
         }
 
         
-        {//second room
+        {//orange room
             ResourceManager::LoadModel(
                 // "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/export/test_floor/gltf_2_tiling_texture/test_rooms.gltf",
                 "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/export/test_floor/gltf_3_added_interactable/test_rooms.gltf",
@@ -153,10 +153,12 @@ void Game::init()
             auto test_room = rooms["test_room"].get();
             test_room->Init(&ResourceManager::GetModel("test_room_model"));
             test_room->cameras["cam_fly"] = std::make_unique<CameraFly>(
-                glm::vec3(-3.228f, 3.582f, 4.333f),
-                glm::vec3(0.0f, 1.0f, 0.0f),
-                -39.0f,
-                41.0f
+                CameraFly(
+                    glm::vec3(-4.0f, 0.5f, 4.0f),
+                    glm::vec3(0.0f, 1.0f, 0.0f),
+                    -39.0f,
+                    41.0f
+                )
             );
             test_room->init_interactable(
                 "some_interactable", 

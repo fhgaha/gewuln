@@ -144,7 +144,8 @@ void Game::init()
         {//orange room
             ResourceManager::LoadModel(
                 // "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/export/test_floor/gltf_2_tiling_texture/test_rooms.gltf",
-                "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/export/test_floor/gltf_3_added_interactable/test_rooms.gltf",
+                // "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/export/test_floor/gltf_3_added_interactable/test_rooms.gltf",
+                "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/export/test_floor/gltf_4_two_interactables_one_with_center_below_another_with_center_above/test_rooms.gltf",
                 false,
                 "test_room_model"
             );
@@ -156,12 +157,12 @@ void Game::init()
                 CameraFly(
                     glm::vec3(-4.0f, 0.5f, 4.0f),
                     glm::vec3(0.0f, 1.0f, 0.0f),
-                    -39.0f,
-                    41.0f
+                    -49.0f,
+                    2.0f
                 )
             );
             test_room->init_interactable(
-                "some_interactable", 
+                "interactable_with_center_at_hight_half_meter", 
                 Room::Interactable{
                     //TODO hardcoded garbage shit
                     .mesh = &test_room->model->interactiable_meshes[0],
@@ -171,6 +172,19 @@ void Game::init()
                     }
                 }
             );
+            
+            test_room->init_interactable(
+                "interactable_with_center_at_hight_2_meters", 
+                Room::Interactable{
+                    //TODO hardcoded garbage shit
+                    .mesh = &test_room->model->interactiable_meshes[1],
+                    .glfw_key = GLFW_KEY_E,
+                    .action = []{
+                        std::cout << "hello action\n";
+                    }
+                }
+            );
+            
             test_room->initial_cam = test_room->cameras["cam_fly"].get();
             test_room->current_cam = test_room->initial_cam;
         }

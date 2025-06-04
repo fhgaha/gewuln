@@ -135,64 +135,30 @@ public:
 			Bone* bone = currentAnimation->FindBone(nodeName);
 			if (bone)
 			{
-				glm::vec3 up(0.0f, 1.0f, 0.0f);
+				glm::vec3 char_to_trg_dir = glm::normalize(target - char_pos);
+				float angle_around_y = -glm::orientedAngle(
+					glm::normalize(glm::vec2(char_forward.x, char_forward.z)), 
+					glm::normalize(glm::vec2(char_to_trg_dir.x, char_to_trg_dir.z))
+				);
+				
 				glm::mat4 head_pos_mat = parentTransform * bone->GetLocalTransform();
 				glm::vec3 head_pos = glm::vec3(head_pos_mat[3]) + char_pos;
-				glm::vec3 direction = glm::normalize(target - head_pos);
-				direction = glm::normalize(direction);
-				float angle_rad = glm::angle(direction, char_forward);
-				// direction = glm::rotateY(direction, angle_rad);
-				// direction = glm::rotateY(direction, -angle_rad);
+				glm::vec3 head_to_trg_dir = glm::normalize(target - head_pos);
+				float angle_around_x = glm::acos(head_to_trg_dir.y) - glm::half_pi<float>();	//-П/2 to get the direction of the face
 				
-				// auto dir = glm::normalize(target - head_pos);
-				auto dir = glm::normalize(target - char_pos);
-				auto angle_around_up = glm::orientedAngle(
-					glm::normalize(glm::vec2(char_forward.x, char_forward.z)), 
-					glm::normalize(glm::vec2(dir.x, dir.z))
-				);
+				bool too_large_angle_around_x = glm::degrees(angle_around_x) > 70.0f || glm::degrees(angle_around_x) < -70.0f;
+				bool too_large_angle_around_y = glm::degrees(angle_around_y) > 85.0f || glm::degrees(angle_around_y) < -85.0f;
+				if (too_large_angle_around_x || too_large_angle_around_y){
+					angle_around_x = 0.0f;
+					angle_around_y = 0.0f;
+				}
+				
+				angle_around_x_rad = glm::lerp(angle_around_x_rad, angle_around_x, HEAD_ROTATION_SPEED_AROUND_Y * deltaTime);
+				angle_around_y_rad = glm::lerp(angle_around_y_rad, angle_around_y, HEAD_ROTATION_SPEED_AROUND_X * deltaTime);
 				
 				glm::mat4 rotation = glm::mat4(1.0f);
-
-				// couldnt solve these piece of shit angles 				
-				float angle_x_rad;
-				float angle_y_rad;
-				
-				
-				glm::vec3 dir2 = glm::normalize(target - head_pos);
-				glm::vec2 dir2_norm = glm::normalize(glm::vec2(dir2.z, dir2.y));
-				float angle_around_x = glm::orientedAngle(
-					// glm::normalize(glm::vec2(char_forward.z, char_forward.y)), 
-					glm::vec2(1.0f, 0.0f),
-					dir2_norm
-				);
-				
-				angle_around_x = glm::acos(dir2.y);	//[0, pi]
-				angle_around_x -= glm::half_pi<float>();
-				// printf("angle around x: %f\n", glm::degrees(angle_around_x));
-				
-				// if (target.y > head_pos.y) {
-				// 	angle_around_x *= -1.0f;
-				// }
-
-				// angle_x_rad = glm::radians(30.0f);
-				// angle_y_rad = glm::radians(45.0f);
-				
-				angle_x_rad = angle_around_x;
-				angle_y_rad = -angle_around_up;
-				
-				
-				//angre around x jumps from 33 deg to -146 deg and back. why?
-				
-				// printf("angle around x: %f, angle around y: %f\n", glm::degrees(angle_x_rad), glm::degrees(angle_y_rad));
-				
-				// glm::vec3 char_right = glm::normalize(glm::cross(char_forward, up));
-				// bool is_to_right = glm::dot(direction, char_right) >= 0.0f;
-				// if(is_to_right) {
-				// 	angle_y_rad = -angle_y_rad;
-				// }
-
-				rotation = glm::rotate(rotation, angle_y_rad, up);
-				rotation = glm::rotate(rotation, angle_x_rad, glm::vec3(1.0f, 0.0f, 0.0f));
+				rotation = glm::rotate(rotation, angle_around_y_rad, glm::vec3(0.0f, 1.0f, 0.0f));
+				rotation = glm::rotate(rotation, angle_around_x_rad, glm::vec3(1.0f, 0.0f, 0.0f));
 				
 				bone->Update_with_rotation(currentTime, rotation);
 				// bone->Update(currentTime);
@@ -241,6 +207,10 @@ private:
 	Animation* currentAnimation;
 	float currentTime;
 	float deltaTime;
+	float angle_around_x_rad = 0.0f;
+	float angle_around_y_rad = 0.0f;
+	const float HEAD_ROTATION_SPEED_AROUND_X = 10.0f;
+	const float HEAD_ROTATION_SPEED_AROUND_Y = 5.0f;
 
 	bool check_has_animations() {
 		if (animations.empty()) {

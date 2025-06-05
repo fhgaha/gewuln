@@ -123,16 +123,16 @@ public:
 	glm::vec3 char_forward 	= glm::vec3(1.0f);
 	glm::vec3 char_pos 		= glm::vec3(0.0f);
 	
-	//failed attempt on head rotation
 	void calculate_bone_transform_with_look_at(const AssimpNodeData* node, glm::mat4 parentTransform)
 	{
-		std::string desired_name = "mixamorig:Head";
+		std::string desired_name = "mixamorig:Neck";
 		std::string nodeName = node->name;
 		glm::mat4 globalTransformation;
 		
+		glm::mat4 nodeTransform = node->transformation;
+		Bone* bone = currentAnimation->FindBone(nodeName);
+
 		if (nodeName == desired_name){
-			glm::mat4 nodeTransform = node->transformation;
-			Bone* bone = currentAnimation->FindBone(nodeName);
 			if (bone)
 			{
 				glm::vec3 char_to_trg_dir = glm::normalize(target - char_pos);
@@ -141,10 +141,10 @@ public:
 					glm::normalize(glm::vec2(char_to_trg_dir.x, char_to_trg_dir.z))
 				);
 				
-				glm::mat4 head_pos_mat = parentTransform * bone->GetLocalTransform();
-				glm::vec3 head_pos = glm::vec3(head_pos_mat[3]) + char_pos;
-				glm::vec3 head_to_trg_dir = glm::normalize(target - head_pos);
-				float angle_around_x = glm::acos(head_to_trg_dir.y) - glm::half_pi<float>();	//-П/2 to get the direction of the face
+				glm::mat4 neck_pos_mat = parentTransform * bone->GetLocalTransform();
+				glm::vec3 neck_pos = glm::vec3(neck_pos_mat[3]) + char_pos;
+				glm::vec3 neck_to_trg_dir = glm::normalize(target - neck_pos);
+				float angle_around_x = glm::acos(neck_to_trg_dir.y) - glm::half_pi<float>();	//-П/2 to get the direction of the face
 				
 				bool too_large_angle_around_x = glm::degrees(angle_around_x) > 70.0f || glm::degrees(angle_around_x) < -70.0f;
 				bool too_large_angle_around_y = glm::degrees(angle_around_y) > 85.0f || glm::degrees(angle_around_y) < -85.0f;
@@ -166,6 +166,7 @@ public:
 					angle_around_y_rad += (angle_around_y_rad > angle_around_y ? -1 : 1) * deltaTime;
 				}
 				
+				// instead of this should slerp old rotation and new rotation i guess
 				glm::mat4 rotation = glm::mat4(1.0f);
 				rotation = glm::rotate(rotation, angle_around_y_rad, glm::vec3(0.0f, 1.0f, 0.0f));
 				rotation = glm::rotate(rotation, angle_around_x_rad, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -174,33 +175,21 @@ public:
 				// bone->Update(currentTime);
 				nodeTransform = bone->GetLocalTransform();
 			}
-
-			globalTransformation = parentTransform * nodeTransform;
-
-			auto boneInfoMap = currentAnimation->GetBoneIDMap();
-			if (boneInfoMap.find(nodeName) != boneInfoMap.end())
-			{
-				int index = boneInfoMap[nodeName].id;
-				glm::mat4 offset = boneInfoMap[nodeName].offset;
-				finalBoneMatrices[index] = globalTransformation * offset;
-			}
 		} else {
-			glm::mat4 nodeTransform = node->transformation;
-			Bone* bone = currentAnimation->FindBone(nodeName);
-
 			if (bone){
 				bone->Update(currentTime);
 				nodeTransform = bone->GetLocalTransform();
 			}
+		}
+		
+		globalTransformation = parentTransform * nodeTransform;
 
-			globalTransformation = parentTransform * nodeTransform;
-
-			auto boneInfoMap = currentAnimation->GetBoneIDMap();
-			if (boneInfoMap.find(nodeName) != boneInfoMap.end()){
-				int index = boneInfoMap[nodeName].id;
-				glm::mat4 offset = boneInfoMap[nodeName].offset;
-				finalBoneMatrices[index] = globalTransformation * offset;
-			}
+		auto boneInfoMap = currentAnimation->GetBoneIDMap();
+		if (boneInfoMap.find(nodeName) != boneInfoMap.end())
+		{
+			int index = boneInfoMap[nodeName].id;
+			glm::mat4 offset = boneInfoMap[nodeName].offset;
+			finalBoneMatrices[index] = globalTransformation * offset;
 		}
 
 		for (int i = 0; i < node->childrenCount; i++){
@@ -219,8 +208,8 @@ private:
 	float deltaTime;
 	float angle_around_x_rad = 0.0f;
 	float angle_around_y_rad = 0.0f;
-	float HEAD_ROTATION_SPEED_AROUND_X = 10.0f;
-	float HEAD_ROTATION_SPEED_AROUND_Y = 5.0f;
+	float NECK_ROTATION_SPEED_AROUND_X = 10.0f;
+	float NECK_ROTATION_SPEED_AROUND_Y = 5.0f;
 
 	bool check_has_animations() {
 		if (animations.empty()) {

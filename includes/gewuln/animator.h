@@ -153,13 +153,23 @@ public:
 					angle_around_y = 0.0f;
 				}
 				
-				angle_around_x_rad = glm::lerp(angle_around_x_rad, angle_around_x, HEAD_ROTATION_SPEED_AROUND_Y * deltaTime);
-				angle_around_y_rad = glm::lerp(angle_around_y_rad, angle_around_y, HEAD_ROTATION_SPEED_AROUND_X * deltaTime);
+				// angle_around_x_rad = glm::lerp(angle_around_x_rad, angle_around_x,  deltaTime);
+				// angle_around_y_rad = glm::lerp(angle_around_y_rad, angle_around_y,  deltaTime);
+				
+				// angle_around_x_rad = angle_around_x;
+				// angle_around_y_rad = angle_around_y;
+				
+				bool big_difference  = glm::length2(angle_around_x_rad - angle_around_x) > 1e-3 
+									|| glm::length2(angle_around_y_rad - angle_around_y) > 1e-3;
+				if (big_difference) {
+					angle_around_x_rad += (angle_around_x_rad > angle_around_x ? -1 : 1) * deltaTime;
+					angle_around_y_rad += (angle_around_y_rad > angle_around_y ? -1 : 1) * deltaTime;
+				}
 				
 				glm::mat4 rotation = glm::mat4(1.0f);
 				rotation = glm::rotate(rotation, angle_around_y_rad, glm::vec3(0.0f, 1.0f, 0.0f));
 				rotation = glm::rotate(rotation, angle_around_x_rad, glm::vec3(1.0f, 0.0f, 0.0f));
-				
+		
 				bone->Update_with_rotation(currentTime, rotation);
 				// bone->Update(currentTime);
 				nodeTransform = bone->GetLocalTransform();
@@ -209,8 +219,8 @@ private:
 	float deltaTime;
 	float angle_around_x_rad = 0.0f;
 	float angle_around_y_rad = 0.0f;
-	const float HEAD_ROTATION_SPEED_AROUND_X = 10.0f;
-	const float HEAD_ROTATION_SPEED_AROUND_Y = 5.0f;
+	float HEAD_ROTATION_SPEED_AROUND_X = 10.0f;
+	float HEAD_ROTATION_SPEED_AROUND_Y = 5.0f;
 
 	bool check_has_animations() {
 		if (animations.empty()) {

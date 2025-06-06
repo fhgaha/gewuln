@@ -1,0 +1,56 @@
+# TOML reference: 	toml.io/en/latest
+
+# Each room may have variable amount of cameras, interactables, characters
+# Should have at least one camera
+
+[[rooms]]
+name = "test_kitchen_room"
+path = "D:/MyProjects/cpp/gewuln/assets/models/room/export/gltf_6_room_exit/room.gltf"
+name_model = "test_kitchen_room_model"
+current_camera = "cam_fly"
+
+	[[rooms.cameras]]
+	name ="cam_fly"
+	type ="CameraFly"
+	position =[ -1.15, 1.61, 1.47 ]
+	yaw =-80.72
+	pitch =13.36
+	
+	[[rooms.cameras]]
+	name = "look_at_camera_corridor"
+	type = "CameraLookAt"
+	position = [-3.228, 3.582, 4.333]
+	yaw = -39.0
+	pitch = 41.0
+
+	[[rooms.cameras]]
+	name = "look_at_camera_kitchen_start"
+	type = "CameraLookAt"
+	position = [1.367, 2.045, 3.924]
+	yaw = -86.3601
+	pitch = 16.0
+
+	[[rooms.cameras]]
+	name = "look_at_camera_kitchen_end"
+	type = "CameraLookAt"
+	position = [0.673, 2.138, 4.030]
+	yaw = -263.88
+	pitch = 19.7599
+
+	[[rooms.interactables]]
+	name = "kitchen_inter"
+	mesh_index = 0
+	action = 'std::cout << "hello action\n";'
+
+	[[rooms.exits]]
+	mesh_index = 0
+	target_room = "another_room"
+	on_enter = 'std::cout << "start room: on room enter\n";'
+	on_exit = 'std::cout << "start room: on room exit\n";'
+
+	[[rooms.characters]]
+	name = "mona"
+	position = [ -1.0, 0, 0 ]
+
+[[rooms]]
+name = "test_room"

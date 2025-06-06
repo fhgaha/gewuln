@@ -132,9 +132,8 @@ public:
 		glm::mat4 nodeTransform = node->transformation;
 		Bone* bone = currentAnimation->FindBone(nodeName);
 
-		if (nodeName == desired_name){
-			if (bone)
-			{
+		if (bone){
+			if (nodeName == desired_name){
 				glm::vec3 char_to_trg_dir = glm::normalize(target - char_pos);
 				float angle_around_y = -glm::orientedAngle(
 					glm::normalize(glm::vec2(char_forward.x, char_forward.z)), 
@@ -173,13 +172,11 @@ public:
 		
 				bone->Update_with_rotation(currentTime, rotation);
 				// bone->Update(currentTime);
-				nodeTransform = bone->GetLocalTransform();
-			} 
-		} else {
-			if (bone){
+			} else {
 				bone->Update(currentTime);
-				nodeTransform = bone->GetLocalTransform();
 			}
+			
+			nodeTransform = bone->GetLocalTransform();
 		}
 		
 		globalTransformation = parentTransform * nodeTransform;

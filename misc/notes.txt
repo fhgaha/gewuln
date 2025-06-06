@@ -74,3 +74,15 @@ and cant remember anything more.
 		// 	finalBoneMatrices[index] = newHeadMatrix;
 
 		// }
+		
+
+//-----------------------------------------------------------------------------------------------
+// Blender
+//-----------------------------------------------------------------------------------------------		
+GLTF viewer: https://sandbox.babylonjs.com/
+
+Custom props:
+is_collider
+is_interactable
+is_walkable_area
+is_room_exit

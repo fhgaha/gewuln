@@ -43,7 +43,7 @@ public:
 	
 	Model														*model;
 	Camera														*initial_cam;
-	Camera														*active_cam;
+	Camera														*current_cam;
 	
 	std::optional<Mesh>											*walkable_area;
 
@@ -53,7 +53,7 @@ public:
 
 	~Room() {
 		delete initial_cam;
-		delete active_cam;
+		delete current_cam;
 		delete walkable_area;
 		delete model;
 	}

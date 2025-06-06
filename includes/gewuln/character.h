@@ -182,10 +182,6 @@ class Character {
 					animator.target = Geometry3d::compute_box_center(interacting_with->mesh->vertices) /*+ interacting_with->mesh->Position*/;
 					animator.char_pos = this->position;
 					animator.char_forward = this->forward;
-					// if (animator.head_forward == glm::vec3(0.0f)) {
-					// 	animator.head_forward = this->forward;
-					// }
-					// std::cout << animator.target << ", " << this->position << ", " << this->forward << "\n";
 					animator.update_animation_with_look_at(dt);
 				} else {
 					animator.update_animation(dt);

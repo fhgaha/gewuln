@@ -112,7 +112,7 @@ int main()
     // stbi_set_flip_vertically_on_load(true);
 
 
-    game.Init();
+    game.init();
 
     // render loop
     while (!glfwWindowShouldClose(window))
@@ -121,8 +121,8 @@ int main()
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        game.Update(deltaTime);
-        game.ProcessInput();
+        game.update(deltaTime);
+        game.process_input();
 
         // render
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -130,7 +130,7 @@ int main()
               GL_COLOR_BUFFER_BIT
             | GL_DEPTH_BUFFER_BIT
         );
-        game.Render();
+        game.render();
 
 
         // glCheckError();
@@ -194,12 +194,12 @@ void mouse_callback(GLFWwindow * window, double xpos, double ypos)
     xoffset *= sensitivity;
     yoffset *= sensitivity;
 
-    game.ProcessMouseMovement(xoffset, yoffset);
+    game.process_mouse_movement(xoffset, yoffset);
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    game.ProcessMouseScroll(static_cast<float>(yoffset));
+    game.process_mouse_scroll(static_cast<float>(yoffset));
 }
 
 

@@ -174,7 +174,7 @@ public:
 				bone->Update_with_rotation(currentTime, rotation);
 				// bone->Update(currentTime);
 				nodeTransform = bone->GetLocalTransform();
-			}
+			} 
 		} else {
 			if (bone){
 				bone->Update(currentTime);

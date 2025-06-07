@@ -24,7 +24,7 @@ public:
 		int 					glfw_key;
 		std::function<void()> 	action;
 	};
-	
+
 	struct Exit
 	{
 		Mesh					*mesh;
@@ -35,16 +35,16 @@ public:
 		std::function<void()> 	on_room_enter;
 		std::function<void()> 	on_room_exit;
 	};
-	
+
 	std::unordered_map<std::string, std::unique_ptr<Camera>>	cameras;
 	std::unordered_map<std::string, Interactable>				interactables;
 	std::unordered_map<std::string, Exit>						exits;
-	
-	
+
+
 	Model														*model;
 	Camera														*initial_cam;
 	Camera														*current_cam;
-	
+
 	std::optional<Mesh>											*walkable_area;
 
 	//TODO
@@ -64,12 +64,12 @@ public:
 		this->model = model;
 		this->walkable_area = &model->walkable_area;
 	}
-	
+
 	void init_interactable(const char* name, const Interactable interactable)
 	{
 		interactables[name] = interactable;
 	}
-	
+
 	void init_exit(const char* name, const Exit exit)
 	{
 		exits[name] = exit;
@@ -79,9 +79,8 @@ public:
 	bool inside_walkable_area(const Mesh &character_collider, const glm::vec3 position_to_test)
 	{
 		assert(walkable_area->has_value() && "Walkable area has no value!");
-		
-		//1. get character's 4 lowest pts of collider
 
+		//1. get character's 4 lowest pts of collider
 		std::array<glm::vec2, 4> small_square;
 
 		//there are 4*6 small_verts (4 per side, 6 sides of a cube)
@@ -112,9 +111,8 @@ public:
 
 
 		//2. get all walkable areas triangles and their points
-
 		std::vector<std::array<glm::vec2, 3>> walkable_area_tris;
-		
+
 		const std::vector<Vertex> 		&walkable_verts 	= this->walkable_area->value().vertices;
 		const std::vector<unsigned int> &walkable_indeces 	= this->walkable_area->value().indices;
 
@@ -129,25 +127,11 @@ public:
 			walkable_area_tris.push_back(tri);
 		}
 
-
 		//3. check the intersection with walkable area
-
 		bool inside = Geometry2d::rect_inside_area_of_tris(
 			small_square,
 			walkable_area_tris
 		);
-
-		// std::cout << "small poly: \n";
-		// for (auto &pt_d : small_square)
-		// {
-		// 	std::cout << "\t{" << pt_d << "},";
-		// }
-		// std::cout << "\n";
-
-		// std::cout << "walkable_pts:\n";
-		//...
-		// std::cout << "inside area: " << inside << "\n";
-		// std::cout << "========================\n";
 
 		return inside;
 	}

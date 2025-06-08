@@ -2,11 +2,10 @@
 #include <unordered_map>
 #include <memory>
 #include <utility>
+#include <stdio.h>
 #include <gewuln/model_renderer.h>
-#include <gewuln/character.h>
 #include <gewuln/text_renderer.h>
 #include <gewuln/geometry_2d.h>
-#include <stdio.h>
 
 // settings
 bool show_fps = true;
@@ -15,9 +14,6 @@ bool show_granny_text;
 
 ModelRenderer                                               *model_renderer;
 TextRenderer                                                *text_renderer;
-Character                                                   *active_character;
-
-std::unordered_map<std::string, Character>                  characters;
 
 
 Game::Game(unsigned int width, unsigned int height)
@@ -249,7 +245,8 @@ void Game::process_input()
         current_room->current_cam->ProcessKeyboard(RIGHT, dt);
 
     if (active_character) {
-        active_character->ProcessInput( this, dt);
+        active_character->current_room_tmp = this->current_room;
+        active_character->ProcessInput(Keys, KeysProcessed, dt);
     }
 
     if (Keys[GLFW_KEY_GRAVE_ACCENT] && !KeysProcessed[GLFW_KEY_GRAVE_ACCENT]) { /* ` */

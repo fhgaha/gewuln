@@ -7,7 +7,7 @@
 #include <gewuln/camera/camera_look_at.h>
 #include <gewuln/camera/camera_fly.h>
 #include <gewuln/room.h>
-
+#include <gewuln/character.h>
 
 // Represents the current state of the game
 enum GameState {
@@ -30,11 +30,12 @@ public:
     bool                    Keys[1024], KeysProcessed[1024];
     unsigned int            Width, Height;
     float                   dt;
-    
-    Room                    *start_room;
+
     Room                    *current_room;
-    
+    Character               *active_character;
+
     std::unordered_map<std::string, std::unique_ptr<Room>>      rooms;
+    std::unordered_map<std::string, Character>                  characters;
 
 
     // constructor/destructor

@@ -7,11 +7,11 @@
 #include<glm/gtc/quaternion.hpp>
 #include<iostream>
 
-class AssimpGLMHelpers
+class Assimp_GLM_Helpers
 {
 public:
 
-	static inline glm::mat4 ConvertMatrixToGLMFormat(const aiMatrix4x4& from)
+	static inline glm::mat4 ai_mat_to_glm(const aiMatrix4x4& from)
 	{
 		glm::mat4 to;
 		//the a,b,c,d in assimp is the row ; the 1,2,3,4 is the column

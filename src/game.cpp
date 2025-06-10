@@ -212,10 +212,33 @@ void Game::init()
             );
         }
 
-        current_room = rooms["test_room"].get();
+        { //town
+            ResourceManager::LoadModel(
+                "D:/MyProjects/cpp/gewuln/assets/models/town/export/glfw_1/town.gltf",
+                false,
+                "town_model"
+            );
+
+            rooms["town_room"] = std::make_unique<Room>();
+            auto town_room = rooms["town_room"].get();
+            town_room->Init(&ResourceManager::GetModel("town_model"));
+            town_room->cameras["cam_fly"] = std::make_unique<CameraFly>(
+                CameraFly(
+                    glm::vec3(1.674590f, 4.121703f, 3.214545f),
+                    glm::vec3(0.0f, 1.0f, 0.0f),
+                    -90.0f,
+                    50.0f
+                )
+            );
+
+            current_room = rooms["town_room"].get();
+            town_room->initial_cam = town_room->cameras["cam_fly"].get();
+            town_room->current_cam = town_room->initial_cam;
+        }
 
     }
 }
+
 
 void Game::update(float dt)
 {

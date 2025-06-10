@@ -41,26 +41,27 @@ public:
 		Walkable,
 		RoomExit
 	};
-	
+
     static const std::unordered_map<std::string, BlenderCustomProps>& get_blender_custom_props() {
         static const std::unordered_map<std::string, BlenderCustomProps> mapping = {
             {"is_collider",      BlenderCustomProps::Collider},
             {"is_interactable",  BlenderCustomProps::Interactable},
+            {"is_walkable",		 BlenderCustomProps::Walkable},
             {"is_walkable_area", BlenderCustomProps::Walkable},
             {"is_room_exit",     BlenderCustomProps::RoomExit}
         };
         return mapping;
     }
-	
+
 	glm::vec3			position;
 	std::vector<Mesh>	meshes;
 
-	//optional meshes that are imported from blender using custom properties	
+	//optional meshes that are imported from blender using custom properties
 	std::optional<Mesh>	collider_mesh;
 	std::optional<Mesh>	walkable_area;
 	std::vector<Mesh> 	interactiable_meshes;
 	std::vector<Mesh> 	room_exit_meshes;
-	
+
 	Model() {}
 	Model(std::string const &path, bool animated, glm::vec3 pos = glm::vec3(0.0f))
 	{
@@ -87,7 +88,7 @@ private:
 			path,
 			aiProcess_Triangulate |	aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices
 		);
-		
+
 		bool error = !scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode;
 		if(error)
 		{
@@ -96,10 +97,10 @@ private:
 		}
 		directory = path.substr(0, path.find_last_of('/'));
 
-		processNode(scene->mRootNode, scene);
+		process_node_recursively(scene->mRootNode, scene);
 	}
 
-	void processNode(aiNode *node, const aiScene *scene)
+	void process_node_recursively(aiNode *node, const aiScene *scene)
 	{
 		//looking for a collider
 		//Usage: in Blender create a cube, select the Cube object, create custom property "is_collider".
@@ -111,12 +112,12 @@ private:
 			for (unsigned int i = 0; i < node->mMetaData->mNumProperties; i++)
 			{
 				const aiString& key = node->mMetaData->mKeys[i];
-				const auto &strings_as_bender_custom_types = Model::get_blender_custom_props();	//what is going on?
-        		auto it = strings_as_bender_custom_types.find(key.C_Str());
-				if (it != strings_as_bender_custom_types.end()){
+				const auto &strings_as_blender_custom_types = Model::get_blender_custom_props();	//what is going on?
+        		auto it = strings_as_blender_custom_types.find(key.C_Str());
+				if (it != strings_as_blender_custom_types.end()){
 					cur_custom_prop = it->second;
 				}
-				
+
 				switch (cur_custom_prop)
 				{
 					case BlenderCustomProps::Regular:
@@ -135,32 +136,41 @@ private:
 				}
 			}
 		}
-
+		
+		node->mTransformation = scene->mRootNode == node// node->mParent == nullptr 
+			? aiMatrix4x4()
+			: node->mParent->mTransformation * node->mTransformation;
+			
+		glm::mat4 trm = Assimp_GLM_Helpers::ai_mat_to_glm(node->mTransformation);
+			
 		// process all the node’s meshes (if any)
 		for(unsigned int i = 0; i < node->mNumMeshes; i++)
 		{
-			aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
+			aiMesh *ai_mesh = scene->mMeshes[node->mMeshes[i]];
+			Mesh mesh = processMesh(ai_mesh, scene, trm);
+			mesh.transformation = Assimp_GLM_Helpers::ai_mat_to_glm(node->mTransformation);
+			mesh.parent = node->mParent;
 			switch (cur_custom_prop)
 			{
-				case BlenderCustomProps::Regular:
-					meshes.push_back(processMesh(mesh, scene, this->animated));
-					break;
-				case BlenderCustomProps::Collider:
-					collider_mesh = processMesh(mesh, scene, false);
+				case BlenderCustomProps::Regular:{
+					meshes.push_back(std::move(mesh));
+				}break;
+				case BlenderCustomProps::Collider:{
+					collider_mesh = std::move(mesh);
 					cur_custom_prop = BlenderCustomProps::Regular;
-					break;
-				case BlenderCustomProps::Interactable:
-					interactiable_meshes.push_back(processMesh(mesh, scene, false));
+				}break;
+				case BlenderCustomProps::Interactable:{
+					interactiable_meshes.push_back(std::move(mesh));
 					cur_custom_prop = BlenderCustomProps::Regular;
-					break;
-				case BlenderCustomProps::Walkable:
-					walkable_area = processMesh(mesh, scene, false);
+				}break;
+				case BlenderCustomProps::Walkable:{
+					walkable_area = std::move(mesh);
 					cur_custom_prop = BlenderCustomProps::Regular;
-					break;
-				case BlenderCustomProps::RoomExit:
-					room_exit_meshes.push_back(processMesh(mesh, scene, false));
+				}break;
+				case BlenderCustomProps::RoomExit:{
+					room_exit_meshes.push_back(std::move(mesh));
 					cur_custom_prop = BlenderCustomProps::Regular;
-					break;
+				}break;
 				default:
 					assert(false && "!Should not be reachable");
 					break;
@@ -170,22 +180,35 @@ private:
 		// then do the same for each of its children
 		for(unsigned int i = 0; i < node->mNumChildren; i++)
 		{
-			processNode(node->mChildren[i], scene);
+			process_node_recursively(node->mChildren[i], scene);
 		}
-
 	}
 
-	Mesh processMesh(aiMesh *mesh, const aiScene *scene, bool animated)
+	Mesh processMesh(aiMesh *mesh, const aiScene *scene, const glm::mat4 &transform)
 	{
 		std::vector<Vertex>       vertices;
 		std::vector<unsigned int> indices;
 		std::vector<Texture>      textures;
 
+		glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(transform)));	//wtf??
+		
 		for(unsigned int i = 0; i < mesh->mNumVertices; i++)
 		{
 			Vertex vertex;
-			vertex.Position = glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
-			vertex.Normal 	= glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
+			// vertex.Position = glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
+			glm::vec4 pos = glm::vec4(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z, 1.0f);
+			if (!this->animated){
+				pos = transform * pos;
+			}
+			vertex.Position = glm::vec3(pos);
+			
+			
+			// vertex.Normal 	= glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
+			if (mesh->HasNormals()) {
+				glm::vec3 norm = normalMatrix * glm::vec3( mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
+				vertex.Normal = glm::normalize(norm);
+			}
+			
 
 			glm::vec2 tex_coords = glm::vec2(0.0f, 0.0f);
 			// use texture coordinates if mesh has any
@@ -228,8 +251,8 @@ private:
 		}
 
 		ExtractBoneWeightForVertices(vertices, mesh, scene);
-
-		return Mesh(vertices, indices, textures, animated);
+		
+		return Mesh(vertices, indices, textures, this->animated);
 	}
 
 	std::vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName)
@@ -304,7 +327,7 @@ private:
             {
                 BoneInfo newBoneInfo;
                 newBoneInfo.id = boneCounter;
-                newBoneInfo.offset = AssimpGLMHelpers::ConvertMatrixToGLMFormat(
+                newBoneInfo.offset = Assimp_GLM_Helpers::ai_mat_to_glm(
                     mesh->mBones[boneIndex]->mOffsetMatrix
 				);
                 boneInfoMap[boneName] = newBoneInfo;

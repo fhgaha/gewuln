@@ -15,6 +15,8 @@ out vec4 FragColor;
 
 void main()
 {
+   // FragColor = vec4(Normal, 1.0f);  // show normals
+   
    if (drawing_wireframe) {
       FragColor = vec4(wireframe_color, 1.0);      
    } else {

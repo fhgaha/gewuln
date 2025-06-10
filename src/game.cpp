@@ -190,7 +190,7 @@ void Game::init()
         }
 
         //TODO forced to do this shit after creating "another room"
-        {//start room exits
+        {//kitchen room exits
 
             rooms["test_kitchen_room"]->init_exit(
                 "exit",
@@ -215,7 +215,7 @@ void Game::init()
 
         { //town
             ResourceManager::LoadModel(
-                "D:/MyProjects/cpp/gewuln/assets/models/town/export/glfw_1/town.gltf",
+                "D:/MyProjects/cpp/gewuln/assets/models/town/export/glfw_5_fixed_faces/town.gltf",
                 false,
                 "town_model"
             );

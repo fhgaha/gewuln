@@ -16,8 +16,8 @@
 train dark with uncle Kolya. dark wagon, full of teens or young adults. i have one ear headphones, lost the other
 half of the pair. one girl is attractive and is near me and watching at me. a mirror on the wall. at some point
 we kiss each other. then we go the toilet to do something involving her mouth and my not mouth. after some time
-she laughs, looks at me with ammetist eyes with no pupils and spreads something with her hand over my face. its 
-that amethyst looking spread. now im blinded as well. i walk back alone, scream and noone notice me. i look at 
+she laughs, looks at me with ammetist eyes with no pupils and spreads something with her hand over my face. its
+that amethyst looking spread. now im blinded as well. i walk back alone, scream and noone notice me. i look at
 the mirror and see myself there chatting with that girl earlier. i scream again at the mirror, only that girl
 looks at me with a smile. so im on the other side of the mirror, cool. then something happens involving train
 stop, me driving a track and crashing it to attract attention and something with that wireless ears i have irl
@@ -74,11 +74,11 @@ and cant remember anything more.
 		// 	finalBoneMatrices[index] = newHeadMatrix;
 
 		// }
-		
+
 
 //-----------------------------------------------------------------------------------------------
 // Blender
-//-----------------------------------------------------------------------------------------------		
+//-----------------------------------------------------------------------------------------------
 GLTF viewer: https://sandbox.babylonjs.com/
 
 Custom props:
@@ -86,3 +86,10 @@ is_collider
 is_interactable
 is_walkable_area
 is_room_exit
+
+//command to `build and run`
+.\build ; if ($?) {.\build\win64_gewuln.exe}
+
+//lite 2d collider lib
+https://github.com/erincatto/box2d-lite
+

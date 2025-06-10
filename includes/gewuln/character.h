@@ -26,17 +26,13 @@ class Character {
 		glm::vec3	forward  = glm::vec3(0.0f, 0.0f, 1.0f);
 		glm::vec3	velocity = glm::vec3(0.0f);
 
-
-		bool 		enableHeadLook = true;
-		glm::vec3 	headLookTarget;
-		std::string headBoneName = "mixamorig:Head";
-
-		std::unordered_map<std::string, Room::Interactable>* room_interactables_tmp;
+		Room 		*current_room_tmp;
 
 
 		Character(){};
 
-		Character(Model *model, Animator animator, glm::vec3 position){
+		Character(Model *model, Animator animator, glm::vec3 position)
+		{
 			this->model = model;
 			this->animator = animator;
 			this->position = position;
@@ -45,15 +41,14 @@ class Character {
 		}
 
 
-		void ProcessInput(Game *game, const float dt)
+		void ProcessInput(bool *Keys, bool *KeysProcessed, const float dt)
 		{
-
-			if (game->Keys[GLFW_KEY_E] && !game->KeysProcessed[GLFW_KEY_E]){
+			if (Keys[GLFW_KEY_E] && !KeysProcessed[GLFW_KEY_E]){
 
 				assert(this->model->collider_mesh.has_value() && "Character must have collider mesh!");
 
 				{//interactables
-					for (auto &[room_name, interactable] : game->current_room->interactables)
+					for (auto &[room_name, interactable] : current_room_tmp->interactables)
 					{
 						std::vector<Vertex> transformed_verts = this->model->collider_mesh.value().vertices;
 						for (size_t i = 0; i < transformed_verts.size(); i++){
@@ -69,7 +64,7 @@ class Character {
 						if (collider_intersects_an_interactable){
 							//TODO should be configurable action
 							interactable.action();
-							// game->PlayCameraThing();
+							// PlayCameraThing();
 						}
 
 					}
@@ -78,7 +73,7 @@ class Character {
 
 				{//switch rooms
 
-					for (auto &[room_name, room_exit] : game->current_room->exits)
+					for (auto &[room_name, room_exit] : current_room_tmp->exits)
 					{
 						std::vector<Vertex> transformed_verts = this->model->collider_mesh.value().vertices;
 						for (size_t i = 0; i < transformed_verts.size(); i++){
@@ -98,15 +93,15 @@ class Character {
 					}
 				}
 
-				game->KeysProcessed[GLFW_KEY_E] = true;
+				KeysProcessed[GLFW_KEY_E] = true;
 			}
 
 
-			if (game->Keys[GLFW_KEY_A]){
+			if (Keys[GLFW_KEY_A]){
 				rot_rad += ROT_SPEED * dt;
 				forward = glm::rotate(forward, ROT_SPEED * dt, glm::vec3(0.0f, 1.0f, 0.0f));
 			}
-			if (game->Keys[GLFW_KEY_D]){
+			if (Keys[GLFW_KEY_D]){
 				rot_rad -= ROT_SPEED * dt;
 				forward = glm::rotate(forward, -ROT_SPEED * dt, glm::vec3(0.0f, 1.0f, 0.0f));
 			}
@@ -118,30 +113,11 @@ class Character {
 				rot_rad += 2.0f * glm::pi<float>();
 			}
 
-			bool inside = false;
-			if (game->Keys[GLFW_KEY_W]){
+			// bool inside = false;
+			if (Keys[GLFW_KEY_W]){
 			    velocity = forward * WALK_SPEED * dt;
-
-				//TODO why character cares about game and current room and interactables?
-				//check that the character won't leave walkable area on the next frame
-				inside = game->current_room->inside_walkable_area(
-					this->model->collider_mesh.value(),
-					this->position + velocity
-				);
-
 			} else {
 				velocity = glm::vec3(0.0f);
-			}
-			if (inside) {
-				this->position += velocity;
-			}
-
-			if (game->Keys[GLFW_KEY_1]){
-				//auto head_bone = model.boneinfo["mixamorig:HeadTop_End"].offset = mat4x4
-				//rotate head_bone
-
-				// glm::mat4 head_bone_offset = model->GetBoneInfoMap()["mixamorig:HeadTop_End"].offset;
-
 			}
 
 		}
@@ -156,13 +132,44 @@ class Character {
 				animator.PlayAnimation("idle");
 			}
 
+			{ //move
+				assert(current_room_tmp && "Should have current room");
+				bool inside = current_room_tmp->inside_walkable_area(this->model->collider_mesh.value(), this->position + velocity);
+				if (inside) {
+					this->position += velocity;
+				} else {
+					// move and slide
+					// https://gamedev.stackexchange.com/questions/200354/how-to-slide-along-a-wall-at-full-speed
 
-			//check intersection with interactable.
-			//TODO use events like on enter, on exit or something. check a stack of active interactables maybe
-			if (room_interactables_tmp) {
+					glm::vec3 left(velocity.z, velocity.y, -velocity.x);	//rotated 90 deg counter clockwise
+					glm::vec3 right(-velocity.z, velocity.y, velocity.x);	//rotated 90 deg clockwise
+
+					glm::vec3 small_left  = glm::normalize(left) * dt;
+					glm::vec3 small_right = glm::normalize(right) * dt;
+
+					float vel_len = glm::length(velocity);
+					glm::vec3 eight_right = glm::normalize(velocity + right) * vel_len;
+					glm::vec3 eight_left  = glm::normalize(velocity + left)  * vel_len;
+
+					//if one of them not inside after movement, move the other way. if both not inside - dont move.
+					bool eight_right_is_inside = current_room_tmp->inside_walkable_area(this->model->collider_mesh.value(), this->position + eight_right);
+					bool eight_left_is_inside  = current_room_tmp->inside_walkable_area(this->model->collider_mesh.value(), this->position + eight_left);
+					if (eight_left_is_inside && eight_right_is_inside){
+					} else if (eight_left_is_inside) {
+						this->position += small_left;
+					} else if (eight_right_is_inside) {
+						this->position += small_right;
+					} else {
+						//cant move anywhere
+					}
+				}
+			}
+
+			{ //look at center of interactable cube
+				//TODO use events like on enter, on exit or something. check a stack of active interactables maybe
 				bool collider_intersects_an_interactable = false;
 				Room::Interactable *interacting_with = nullptr;
-				for (auto &[room_name, interactable] : *room_interactables_tmp)
+				for (auto &[room_name, interactable] : current_room_tmp->interactables)
 				{
 					std::vector<Vertex> transformed_verts = this->model->collider_mesh.value().vertices;
 					for (size_t i = 0; i < transformed_verts.size(); i++){
@@ -178,6 +185,7 @@ class Character {
 						break;
 					}
 				}
+
 				if (collider_intersects_an_interactable) {
 					animator.target = Geometry3d::compute_box_center(interacting_with->mesh->vertices) /*+ interacting_with->mesh->Position*/;
 					animator.char_pos = this->position;
@@ -187,7 +195,6 @@ class Character {
 					animator.update_animation(dt);
 				}
 			}
-
 		}
 };
 

@@ -11,7 +11,6 @@
 bool show_fps = true;
 bool show_granny_text;
 
-
 ModelRenderer                                               *model_renderer;
 TextRenderer                                                *text_renderer;
 
@@ -133,7 +132,8 @@ void Game::init()
                     }
                 }
             );
-
+            
+            current_room = kitchen_room;
         }
 
 
@@ -186,6 +186,7 @@ void Game::init()
 
             test_room->initial_cam = test_room->cameras["cam_fly"].get();
             test_room->current_cam = test_room->initial_cam;
+            current_room = test_room;
         }
 
         //TODO forced to do this shit after creating "another room"
@@ -231,11 +232,17 @@ void Game::init()
                 )
             );
 
-            current_room = rooms["town_room"].get();
             town_room->initial_cam = town_room->cameras["cam_fly"].get();
             town_room->current_cam = town_room->initial_cam;
+            current_room = town_room;
         }
-
+        
+        
+        
+        { //check_everything_inited
+            assert(this->current_room               && "!Current room is not set");
+            assert(this->current_room->current_cam  && "!Current camera is not set");
+        }
     }
 }
 

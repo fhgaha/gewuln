@@ -64,7 +64,7 @@ private:
 		assert(src);
 
 		dest.name = src->mName.data;
-		dest.transformation = AssimpGLMHelpers::ConvertMatrixToGLMFormat(src->mTransformation);
+		dest.transformation = Assimp_GLM_Helpers::ai_mat_to_glm(src->mTransformation);
 		dest.childrenCount = src->mNumChildren;
 
 		for (int i = 0; i < src->mNumChildren; i++)

@@ -19,3 +19,6 @@ build/
 # Ignore build output
 bin/
 obj/
+
+# Other folders
+assets/Classic 64 Asset Pack 0.6/

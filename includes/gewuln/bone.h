@@ -44,7 +44,7 @@ public:
 			aiVector3D aiPosition = channel->mPositionKeys[positionIndex].mValue;
 			float timeStamp = channel->mPositionKeys[positionIndex].mTime;
 			KeyPosition data;
-			data.position = AssimpGLMHelpers::GetGLMVec(aiPosition);
+			data.position = Assimp_GLM_Helpers::GetGLMVec(aiPosition);
 			data.timeStamp = timeStamp;
 			positions.push_back(data);
 		}
@@ -55,7 +55,7 @@ public:
 			aiQuaternion aiOrientation = channel->mRotationKeys[rotationIndex].mValue;
 			float timeStamp = channel->mRotationKeys[rotationIndex].mTime;
 			KeyRotation data;
-			data.orientation = AssimpGLMHelpers::GetGLMQuat(aiOrientation);
+			data.orientation = Assimp_GLM_Helpers::GetGLMQuat(aiOrientation);
 			data.timeStamp = timeStamp;
 			rotations.push_back(data);
 		}
@@ -66,7 +66,7 @@ public:
 			aiVector3D scale = channel->mScalingKeys[keyIndex].mValue;
 			float timeStamp = channel->mScalingKeys[keyIndex].mTime;
 			KeyScale data;
-			data.scale = AssimpGLMHelpers::GetGLMVec(scale);
+			data.scale = Assimp_GLM_Helpers::GetGLMVec(scale);
 			data.timeStamp = timeStamp;
 			scales.push_back(data);
 		}

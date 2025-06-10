@@ -7,8 +7,15 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <gewuln/shader.h>
+#include <gewuln/transform.h>
 #include <string>
 #include <vector>
+
+//tmp
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 
 struct Vertex
 {
@@ -41,15 +48,19 @@ public:
 	std::vector<unsigned int> 	  indices;
 	std::vector<Texture>      	  textures;
 	
-
+	glm::mat4	transformation;	//transform cmp
+	aiNode		*parent;
+	
+	Transform					  transform;
+	
 	Mesh(){}
 	Mesh(
-		std::vector<Vertex>       vertices, 
-		std::vector<unsigned int> indices,
-		std::vector<Texture>      textures,
-		bool                      animated
+		std::vector<Vertex>			vertices, 
+		std::vector<unsigned int>	indices,
+		std::vector<Texture>		textures,
+		bool						animated
 	);
-	
+		
 	bool IsAnimated() const;
 	void Draw(Shader &shader);
 

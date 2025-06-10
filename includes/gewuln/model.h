@@ -146,29 +146,43 @@ private:
 		// process all the node’s meshes (if any)
 		for(unsigned int i = 0; i < node->mNumMeshes; i++)
 		{
-			aiMesh *ai_mesh = scene->mMeshes[node->mMeshes[i]];
-			Mesh mesh = processMesh(ai_mesh, scene, trm);
-			mesh.transformation = Assimp_GLM_Helpers::ai_mat_to_glm(node->mTransformation);
-			mesh.parent = node->mParent;
+			aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
 			switch (cur_custom_prop)
 			{
 				case BlenderCustomProps::Regular:{
-					meshes.push_back(std::move(mesh));
+					auto m = processMesh(mesh, scene, this->animated, trm);
+					if (!this->animated){
+						m.transformation = Assimp_GLM_Helpers::ai_mat_to_glm(node->mTransformation);
+						m.parent = node->mParent;
+					}
+					meshes.push_back(std::move(m));
 				}break;
 				case BlenderCustomProps::Collider:{
-					collider_mesh = std::move(mesh);
+					auto m = processMesh(mesh, scene, false, trm);
+					m.transformation = Assimp_GLM_Helpers::ai_mat_to_glm(node->mTransformation);
+					m.parent = node->mParent;
+					collider_mesh = std::move(m);
 					cur_custom_prop = BlenderCustomProps::Regular;
 				}break;
 				case BlenderCustomProps::Interactable:{
-					interactiable_meshes.push_back(std::move(mesh));
+					auto m = processMesh(mesh, scene, false, trm);
+					m.transformation = Assimp_GLM_Helpers::ai_mat_to_glm(node->mTransformation);
+					m.parent = node->mParent;
+					interactiable_meshes.push_back(std::move(m));
 					cur_custom_prop = BlenderCustomProps::Regular;
 				}break;
 				case BlenderCustomProps::Walkable:{
-					walkable_area = std::move(mesh);
+					auto m = processMesh(mesh, scene, false, trm);
+					m.transformation = Assimp_GLM_Helpers::ai_mat_to_glm(node->mTransformation);
+					m.parent = node->mParent;
+					walkable_area = std::move(m);
 					cur_custom_prop = BlenderCustomProps::Regular;
 				}break;
 				case BlenderCustomProps::RoomExit:{
-					room_exit_meshes.push_back(std::move(mesh));
+					auto m = processMesh(mesh, scene, false, trm);
+					m.transformation = Assimp_GLM_Helpers::ai_mat_to_glm(node->mTransformation);
+					m.parent = node->mParent;
+					room_exit_meshes.push_back(std::move(m));
 					cur_custom_prop = BlenderCustomProps::Regular;
 				}break;
 				default:
@@ -184,7 +198,7 @@ private:
 		}
 	}
 
-	Mesh processMesh(aiMesh *mesh, const aiScene *scene, const glm::mat4 &transform)
+	Mesh processMesh(aiMesh *mesh, const aiScene *scene, bool animated, const glm::mat4 &transform)
 	{
 		std::vector<Vertex>       vertices;
 		std::vector<unsigned int> indices;
@@ -197,7 +211,7 @@ private:
 			Vertex vertex;
 			// vertex.Position = glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
 			glm::vec4 pos = glm::vec4(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z, 1.0f);
-			if (!this->animated){
+			if (!animated){
 				pos = transform * pos;
 			}
 			vertex.Position = glm::vec3(pos);
@@ -252,7 +266,7 @@ private:
 
 		ExtractBoneWeightForVertices(vertices, mesh, scene);
 		
-		return Mesh(vertices, indices, textures, this->animated);
+		return Mesh(vertices, indices, textures, animated);
 	}
 
 	std::vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName)

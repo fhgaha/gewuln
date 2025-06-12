@@ -11,8 +11,9 @@
 bool show_fps = true;
 bool show_granny_text;
 
-ModelRenderer                                               *model_renderer;
-TextRenderer                                                *text_renderer;
+// GizmoRenderer   *gizmo_render;
+ModelRenderer   *model_renderer;
+TextRenderer    *text_renderer;
 
 
 Game::Game(unsigned int width, unsigned int height)
@@ -50,7 +51,7 @@ void Game::init()
                     mona_path,
                     ResourceManager::GetModel("mona")
                 ),
-                glm::vec3(0.0f, 0.0f, 0.0f)
+                glm::vec3(0.0f, 0.0f, -2.0f)
             );
             active_character = &characters["mona"];
         }
@@ -190,7 +191,7 @@ void Game::init()
         }
 
         //TODO forced to do this shit after creating "another room"
-        {//start room exits
+        {//kitchen room exits
 
             rooms["test_kitchen_room"]->init_exit(
                 "exit",
@@ -215,7 +216,7 @@ void Game::init()
 
         { //town
             ResourceManager::LoadModel(
-                "D:/MyProjects/cpp/gewuln/assets/models/town/export/glfw_1/town.gltf",
+                "D:/MyProjects/cpp/gewuln/assets/models/town/export/glfw_5_fixed_faces/town.gltf",
                 false,
                 "town_model"
             );
@@ -225,10 +226,10 @@ void Game::init()
             town_room->Init(&ResourceManager::GetModel("town_model"));
             town_room->cameras["cam_fly"] = std::make_unique<CameraFly>(
                 CameraFly(
-                    glm::vec3(1.674590f, 4.121703f, 3.214545f),
+                    glm::vec3(2.191804, 6.516104, -7.915638),
                     glm::vec3(0.0f, 1.0f, 0.0f),
-                    -90.0f,
-                    50.0f
+                    -249.56f,
+                    25.0f
                 )
             );
 
@@ -304,6 +305,8 @@ void Game::process_mouse_scroll(float yoffset)
 
 void Game::render()
 {
+    // gizmo_renderer->Draw();
+    
     model_renderer->DrawCharacter(
         active_character,
         current_room->current_cam,
@@ -315,7 +318,6 @@ void Game::render()
         current_room->current_cam,
         (float)Width/(float)Height
     );
-
 
     //fps
     if (show_fps) {

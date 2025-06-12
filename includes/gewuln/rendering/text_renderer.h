@@ -3,11 +3,10 @@
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
-
 #include <ft2build.h>
 #include <freetype/freetype.h>
-#include "texture.h"
-#include "shader.h"
+#include <gewuln/texture.h>
+#include <gewuln/shader.h>
 
 
 struct CharacterLetter {

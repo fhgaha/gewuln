@@ -2,12 +2,12 @@
 #define MODEL_RENDERER_H
 
 #include <vector>
-#include "shader.h"
-#include "mesh.h"
-#include "model.h"
-#include "character.h"
-#include "stdio.h"
-#include "glm/ext.hpp"
+#include <gewuln/shader.h>
+#include <gewuln/mesh.h>
+#include <gewuln/model.h>
+#include <gewuln/character.h>
+#include <stdio.h>
+#include <glm/ext.hpp>
 
 
 class ModelRenderer

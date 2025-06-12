@@ -3,15 +3,16 @@
 #include <memory>
 #include <utility>
 #include <stdio.h>
-#include <gewuln/model_renderer.h>
-#include <gewuln/text_renderer.h>
+#include <gewuln/rendering/gizmo_renderer.h>
+#include <gewuln/rendering/model_renderer.h>
+#include <gewuln/rendering/text_renderer.h>
 #include <gewuln/geometry_2d.h>
 
 // settings
 bool show_fps = true;
 bool show_granny_text;
 
-// GizmoRenderer   *gizmo_render;
+GizmoRenderer   *gizmo_renderer;
 ModelRenderer   *model_renderer;
 TextRenderer    *text_renderer;
 
@@ -21,6 +22,7 @@ Game::Game(unsigned int width, unsigned int height)
 
 Game::~Game()
 {
+    delete gizmo_renderer;
     delete model_renderer;
     delete text_renderer;
     delete current_room;
@@ -305,7 +307,7 @@ void Game::process_mouse_scroll(float yoffset)
 
 void Game::render()
 {
-    // gizmo_renderer->Draw();
+    gizmo_renderer->Draw();
     
     model_renderer->DrawCharacter(
         active_character,

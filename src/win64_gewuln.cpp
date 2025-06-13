@@ -132,7 +132,6 @@ int main()
         );
         game.render();
 
-
         // glCheckError();
         glfwSwapBuffers(window);
         glfwPollEvents();

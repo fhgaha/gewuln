@@ -13,21 +13,18 @@ public:
 	{
 		this->shader = shader;
         
-        //should depend on distance between (0,0,0) camera
-        float axis_len = 1.0f;
-        
         float vertices[] = {
             // X-axis (red)
-            0.0f, 0.0f, 0.0f,  // Origin
-            axis_len, 0.0f, 0.0f,  // X-direction
+            0.0f, 0.0f, 0.0f,
+            1.0f, 0.0f, 0.0f,
             
             // Y-axis (green)
-            0.0f, 0.0f, 0.0f,  // Origin
-            0.0f, axis_len, 0.0f,  // Y-direction
+            0.0f, 0.0f, 0.0f,
+            0.0f, 1.0f, 0.0f,
             
             // Z-axis (blue)
-            0.0f, 0.0f, 0.0f,  // Origin
-            0.0f, 0.0f, axis_len   // Z-direction
+            0.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f 
         };
         glGenVertexArrays(1, &VAO);
         glGenBuffers(1, &VBO);
@@ -46,12 +43,16 @@ public:
 
 	void Draw(Camera *cam, float aspect)
 	{
+        axis_len = glm::length(cam->Position) * 0.2f;
+        
+        
         shader.Use(); // CRITICAL: Must activate shader first
         
         // Prepare transformations
         glm::mat4 projection = glm::perspective(glm::radians(cam->Zoom), aspect, 0.1f, 100.0f);
         glm::mat4 view = cam->GetViewMatrix();
-        glm::mat4 model = glm::mat4(1.0f); // Identity matrix
+        glm::mat4 model = glm::mat4(1.0f); 
+        model = glm::scale(model, glm::vec3(axis_len)); //used for scaling with distance to cam
 
         shader.SetMatrix4("projection", projection);
         shader.SetMatrix4("view", view);
@@ -80,6 +81,7 @@ public:
 private:
 	Shader shader;
 	unsigned int VAO, VBO;
+    float axis_len = 1.0f;
 };
 
 #endif

@@ -7,6 +7,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
+#include <gewuln/global.h>
 #include "game.h"
 
 // Use NVIDIA Gpu for NVIDIA Optimus laptops/GPUs
@@ -173,6 +174,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     // make sure the viewport matches the new window dimensions; note that width and
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
+    Global::set_window_size(width, height);
 }
 
 void mouse_callback(GLFWwindow * window, double xpos, double ypos)

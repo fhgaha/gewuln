@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <gewuln/shader.h>
+#include <gewuln/global.h>
 
 class GizmoRenderer
 {
@@ -11,19 +12,22 @@ public:
 	GizmoRenderer(Shader &shader)
 	{
 		this->shader = shader;
-		
+        
+        //should depend on distance between (0,0,0) camera
+        float axis_len = 1.0f;
+        
         float vertices[] = {
             // X-axis (red)
             0.0f, 0.0f, 0.0f,  // Origin
-            1.0f, 0.0f, 0.0f,  // X-direction
+            axis_len, 0.0f, 0.0f,  // X-direction
             
             // Y-axis (green)
             0.0f, 0.0f, 0.0f,  // Origin
-            0.0f, 1.0f, 0.0f,  // Y-direction
+            0.0f, axis_len, 0.0f,  // Y-direction
             
             // Z-axis (blue)
             0.0f, 0.0f, 0.0f,  // Origin
-            0.0f, 0.0f, 1.0f   // Z-direction
+            0.0f, 0.0f, axis_len   // Z-direction
         };
         glGenVertexArrays(1, &VAO);
         glGenBuffers(1, &VBO);

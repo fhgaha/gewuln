@@ -12,12 +12,19 @@ public:
 	{
 		this->shader = shader;
 		
-		  // Define vertex data for the line
         float vertices[] = {
-            0.0f, 0.0f, 0.0f, // Start point (origin)
-            1.0f, 0.0f, 0.0f  // End point (x-axis)
+            // X-axis (red)
+            0.0f, 0.0f, 0.0f,  // Origin
+            1.0f, 0.0f, 0.0f,  // X-direction
+            
+            // Y-axis (green)
+            0.0f, 0.0f, 0.0f,  // Origin
+            0.0f, 1.0f, 0.0f,  // Y-direction
+            
+            // Z-axis (blue)
+            0.0f, 0.0f, 0.0f,  // Origin
+            0.0f, 0.0f, 1.0f   // Z-direction
         };
-
         glGenVertexArrays(1, &VAO);
         glGenBuffers(1, &VBO);
         
@@ -28,7 +35,7 @@ public:
         // Vertex positions (matches vertex shader layout location 0)
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-        
+		
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
 	}
@@ -45,13 +52,24 @@ public:
         shader.SetMatrix4("projection", projection);
         shader.SetMatrix4("view", view);
         shader.SetMatrix4("model", model);
-        
-        // Set color to red
-        shader.SetVector3f("color", glm::vec3(1.0f, 0.0f, 0.0f));
 
         // Draw line
         glBindVertexArray(VAO);
-        glDrawArrays(GL_LINES, 0, 2);
+		glDisable(GL_DEPTH_TEST);
+        
+        // red
+        shader.SetVector3f("color", glm::vec3(1.0f, 0.0f, 0.0f));
+		glDrawArrays(GL_LINES, 0, 2);
+
+        // green
+        shader.SetVector3f("color", glm::vec3(0.0f, 1.0f, 0.0f));
+        glDrawArrays(GL_LINES, 2, 2);
+        
+        // blue
+        shader.SetVector3f("color", glm::vec3(0.0f, 0.0f, 1.0f));
+        glDrawArrays(GL_LINES, 4, 2);
+
+		glEnable(GL_DEPTH_TEST);
         glBindVertexArray(0);
 	}
 

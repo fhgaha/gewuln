@@ -10,7 +10,7 @@
 
 // settings
 bool show_fps = true;
-bool show_granny_text;
+bool show_granny_text = true;
 
 GizmoRenderer   *gizmo_renderer;
 ModelRenderer   *model_renderer;

@@ -7,6 +7,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
+#include <gewuln/global.h>
 #include "game.h"
 
 // Use NVIDIA Gpu for NVIDIA Optimus laptops/GPUs
@@ -18,6 +19,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
+void viewport_letterboxing(int width, int height);
 void APIENTRY glDebugOutput(
     GLenum source, GLenum type, unsigned int id,
     GLenum severity, GLsizei length,
@@ -28,8 +30,8 @@ GLenum glCheckError_(const char *file, int line);
 #define glCheckError() glCheckError_(__FILE__, __LINE__)
 
 // settings
-const unsigned int SCR_WIDTH  = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_WIDTH = 1366, SCR_HEIGHT = 768;
+const float TARGET_ASPECT = 21.0f / 9.0f;
 
 const bool debug = true;
 
@@ -100,6 +102,9 @@ int main()
         }
     }
 
+    // glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT - 200);
+    // viewport_letterboxing(SCR_WIDTH, SCR_HEIGHT);
+    
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // wireframe
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE); // draw faces of front sides only
@@ -125,13 +130,10 @@ int main()
         game.process_input();
 
         // render
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(
-              GL_COLOR_BUFFER_BIT
-            | GL_DEPTH_BUFFER_BIT
-        );
+        // glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         game.render();
-
 
         // glCheckError();
         glfwSwapBuffers(window);
@@ -173,7 +175,29 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     // make sure the viewport matches the new window dimensions; note that width and
     // height will be significantly larger than specified on retina displays.
-    glViewport(0, 0, width, height);
+    // glViewport(0, 0, width, height);
+    
+    viewport_letterboxing(width, height);
+    
+    Global::set_window_size(width, height);
+}
+
+void viewport_letterboxing(int width, int height)
+{
+    int viewportHeight = static_cast<int>(width / TARGET_ASPECT);
+    int viewportY = 0;
+
+    if (viewportHeight > height) {
+        // If too tall, use window height and adjust width
+        int viewportWidth = static_cast<int>(height * TARGET_ASPECT);
+        viewportY = 0;
+        int viewportX = (width - viewportWidth) / 2;
+        glViewport(viewportX, viewportY, viewportWidth, height);
+    } else {
+        // Center vertically
+        viewportY = (height - viewportHeight) / 2;
+        glViewport(0, viewportY, width, viewportHeight);
+    }
 }
 
 void mouse_callback(GLFWwindow * window, double xpos, double ypos)

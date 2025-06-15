@@ -3,11 +3,10 @@
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
-
 #include <ft2build.h>
 #include <freetype/freetype.h>
-#include "texture.h"
-#include "shader.h"
+#include <gewuln/texture.h>
+#include <gewuln/shader.h>
 
 
 struct CharacterLetter {
@@ -21,18 +20,14 @@ struct CharacterLetter {
 class TextRenderer {
 	public:
 		std::map<char, CharacterLetter> Characters;
-	    Shader TextShader;
+	    Shader shader;
 
-		TextRenderer(unsigned int width, unsigned int height)
+		TextRenderer(Shader &shader, unsigned int width, unsigned int height)
 		{
-		    this->TextShader = ResourceManager::LoadShader(
-		    	"D:/MyProjects/cpp/gewuln/src/shaders/text_shaders/text_2d.vert",
-		    	"D:/MyProjects/cpp/gewuln/src/shaders/text_shaders/text_2d.frag",
-		    	nullptr,
-		    	"text"
-		    );
-		    this->TextShader.SetMatrix4("projection", glm::ortho(0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f), true);
-		    this->TextShader.SetInteger("text", 0);
+			// ResourceManager::GetShader()
+		    this->shader = shader;
+		    this->shader.SetMatrix4("projection", glm::ortho(0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f), true);
+		    this->shader.SetInteger("text", 0);
 
 		    // configure VAO/VBO for texture quads
 		    glGenVertexArrays(1, &this->VAO);
@@ -46,28 +41,30 @@ class TextRenderer {
 		    glBindVertexArray(0);
 		}
 
-		void Load(std::string font, unsigned int fontSize)
+		// This method is separate from the constructor with the idea that it will allow to change font or font size if needed
+		void Load(std::string font_path, unsigned int font_size)
 		{
 		    // first clear the previously loaded Characters
 			this->Characters.clear();
 			// then initialize and load the FreeType library
 			FT_Library ft;
-			if (FT_Init_FreeType(&ft)) // all functions return a value different than 0 whenever an error occurred
+			if (FT_Init_FreeType(&ft)){ // all functions return a value different than 0 whenever an error occurred
 			    std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
-			// load font as face
+			}
+			// load font_path as face
 			FT_Face face;
-			if (FT_New_Face(ft, font.c_str(), 0, &face))
-			    std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
+			if (FT_New_Face(ft, font_path.c_str(), 0, &face)){
+			    std::cout << "ERROR::FREETYPE: Failed to load font_path" << std::endl;
+			}
 			// set size to load glyphs as
-			FT_Set_Pixel_Sizes(face, 0, fontSize);
+			FT_Set_Pixel_Sizes(face, 0, font_size);
 			// disable byte-alignment restriction
 			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 			// then for the first 128 ASCII characters, pre-load/compile their characters and store them
 			for (GLubyte c = 0; c < 128; c++) // lol see what I did there
 			{
 			    // load character glyph
-			    if (FT_Load_Char(face, c, FT_LOAD_RENDER))
-			    {
+			    if (FT_Load_Char(face, c, FT_LOAD_RENDER)){
 			        std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
 			        continue;
 			    }
@@ -85,7 +82,7 @@ class TextRenderer {
 			        GL_RED,
 			        GL_UNSIGNED_BYTE,
 			        face->glyph->bitmap.buffer
-			        );
+				);
 			    // set texture options
 			    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 			    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -96,7 +93,7 @@ class TextRenderer {
 			    CharacterLetter character = {
 			        texture,
 			        glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
-			        glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+			        glm::ivec2(face->glyph->bitmap_left,  face->glyph->bitmap_top),
 			        (unsigned int)face->glyph->advance.x
 			    };
 			    Characters.insert(std::pair<char, CharacterLetter>(c, character));
@@ -110,8 +107,8 @@ class TextRenderer {
 	    void Draw(std::string text, float x, float y, float scale, glm::vec3 color = glm::vec3(1.0f))
 	    {
 		    // activate corresponding render state
-		    this->TextShader.Use();
-		    this->TextShader.SetVector3f("textColor", color);
+		    this->shader.Use();
+		    this->shader.SetVector3f("textColor", color);
 		    glActiveTexture(GL_TEXTURE0);
 		    glBindVertexArray(this->VAO);
 
@@ -147,6 +144,7 @@ class TextRenderer {
 		        // now advance cursors for next glyph
 		        x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (1/64th times 2^6 = 64)
 		    }
+			
 		    glBindVertexArray(0);
 		    glBindTexture(GL_TEXTURE_2D, 0);
 	    }

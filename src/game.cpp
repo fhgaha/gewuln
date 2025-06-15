@@ -3,15 +3,16 @@
 #include <memory>
 #include <utility>
 #include <stdio.h>
-#include <gewuln/model_renderer.h>
-#include <gewuln/text_renderer.h>
+#include <gewuln/rendering/gizmo_renderer.h>
+#include <gewuln/rendering/model_renderer.h>
+#include <gewuln/rendering/text_renderer.h>
 #include <gewuln/geometry_2d.h>
 
 // settings
 bool show_fps = true;
-bool show_granny_text;
+bool show_granny_text = true;
 
-// GizmoRenderer   *gizmo_render;
+GizmoRenderer   *gizmo_renderer;
 ModelRenderer   *model_renderer;
 TextRenderer    *text_renderer;
 
@@ -21,6 +22,7 @@ Game::Game(unsigned int width, unsigned int height)
 
 Game::~Game()
 {
+    delete gizmo_renderer;
     delete model_renderer;
     delete text_renderer;
     delete current_room;
@@ -29,16 +31,42 @@ Game::~Game()
 
 void Game::init()
 {
-    ResourceManager::LoadShader(
-        "D:/MyProjects/cpp/gewuln/src/shaders/default/default.vert",
-        "D:/MyProjects/cpp/gewuln/src/shaders/default/default.frag",
-        nullptr,
-        "model_shader"
-    );
+    { //renderers
+        model_renderer = new ModelRenderer(
+            ResourceManager::LoadShader(
+                "D:/MyProjects/cpp/gewuln/src/shaders/default/default.vert",
+                "D:/MyProjects/cpp/gewuln/src/shaders/default/default.frag",
+                nullptr,
+                "model_shader"
+            )
+        );
+        Global::draw_gizmos = false;
+        
+        
+        text_renderer = new TextRenderer(
+            ResourceManager::LoadShader(
+                "D:/MyProjects/cpp/gewuln/src/shaders/text_shaders/text_2d.vert",
+                "D:/MyProjects/cpp/gewuln/src/shaders/text_shaders/text_2d.frag",
+                nullptr,
+                "text_shader"
+            ),
+            this->Width, 
+            this->Height
+        );
+        text_renderer->Load("D:/MyProjects/cpp/gewuln/assets/fonts/arial/arial.ttf", 24);
+        
+        
+        gizmo_renderer = new GizmoRenderer(
+            ResourceManager::LoadShader(
+                "D:/MyProjects/cpp/gewuln/src/shaders/origin_gizmo/origin_gizmo.vert",
+                "D:/MyProjects/cpp/gewuln/src/shaders/origin_gizmo/origin_gizmo.frag",
+                nullptr,
+                "gizmo_shader"
+            )
+        );
+    }
 
-
-    model_renderer = new ModelRenderer(ResourceManager::GetShader("model_shader"));
-    model_renderer->draw_gizmos = false;
+    
 
     {//characters
         {//main character
@@ -51,15 +79,10 @@ void Game::init()
                     mona_path,
                     ResourceManager::GetModel("mona")
                 ),
-                glm::vec3(0.0f, 0.0f, -2.0f)
+                glm::vec3(0.0f, 0.0f, 0.0f)
             );
             active_character = &characters["mona"];
         }
-    }
-
-    {//text renderer
-        text_renderer = new TextRenderer(this->Width, this->Height);
-        text_renderer->Load("D:/MyProjects/cpp/gewuln/assets/fonts/arial/arial.ttf", 24);
     }
 
 
@@ -281,7 +304,7 @@ void Game::process_input()
     }
 
     if (Keys[GLFW_KEY_GRAVE_ACCENT] && !KeysProcessed[GLFW_KEY_GRAVE_ACCENT]) { /* ` */
-        model_renderer->draw_gizmos = !model_renderer->draw_gizmos;
+        Global::draw_gizmos = !Global::draw_gizmos;
         KeysProcessed[GLFW_KEY_GRAVE_ACCENT] = true;
     }
 
@@ -305,8 +328,6 @@ void Game::process_mouse_scroll(float yoffset)
 
 void Game::render()
 {
-    // gizmo_renderer->Draw();
-    
     model_renderer->DrawCharacter(
         active_character,
         current_room->current_cam,
@@ -320,8 +341,9 @@ void Game::render()
     );
 
     //fps
+    //TODO no need to pass it there every frame
     if (show_fps) {
-        text_renderer->Draw("FPS: " + std::to_string(1/this->dt), this->Width * 0.05f, this->Height * 0.05f, 1.0f);
+        text_renderer->Draw(std::format("FPS: {}", (int)(1/this->dt)), this->Width * 0.05f, this->Height * 0.05f, 1.0f);
     }
 
     //subtitles
@@ -336,4 +358,11 @@ void Game::render()
         text_renderer->Draw(line_2, this->Width * 0.10f, this->Height - 24.0f * 2.0f * 3.0f, 1.5f);
         text_renderer->Draw(line_3, this->Width * 0.10f, this->Height - 24.0f * 2.0f * 2.0f, 1.5f);
     }
+    
+
+    if (Global::draw_gizmos) {
+        //TODO no need to pass it there every frame
+        gizmo_renderer->Draw(current_room->current_cam, (float)Width/(float)Height);
+    }        
+    
 }

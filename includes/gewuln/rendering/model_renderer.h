@@ -2,20 +2,18 @@
 #define MODEL_RENDERER_H
 
 #include <vector>
-#include "shader.h"
-#include "mesh.h"
-#include "model.h"
-#include "character.h"
-#include "stdio.h"
-#include "glm/ext.hpp"
+#include <gewuln/shader.h>
+#include <gewuln/mesh.h>
+#include <gewuln/model.h>
+#include <gewuln/character.h>
+#include <stdio.h>
+#include <glm/ext.hpp>
 
 
 class ModelRenderer
 {
 
 public:
-	bool	draw_gizmos;
-
 	ModelRenderer(Shader &shader): shader(shader){}
 
 	void DrawCharacter(
@@ -76,7 +74,7 @@ public:
 		}
 
 		//draw collider wireframe
-		if (draw_gizmos)
+		if (Global::draw_gizmos)
 		{
 			if (loaded_model.collider_mesh.has_value())
 			{
@@ -149,7 +147,7 @@ public:
 		}
 
 		//draw interactable wireframe
-		if (draw_gizmos)
+		if (Global::draw_gizmos)
 		{
 			{//draw all the interactable meshes
 				

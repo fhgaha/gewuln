@@ -14,8 +14,6 @@ class ModelRenderer
 {
 
 public:
-	bool	draw_gizmos;
-
 	ModelRenderer(Shader &shader): shader(shader){}
 
 	void DrawCharacter(
@@ -76,7 +74,7 @@ public:
 		}
 
 		//draw collider wireframe
-		if (draw_gizmos)
+		if (Global::draw_gizmos)
 		{
 			if (loaded_model.collider_mesh.has_value())
 			{
@@ -149,7 +147,7 @@ public:
 		}
 
 		//draw interactable wireframe
-		if (draw_gizmos)
+		if (Global::draw_gizmos)
 		{
 			{//draw all the interactable meshes
 				

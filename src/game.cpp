@@ -40,7 +40,7 @@ void Game::init()
                 "model_shader"
             )
         );
-        model_renderer->draw_gizmos = false;
+        Global::draw_gizmos = false;
         
         
         text_renderer = new TextRenderer(
@@ -304,7 +304,7 @@ void Game::process_input()
     }
 
     if (Keys[GLFW_KEY_GRAVE_ACCENT] && !KeysProcessed[GLFW_KEY_GRAVE_ACCENT]) { /* ` */
-        model_renderer->draw_gizmos = !model_renderer->draw_gizmos;
+        Global::draw_gizmos = !Global::draw_gizmos;
         KeysProcessed[GLFW_KEY_GRAVE_ACCENT] = true;
     }
 
@@ -359,8 +359,10 @@ void Game::render()
         text_renderer->Draw(line_3, this->Width * 0.10f, this->Height - 24.0f * 2.0f * 2.0f, 1.5f);
     }
     
-        
-    //TODO no need to pass it there every frame
-    gizmo_renderer->Draw(current_room->current_cam, (float)Width/(float)Height);
+
+    if (Global::draw_gizmos) {
+        //TODO no need to pass it there every frame
+        gizmo_renderer->Draw(current_room->current_cam, (float)Width/(float)Height);
+    }        
     
 }

@@ -52,7 +52,7 @@ public:
         glm::mat4 projection = glm::perspective(glm::radians(cam->Zoom), aspect, 0.1f, 100.0f);
         glm::mat4 view = cam->GetViewMatrix();
         glm::mat4 model = glm::mat4(1.0f); 
-        model = glm::scale(model, glm::vec3(axis_len)); //used for scaling with distance to cam
+        model = glm::scale(model, glm::vec3(axis_len)); //used for scaling with distance between (0,0,0) and camera
 
         shader.SetMatrix4("projection", projection);
         shader.SetMatrix4("view", view);

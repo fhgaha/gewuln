@@ -31,11 +31,11 @@ public:
     unsigned int            Width, Height;
     float                   dt;
 
-    Room                    *current_room;
-    Character               *active_character;
-
     std::unordered_map<std::string, std::unique_ptr<Room>>      rooms;
     std::unordered_map<std::string, Character>                  characters;
+
+    Room                    *current_room;
+    Character               *active_character;
 
 
     // constructor/destructor

@@ -24,58 +24,6 @@ stop, me driving a track and crashing it to attract attention and something with
 and cant remember anything more.
 
 
-
-
-
-		// {//try rotating head here i guess, should compensate to a direction somehow i dont know
-		// 	// "mixamorig:Head"
-		// 	std::string nodeName = "mixamorig:Head";
-
-		// 	if (!currentAnimation) {
-		// 		std::cout << "current animation is nullptr\n";
-		// 		return;
-		// 	}
-		// 	Bone* Bone = currentAnimation->FindBone(nodeName);
-
-		// 	if (!Bone){
-		// 		std::cout << "couldnt find bone " << nodeName << "\n";
-		// 	}
-
-		// 	// glm::mat4 some_mat = glm::lookAt(
-		// 	// 	glm::vec3((float)mat[3][0], (float)mat[3][1], (float)mat[3][2]),
-		// 	// 	// Geometry3d::mat4_to_translation(globalTransformation),
-		// 	// 	glm::vec3(0.0f),
-		// 	// 	glm::vec3(0.0f, 0.0f, 1.0f)
-		// 	// );
-
-		// 	int index = Bone->GetBoneID();
-
-		// 	// Decompose the current head matrix to extract position, rotation, and scale
-		// 	glm::vec3 position, scale, skew;
-		// 	glm::vec4 perspective;
-		// 	glm::quat rotation;
-		// 	glm::decompose(finalBoneMatrices[index], scale, rotation, position, skew, perspective);
-
-		// 	// Calculate the direction from the head's position to the target
-		// 	glm::vec3 target(1.0f);
-		// 	glm::vec3 direction = glm::normalize(target - position);
-
-		// 	// Define the up vector (world-up as Y-axis, adjust if needed)
-		// 	glm::vec3 up(0.0f, 1.0f, 0.0f);
-
-		// 	// Compute the new rotation quaternion using glm::quatLookAt
-		// 	glm::quat newRotation = glm::quatLookAt(direction, up);
-
-		// 	// Reconstruct the transformation matrix with new rotation
-		// 	glm::mat4 newHeadMatrix = glm::translate(glm::mat4(1.0f), position)
-		// 							* glm::mat4_cast(newRotation)
-		// 							* glm::scale(glm::mat4(1.0f), scale);
-
-		// 	finalBoneMatrices[index] = newHeadMatrix;
-
-		// }
-
-
 //-----------------------------------------------------------------------------------------------
 // Blender
 //-----------------------------------------------------------------------------------------------
@@ -94,5 +42,13 @@ is_room_exit
 https://github.com/erincatto/box2d-lite
 
 
+//==============DIALOGS==============
+
 -no husband? youth these days. i swear i should be the one killing al those people around.
 -charlie! dont you say that! please forgive my husband.
+
+
+//==============REFERENCES==============
+Blair Witch Volume I: Rustin Parr
+Blair Witch Volume II: The Legend of Coffin Rock 
+Blair Witch Volume III: The Elly Kedward Tale 

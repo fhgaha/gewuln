@@ -28,12 +28,7 @@ and cant remember anything more.
 // Blender
 //-----------------------------------------------------------------------------------------------
 GLTF viewer: https://sandbox.babylonjs.com/
-
-Custom props:
-is_collider
-is_interactable
-is_walkable_area
-is_room_exit
+Not animated model: to succesfully export .fbx I had to change `Diffuse BSDF` to `Principal BSDF`.
 
 //command to `build and run`
 .\build ; if ($?) {.\build\win64_gewuln.exe}
@@ -50,5 +45,5 @@ https://github.com/erincatto/box2d-lite
 
 //==============REFERENCES==============
 Blair Witch Volume I: Rustin Parr
-Blair Witch Volume II: The Legend of Coffin Rock 
-Blair Witch Volume III: The Elly Kedward Tale 
+Blair Witch Volume II: The Legend of Coffin Rock
+Blair Witch Volume III: The Elly Kedward Tale

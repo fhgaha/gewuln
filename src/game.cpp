@@ -41,8 +41,8 @@ void Game::init()
             )
         );
         Global::draw_gizmos = false;
-        
-        
+
+
         text_renderer = new TextRenderer(
             ResourceManager::LoadShader(
                 "D:/MyProjects/cpp/gewuln/src/shaders/text_shaders/text_2d.vert",
@@ -50,12 +50,12 @@ void Game::init()
                 nullptr,
                 "text_shader"
             ),
-            this->Width, 
+            this->Width,
             this->Height
         );
         text_renderer->Load("D:/MyProjects/cpp/gewuln/assets/fonts/arial/arial.ttf", 24);
-        
-        
+
+
         gizmo_renderer = new GizmoRenderer(
             ResourceManager::LoadShader(
                 "D:/MyProjects/cpp/gewuln/src/shaders/origin_gizmo/origin_gizmo.vert",
@@ -66,7 +66,7 @@ void Game::init()
         );
     }
 
-    
+
 
     {//characters
         {//main character
@@ -75,14 +75,24 @@ void Game::init()
 
             characters["mona"] = Character(
                 &ResourceManager::GetModel("mona"),
-                Animator(
-                    mona_path,
-                    ResourceManager::GetModel("mona")
-                ),
+                Animator(mona_path, ResourceManager::GetModel("mona")),
                 glm::vec3(0.0f, 0.0f, 0.0f)
             );
-            active_character = &characters["mona"];
         }
+
+        {//hotel owner
+            auto ho_path = "D:/MyProjects/cpp/gewuln/assets/models/low_poly_humanoids/hotel_owner/export/gltf_2_anims/hotel_owner.gltf";
+            ResourceManager::LoadModel(ho_path, true, "hotel_owner");
+
+            characters["hotel_owner"] = Character {
+                &ResourceManager::GetModel("hotel_owner"),
+                Animator(ho_path, ResourceManager::GetModel("hotel_owner")),
+                glm::vec3(0.0f, 0.0f, 3.0f)
+            };
+        }
+
+        // active_character = &characters["mona"];
+        active_character = &characters["hotel_owner"];
     }
 
 
@@ -156,7 +166,7 @@ void Game::init()
                     }
                 }
             );
-            
+
             current_room = kitchen_room;
         }
 
@@ -237,32 +247,32 @@ void Game::init()
             );
         }
 
-        { //town
-            ResourceManager::LoadModel(
-                "D:/MyProjects/cpp/gewuln/assets/models/town/export/glfw_5_fixed_faces/town.gltf",
-                false,
-                "town_model"
-            );
+        // { //town
+        //     ResourceManager::LoadModel(
+        //         "D:/MyProjects/cpp/gewuln/assets/models/town/export/glfw_5_fixed_faces/town.gltf",
+        //         false,
+        //         "town_model"
+        //     );
 
-            rooms["town_room"] = std::make_unique<Room>();
-            auto town_room = rooms["town_room"].get();
-            town_room->Init(&ResourceManager::GetModel("town_model"));
-            town_room->cameras["cam_fly"] = std::make_unique<CameraFly>(
-                CameraFly(
-                    glm::vec3(2.191804, 6.516104, -7.915638),
-                    glm::vec3(0.0f, 1.0f, 0.0f),
-                    -249.56f,
-                    25.0f
-                )
-            );
+        //     rooms["town_room"] = std::make_unique<Room>();
+        //     auto town_room = rooms["town_room"].get();
+        //     town_room->Init(&ResourceManager::GetModel("town_model"));
+        //     town_room->cameras["cam_fly"] = std::make_unique<CameraFly>(
+        //         CameraFly(
+        //             glm::vec3(2.191804, 6.516104, -7.915638),
+        //             glm::vec3(0.0f, 1.0f, 0.0f),
+        //             -249.56f,
+        //             25.0f
+        //         )
+        //     );
 
-            town_room->initial_cam = town_room->cameras["cam_fly"].get();
-            town_room->current_cam = town_room->initial_cam;
-            current_room = town_room;
-        }
-        
-        
-        
+        //     town_room->initial_cam = town_room->cameras["cam_fly"].get();
+        //     town_room->current_cam = town_room->initial_cam;
+        //     current_room = town_room;
+        // }
+
+
+
         { //check_everything_inited
             assert(this->current_room               && "!Current room is not set");
             assert(this->current_room->current_cam  && "!Current camera is not set");
@@ -358,11 +368,11 @@ void Game::render()
         text_renderer->Draw(line_2, this->Width * 0.10f, this->Height - 24.0f * 2.0f * 3.0f, 1.5f);
         text_renderer->Draw(line_3, this->Width * 0.10f, this->Height - 24.0f * 2.0f * 2.0f, 1.5f);
     }
-    
+
 
     if (Global::draw_gizmos) {
         //TODO no need to pass it there every frame
         gizmo_renderer->Draw(current_room->current_cam, (float)Width/(float)Height);
-    }        
-    
+    }
+
 }

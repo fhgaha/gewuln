@@ -13,7 +13,6 @@ const unsigned int MAX_BONES_AMOUNT = 100;
 class Animator
 {
 public:
-	std::unordered_map<std::string, Animation> animations;
 
 	Animator(){};
 
@@ -47,14 +46,12 @@ public:
 
 	void PlayAnimation(std::string anim_name)
 	{
-		if (!check_has_animations()) return;
-
 		Animation* anim_to_play;
 		try{
 			anim_to_play = &animations.at(anim_name);
 		}
 		catch(const std::exception& e){
-			std::cerr << "\nNo such animation as \"" << anim_name <<"\"\n";
+			std::cerr << "No such animation as \"" << anim_name <<"\"\n";
 			return;
 		}
 
@@ -68,7 +65,7 @@ public:
 
 	void update_animation(float dt)
 	{
-		if (!check_has_animations()) return;
+		// if (!check_has_animations()) return;
 
 		deltaTime = dt;
 		if (currentAnimation)
@@ -107,7 +104,7 @@ public:
 	
 	void update_animation_with_look_at(float dt)
 	{
-		if (!check_has_animations()) return;
+		// if (!check_has_animations()) return;
 
 		deltaTime = dt;
 		if (currentAnimation)
@@ -208,9 +205,11 @@ private:
 	float NECK_ROTATION_SPEED_AROUND_X = 10.0f;
 	float NECK_ROTATION_SPEED_AROUND_Y = 5.0f;
 
+	std::unordered_map<std::string, Animation> animations;
+	
 	bool check_has_animations() {
 		if (animations.empty()) {
-			std::cerr << "ERROR: can't animate a model with no animations!" << std::endl;
+			std::cerr << "ERROR: can't animate a model with no animations! " << "{this animator parent name}" << std::endl;
 			return false;
 		}
 

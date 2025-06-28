@@ -69,7 +69,7 @@ void Game::init()
 
 
     {//characters
-        {//main character
+        {//mona
             auto mona_path = "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/export/gltf_3_cube_collider/mona.gltf";
             ResourceManager::LoadModel(mona_path, true, "mona");
 
@@ -81,6 +81,7 @@ void Game::init()
         }
 
         {//hotel owner
+            // auto ho_path = "D:/MyProjects/cpp/gewuln/assets/models/low_poly_humanoids/hotel_owner/export/gltf_1_no_anim/hotel_owner.gltf";
             auto ho_path = "D:/MyProjects/cpp/gewuln/assets/models/low_poly_humanoids/hotel_owner/export/gltf_2_anims/hotel_owner.gltf";
             ResourceManager::LoadModel(ho_path, true, "hotel_owner");
 
@@ -91,8 +92,8 @@ void Game::init()
             };
         }
 
-        // active_character = &characters["mona"];
-        active_character = &characters["hotel_owner"];
+        active_character = &characters["mona"];
+        // active_character = &characters["hotel_owner"];
     }
 
 
@@ -284,17 +285,19 @@ void Game::init()
 void Game::update(float dt)
 {
     this->dt = dt;
+    
+    for (auto &[ch_name, ch] : characters)
+    {
+        ch.current_room_tmp = current_room;
+        ch.Update(dt);
+    }
 
     if (active_character) {
-        // active_character->room_interactables_tmp = &current_room->interactables;
-        active_character->current_room_tmp = current_room;
-        active_character->Update(dt);
-
         //look at cam looks at character, fly cam does nothing
         glm::vec3 trg = active_character->position + glm::vec3(0.0f, 1.5f, 0.0f);
         current_room->current_cam->LookAt(&trg);
     }
-
+    
 }
 
 void Game::process_input()
@@ -340,6 +343,12 @@ void Game::render()
 {
     model_renderer->DrawCharacter(
         active_character,
+        current_room->current_cam,
+        (float)Width/(float)Height
+    );
+    
+    model_renderer->DrawCharacter(
+        &characters.at("hotel_owner"),
         current_room->current_cam,
         (float)Width/(float)Height
     );

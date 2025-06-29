@@ -274,7 +274,8 @@ void Game::init()
             characters["mona"] = Character(
                 &ResourceManager::GetModel("mona"),
                 Animator(mona_path, ResourceManager::GetModel("mona")),
-                glm::vec3(0.0f, 0.0f, 0.0f)
+                glm::vec3(0.0f, 0.0f, 0.0f),
+                glm::vec3(0, 0, -1)
             );
             characters["mona"].current_room_tmp = current_room;
         }
@@ -284,11 +285,12 @@ void Game::init()
             auto ho_path = "D:/MyProjects/cpp/gewuln/assets/models/low_poly_humanoids/hotel_owner/export/gltf_2_anims/hotel_owner.gltf";
             ResourceManager::LoadModel(ho_path, true, "hotel_owner");
 
-            characters["hotel_owner"] = Character {
+            characters["hotel_owner"] = Character(
                 &ResourceManager::GetModel("hotel_owner"),
                 Animator(ho_path, ResourceManager::GetModel("hotel_owner")),
-                glm::vec3(0.0f, 0.0f, -3.0f)
-            };
+                glm::vec3(0, 0, -2),
+                glm::vec3(0, 0, 1)
+            );
             characters["hotel_owner"].current_room_tmp = current_room;
         }
 

@@ -197,6 +197,7 @@ public:
 
 private:
 	std::vector<glm::mat4> finalBoneMatrices;
+	std::unordered_map<std::string, Animation> animations;
 	Animation* currentAnimation;
 	float currentTime;
 	float deltaTime;
@@ -204,8 +205,6 @@ private:
 	float angle_around_y_rad = 0.0f;
 	float NECK_ROTATION_SPEED_AROUND_X = 10.0f;
 	float NECK_ROTATION_SPEED_AROUND_Y = 5.0f;
-
-	std::unordered_map<std::string, Animation> animations;
 	
 	bool check_has_animations() {
 		if (animations.empty()) {

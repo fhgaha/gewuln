@@ -193,9 +193,8 @@ void Game::init()
             current_room = test_room;
         }
 
-        //TODO forced to do this shit after creating "another room"
+        //TODO forced to do this when have transition door between rooms
         {//kitchen room exits
-
             rooms["test_kitchen_room"]->init_exit(
                 "exit",
                 Room::Exit {
@@ -217,53 +216,53 @@ void Game::init()
             );
         }
 
-        { //town
-            ResourceManager::LoadModel(
-                "D:/MyProjects/cpp/gewuln/assets/models/town/export/glfw_5_fixed_faces/town.gltf",
-                false,
-                "town_model"
-            );
+        // { //town
+        //     ResourceManager::LoadModel(
+        //         "D:/MyProjects/cpp/gewuln/assets/models/town/export/glfw_5_fixed_faces/town.gltf",
+        //         false,
+        //         "town_model"
+        //     );
 
-            rooms["town_room"] = std::make_unique<Room>();
-            auto town_room = rooms["town_room"].get();
-            town_room->Init(&ResourceManager::GetModel("town_model"));
-            town_room->cameras["cam_fly"] = std::make_unique<CameraFly>(
-                CameraFly(
-                    glm::vec3(2.191804, 6.516104, -7.915638),
-                    glm::vec3(0.0f, 1.0f, 0.0f),
-                    -249.56f,
-                    25.0f
-                )
-            );
+        //     rooms["town_room"] = std::make_unique<Room>();
+        //     auto town_room = rooms["town_room"].get();
+        //     town_room->Init(&ResourceManager::GetModel("town_model"));
+        //     town_room->cameras["cam_fly"] = std::make_unique<CameraFly>(
+        //         CameraFly(
+        //             glm::vec3(2.191804, 6.516104, -7.915638),
+        //             glm::vec3(0.0f, 1.0f, 0.0f),
+        //             -249.56f,
+        //             25.0f
+        //         )
+        //     );
 
-            town_room->initial_cam = town_room->cameras["cam_fly"].get();
-            town_room->current_cam = town_room->initial_cam;
-            current_room = town_room;
-        }
+        //     town_room->initial_cam = town_room->cameras["cam_fly"].get();
+        //     town_room->current_cam = town_room->initial_cam;
+        //     current_room = town_room;
+        // }
         
-        {//hotel lobby
-            ResourceManager::LoadModel(
-                "D:/MyProjects/cpp/gewuln/assets/models/hotel_interiors/export/gltf_1/hotel_lobby.gltf",
-                false,
-                "hotel_lobby"
-            );
+        // {//hotel lobby
+        //     ResourceManager::LoadModel(
+        //         "D:/MyProjects/cpp/gewuln/assets/models/hotel_interiors/export/gltf_1/hotel_lobby.gltf",
+        //         false,
+        //         "hotel_lobby"
+        //     );
 
-            rooms["hotel_lobby"] = std::make_unique<Room>();
-            Room *hotel_lobby = rooms["hotel_lobby"].get();
-            hotel_lobby->Init(&ResourceManager::GetModel("hotel_lobby"));
-            hotel_lobby->cameras["cam_fly"] = std::make_unique<CameraFly>(
-                CameraFly(
-                    glm::vec3(3.606242, 1.840364, 0.545318),
-                    glm::vec3(0.0f, 1.0f, 0.0f),
-                    -167.36f,
-                    11.08f
-                )
-            );
+        //     rooms["hotel_lobby"] = std::make_unique<Room>();
+        //     Room *hotel_lobby = rooms["hotel_lobby"].get();
+        //     hotel_lobby->Init(&ResourceManager::GetModel("hotel_lobby"));
+        //     hotel_lobby->cameras["cam_fly"] = std::make_unique<CameraFly>(
+        //         CameraFly(
+        //             glm::vec3(3.606242, 1.840364, 0.545318),
+        //             glm::vec3(0.0f, 1.0f, 0.0f),
+        //             -167.36f,
+        //             11.08f
+        //         )
+        //     );
 
-            hotel_lobby->initial_cam = hotel_lobby->cameras["cam_fly"].get();
-            hotel_lobby->current_cam = hotel_lobby->initial_cam;
-            current_room = hotel_lobby;
-        }
+        //     hotel_lobby->initial_cam = hotel_lobby->cameras["cam_fly"].get();
+        //     hotel_lobby->current_cam = hotel_lobby->initial_cam;
+        //     current_room = hotel_lobby;
+        // }
     }
     
     {//characters
@@ -277,7 +276,7 @@ void Game::init()
                 glm::vec3(0.0f, 0.0f, 0.0f),
                 glm::vec3(0, 0, -1)
             );
-            characters["mona"].current_room_tmp = current_room;
+            characters["mona"].current_room = current_room;
         }
 
         {//hotel owner
@@ -291,7 +290,7 @@ void Game::init()
                 glm::vec3(0, 0, -2),
                 glm::vec3(0, 0, 1)
             );
-            characters["hotel_owner"].current_room_tmp = current_room;
+            characters["hotel_owner"].current_room = current_room;
         }
 
         active_character = &characters["mona"];
@@ -334,7 +333,7 @@ void Game::process_input()
         current_room->current_cam->ProcessKeyboard(RIGHT, dt);
 
     if (active_character) {
-        active_character->current_room_tmp = this->current_room;
+        active_character->current_room = this->current_room;
         active_character->ProcessInput(Keys, KeysProcessed, dt);
     }
 
@@ -366,11 +365,11 @@ void Game::render()
 {
     for (auto &[ch_name, ch] : characters)
     {
-        if (ch.current_room_tmp == current_room){
+        if (ch.current_room == current_room){
             model_renderer->DrawCharacter(
                 &ch,
                 // current_room->current_cam,
-                ch.current_room_tmp->current_cam,
+                ch.current_room->current_cam,
                 (float)Width/(float)Height
             );
         }

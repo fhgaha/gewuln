@@ -23,10 +23,10 @@ public:
 
 	glm::vec3	position;
 	float		rot_rad;
-	glm::vec3	forward  = glm::vec3(0.0f, 0.0f, 1.0f);
 	glm::vec3	velocity = glm::vec3(0.0f);
+	glm::vec3	forward  = glm::vec3(0.0f, 0.0f, -1.0f);
 
-	Room 		*current_room_tmp;
+	Room 		*current_room;
 
 
 	Character(){};
@@ -52,7 +52,7 @@ public:
 			assert(this->model->collider_mesh.has_value() && "Character must have collider mesh!");
 
 			{//interactables
-				for (auto &[room_name, interactable] : current_room_tmp->interactables)
+				for (auto &[room_name, interactable] : current_room->interactables)
 				{
 					std::vector<Vertex> transformed_verts = this->model->collider_mesh.value().vertices;
 					for (size_t i = 0; i < transformed_verts.size(); i++){
@@ -77,7 +77,7 @@ public:
 
 			{//switch rooms
 
-				for (auto &[room_name, room_exit] : current_room_tmp->exits)
+				for (auto &[room_name, room_exit] : current_room->exits)
 				{
 					std::vector<Vertex> transformed_verts = this->model->collider_mesh.value().vertices;
 					for (size_t i = 0; i < transformed_verts.size(); i++){
@@ -102,21 +102,20 @@ public:
 
 
 		if (Keys[GLFW_KEY_A]){
+			forward = glm::rotateY(forward, ROT_SPEED * dt);
 			rot_rad += ROT_SPEED * dt;
-			forward = glm::rotate(forward, ROT_SPEED * dt, glm::vec3(0.0f, 1.0f, 0.0f));
+			if (rot_rad > glm::pi<float>()) {
+				rot_rad -= glm::two_pi<float>();
+			}
 		}
 		if (Keys[GLFW_KEY_D]){
+			forward = glm::rotateY(forward, -ROT_SPEED * dt);
 			rot_rad -= ROT_SPEED * dt;
-			forward = glm::rotate(forward, -ROT_SPEED * dt, glm::vec3(0.0f, 1.0f, 0.0f));
+			if (rot_rad < -glm::pi<float>()) {
+				rot_rad += glm::two_pi<float>();
+			}
 		}
-
-		if (rot_rad > glm::pi<float>()) {
-			rot_rad -= 2.0f * glm::pi<float>();
-		}
-		if (rot_rad < -glm::pi<float>()) {
-			rot_rad += 2.0f * glm::pi<float>();
-		}
-
+		
 		// bool inside = false;
 		if (Keys[GLFW_KEY_W]){
 			velocity = forward * WALK_SPEED * dt;
@@ -137,8 +136,8 @@ public:
 		}
 
 		{ //move
-			assert(current_room_tmp && "Should have current room");
-			bool inside = current_room_tmp->inside_walkable_area(
+			assert(current_room && "Should have current room");
+			bool inside = current_room->inside_walkable_area(
 				this->model->collider_mesh.value(), 
 				this->position + velocity
 			);
@@ -159,8 +158,14 @@ public:
 				glm::vec3 eight_left  = glm::normalize(velocity + left)  * vel_len;
 
 				//if one of them not inside after movement, move the other way. if both not inside - dont move.
-				bool eight_right_is_inside = current_room_tmp->inside_walkable_area(this->model->collider_mesh.value(), this->position + eight_right);
-				bool eight_left_is_inside  = current_room_tmp->inside_walkable_area(this->model->collider_mesh.value(), this->position + eight_left);
+				bool eight_right_is_inside = current_room->inside_walkable_area(
+					this->model->collider_mesh.value(), 
+					this->position + eight_right
+				);
+				bool eight_left_is_inside  = current_room->inside_walkable_area(
+					this->model->collider_mesh.value(), 
+					this->position + eight_left
+				);
 				if (eight_left_is_inside && eight_right_is_inside){
 				} else if (eight_left_is_inside) {
 					this->position += small_left;
@@ -176,7 +181,7 @@ public:
 			//TODO use events like on enter, on exit or something. check a stack of active interactables maybe
 			bool collider_intersects_an_interactable = false;
 			Room::Interactable *interacting_with = nullptr;
-			for (auto &[room_name, interactable] : current_room_tmp->interactables)
+			for (auto &[room_name, interactable] : current_room->interactables)
 			{
 				std::vector<Vertex> transformed_verts = this->model->collider_mesh.value().vertices;
 				for (size_t i = 0; i < transformed_verts.size(); i++){
@@ -205,7 +210,8 @@ public:
 	}
 
 private:
-    void direction_to_yaw_pitch(const glm::vec3& direction, float& yaw, float& pitch) {
+    void direction_to_yaw_pitch(const glm::vec3& direction, float& yaw, float& pitch) 
+	{
         const float epsilon = 1e-6f;
         glm::vec3 dir = direction;
         

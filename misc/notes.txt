@@ -30,6 +30,8 @@ and cant remember anything more.
 GLTF viewer: https://sandbox.babylonjs.com/
 Not animated model: to succesfully export .fbx I had to change `Diffuse BSDF` to `Principal BSDF`.
 
+Mixamo to blender tutorial: https://www.youtube.com/shorts/uxPJbwXLqJs
+
 //command to `build and run`
 .\build ; if ($?) {.\build\win64_gewuln.exe}
 

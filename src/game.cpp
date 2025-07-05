@@ -143,8 +143,6 @@ void Game::init()
 
         {//orange room
             ResourceManager::LoadModel(
-                // "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/export/test_floor/gltf_2_tiling_texture/test_rooms.gltf",
-                // "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/export/test_floor/gltf_3_added_interactable/test_rooms.gltf",
                 "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/export/test_floor/gltf_4_two_interactables_one_with_center_below_another_with_center_above/test_rooms.gltf",
                 false,
                 "test_room_model"
@@ -279,18 +277,31 @@ void Game::init()
             characters["mona"].current_room = current_room;
         }
 
-        {//hotel owner
-            // auto ho_path = "D:/MyProjects/cpp/gewuln/assets/models/low_poly_humanoids/hotel_owner/export/gltf_1_no_anim/hotel_owner.gltf";
-            auto ho_path = "D:/MyProjects/cpp/gewuln/assets/models/low_poly_humanoids/hotel_owner/export/gltf_2_anims/hotel_owner.gltf";
-            ResourceManager::LoadModel(ho_path, true, "hotel_owner");
+        // {//hotel owner
+        //     // auto ho_path = "D:/MyProjects/cpp/gewuln/assets/models/low_poly_humanoids/hotel_owner/export/gltf_1_no_anim/hotel_owner.gltf";
+        //     auto ho_path = "D:/MyProjects/cpp/gewuln/assets/models/low_poly_humanoids/hotel_owner/export/gltf_2_anims/hotel_owner.gltf";
+        //     ResourceManager::LoadModel(ho_path, true, "hotel_owner");
 
-            characters["hotel_owner"] = Character(
-                &ResourceManager::GetModel("hotel_owner"),
-                Animator(ho_path, ResourceManager::GetModel("hotel_owner")),
+        //     characters["hotel_owner"] = Character(
+        //         &ResourceManager::GetModel("hotel_owner"),
+        //         Animator(ho_path, ResourceManager::GetModel("hotel_owner")),
+        //         glm::vec3(0, 0, -2),
+        //         glm::vec3(0, 0, 1)
+        //     );
+        //     characters["hotel_owner"].current_room = current_room;
+        // }
+        
+        {//hotel owner
+            auto snake_path = "D:/MyProjects/cpp/gewuln/assets/models/low_poly_humanoids/snake/export/gltf_1/snake.gltf";
+            ResourceManager::LoadModel(snake_path, true, "snake");
+
+            characters["snake"] = Character(
+                &ResourceManager::GetModel("snake"),
+                Animator(snake_path, ResourceManager::GetModel("snake")),
                 glm::vec3(0, 0, -2),
                 glm::vec3(0, 0, 1)
             );
-            characters["hotel_owner"].current_room = current_room;
+            characters["snake"].current_room = current_room;
         }
 
         active_character = &characters["mona"];

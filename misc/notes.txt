@@ -1,6 +1,8 @@
 - "Cant find glfw3.dll" error at runtime. Had to copy that file from "glfw-3.4.bin.WIN32\lib-static-ucrt" to build folder manually according to glfw docs.
 
-- Mesh generator: https://huggingface.co/tencent/Hunyuan3D-2
+Mesh generator: https://huggingface.co/tencent/Hunyuan3D-2
+Mixamo to blender tutorial: https://www.youtube.com/shorts/uxPJbwXLqJs
+MGS 1 models: https://sketchfab.com/bioandrew91/collections/metal-gear-solid-1-7cbb3f7eea33408794e06285262d0991
 
 
 1. just walk forward on the solid grouhnd. That's it. This is the end. Or is it? Edning 1/4.
@@ -10,27 +12,12 @@
 5. no, really this is it for now. thanks for playing.
 
 
-
-
--- NIGHTMARE happened at night 28.02.2025 - 01.03.2025 --
-train dark with uncle Kolya. dark wagon, full of teens or young adults. i have one ear headphones, lost the other
-half of the pair. one girl is attractive and is near me and watching at me. a mirror on the wall. at some point
-we kiss each other. then we go the toilet to do something involving her mouth and my not mouth. after some time
-she laughs, looks at me with ammetist eyes with no pupils and spreads something with her hand over my face. its
-that amethyst looking spread. now im blinded as well. i walk back alone, scream and noone notice me. i look at
-the mirror and see myself there chatting with that girl earlier. i scream again at the mirror, only that girl
-looks at me with a smile. so im on the other side of the mirror, cool. then something happens involving train
-stop, me driving a track and crashing it to attract attention and something with that wireless ears i have irl
-and cant remember anything more.
-
-
 //-----------------------------------------------------------------------------------------------
 // Blender
 //-----------------------------------------------------------------------------------------------
 GLTF viewer: https://sandbox.babylonjs.com/
 Not animated model: to succesfully export .fbx I had to change `Diffuse BSDF` to `Principal BSDF`.
 
-Mixamo to blender tutorial: https://www.youtube.com/shorts/uxPJbwXLqJs
 
 //command to `build and run`
 .\build ; if ($?) {.\build\win64_gewuln.exe}

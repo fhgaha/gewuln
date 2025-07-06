@@ -274,6 +274,7 @@ void Game::init()
                 glm::vec3(0.0f, 0.0f, 0.0f),
                 glm::vec3(0, 0, -1)
             );
+            characters["mona"].controlled_by_player = true;
             characters["mona"].current_room = current_room;
         }
 
@@ -291,7 +292,7 @@ void Game::init()
         //     characters["hotel_owner"].current_room = current_room;
         // }
         
-        {//hotel owner
+        {//snake
             auto snake_path = "D:/MyProjects/cpp/gewuln/assets/models/low_poly_humanoids/snake/export/gltf_1/snake.gltf";
             ResourceManager::LoadModel(snake_path, true, "snake");
 

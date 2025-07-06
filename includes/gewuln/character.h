@@ -27,6 +27,7 @@ public:
 	glm::vec3	forward  = glm::vec3(0.0f, 0.0f, -1.0f);
 
 	Room 		*current_room;
+	bool		controlled_by_player;
 
 
 	Character(){};
@@ -47,6 +48,10 @@ public:
 
 	void ProcessInput(bool *Keys, bool *KeysProcessed, const float dt)
 	{
+		if (!controlled_by_player) {
+			return;
+		}
+		
 		if (Keys[GLFW_KEY_E] && !KeysProcessed[GLFW_KEY_E]){
 
 			assert(this->model->collider_mesh.has_value() && "Character must have collider mesh!");

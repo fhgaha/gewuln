@@ -1,6 +1,8 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <glm/gtc/constants.hpp>
+#include <glm/trigonometric.hpp>
 #include <iostream>
 #include <vector>
 #include <gewuln/mesh.h>

@@ -50,13 +50,13 @@ Model& ResourceManager::GetModel(const std::string name)
 
 void ResourceManager::Clear()
 {
-    // (properly) delete all shaders	
+    // (properly) delete all shaders
     for (auto iter : Shaders)
         glDeleteProgram(iter.second.ID);
     // (properly) delete all textures
     for (auto iter : Textures)
         glDeleteTextures(1, &iter.second.ID);
-    
+
     // glad doesnt have delete models
 }
 
@@ -117,7 +117,7 @@ Texture2D ResourceManager::loadTextureFromFile(const char *file, bool alpha)
     // load image
     int width, height, nrChannels;
     unsigned char* data = stbi_load(file, &width, &height, &nrChannels, 0);
-    
+
     switch (nrChannels)
     {
         case 3:
@@ -131,7 +131,7 @@ Texture2D ResourceManager::loadTextureFromFile(const char *file, bool alpha)
         default:
             break;
     }
-    
+
     // now generate texture
     texture.Generate(width, height, data);
     // and finally free image data

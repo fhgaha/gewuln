@@ -9,9 +9,9 @@
 #include <gewuln/model.h>
 #include <gewuln/geometry_3d.h>
 #include <gewuln/geometry_2d.h>
+#include <gewuln/character_state/character_state.h>
 #include <iostream>
 #include <map>
-
 
 class Character {
 public:
@@ -215,6 +215,8 @@ public:
 	}
 
 private:
+	CharacterState	*state_;
+
     void direction_to_yaw_pitch(const glm::vec3& direction, float& yaw, float& pitch) 
 	{
         const float epsilon = 1e-6f;

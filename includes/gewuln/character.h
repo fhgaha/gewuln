@@ -13,6 +13,8 @@
 #include <iostream>
 #include <map>
 
+class Room;
+
 class Character {
 public:
 	float WALK_SPEED = 1.2f;
@@ -43,6 +45,8 @@ public:
 		this->rot_rad = yaw;
 
 		this->animator.PlayAnimation("idle");
+		
+		this->state_ = new IdleState();
 	}
 
 
@@ -121,12 +125,18 @@ public:
 			}
 		}
 		
-		// bool inside = false;
-		if (Keys[GLFW_KEY_W]){
-			velocity = forward * WALK_SPEED * dt;
-		} else {
-			velocity = glm::vec3(0.0f);
+		
+		CharacterState* new_state = state_->process_input(*this, Keys, KeysProcessed, dt);
+		if (new_state){
+			delete state_;
+			state_ = new_state;
 		}
+		
+		// if (Keys[GLFW_KEY_W]){
+		// 	velocity = forward * WALK_SPEED * dt;
+		// } else {
+		// 	velocity = glm::vec3(0.0f);
+		// }
 
 	}
 

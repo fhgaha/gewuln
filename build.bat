@@ -10,6 +10,8 @@ set sources=^
 ../includes/gewuln/shader.cpp ^
 ../includes/gewuln/resource_manager.cpp ^
 ../includes/gewuln/mesh.cpp ^
+../includes/gewuln/character_state/idle_state.cpp ^
+../includes/gewuln/character_state/walk_state.cpp ^
 ../src/game.cpp ^
 ../src/camera/camera_look_at.cpp ^
 ../src/camera/camera_fly.cpp

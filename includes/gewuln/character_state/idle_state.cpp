@@ -1,12 +1,12 @@
 #include <gewuln/character_state/character_state.h>
+#include <GLFW/glfw3.h>
 
 CharacterState* IdleState::process_input(Character& character, bool *Keys, bool *KeysProcessed, const float dt)  
 {
 	printf("entered idle state\n");
 	
-	if (true) {
-		return new WalkState();
-	}
+	auto w = Keys[GLFW_KEY_W];
+	auto st = new WalkState();
 	
 	return nullptr;
 }

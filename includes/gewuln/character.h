@@ -52,6 +52,8 @@ public:
 
 	void ProcessInput(bool *Keys, bool *KeysProcessed, const float dt);
 	void Update(const float dt);
+	void turn_left(const float dt);
+	void turn_right(const float dt);
 
 private:
 	CharacterState	*state_;

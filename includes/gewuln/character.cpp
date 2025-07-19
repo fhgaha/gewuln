@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <gewuln/room.h>
 #include <gewuln/geometry_3d.h>
+#include "character.h"
 
 
 void Character::ProcessInput(bool *Keys, bool *KeysProcessed, const float dt)
@@ -64,33 +65,12 @@ void Character::ProcessInput(bool *Keys, bool *KeysProcessed, const float dt)
 	}
 
 
-	if (Keys[GLFW_KEY_A]){
-		forward = glm::rotateY(forward, ROT_SPEED * dt);
-		rot_rad += ROT_SPEED * dt;
-		if (rot_rad > glm::pi<float>()) {
-			rot_rad -= glm::two_pi<float>();
-		}
-	}
-	if (Keys[GLFW_KEY_D]){
-		forward = glm::rotateY(forward, -ROT_SPEED * dt);
-		rot_rad -= ROT_SPEED * dt;
-		if (rot_rad < -glm::pi<float>()) {
-			rot_rad += glm::two_pi<float>();
-		}
-	}
-	
-	
 	CharacterState* new_state = state_->process_input(*this, Keys, KeysProcessed, dt);
 	if (new_state){
 		delete state_;
 		state_ = new_state;
 	}
 	
-	// if (Keys[GLFW_KEY_W]){
-	// 	velocity = forward * WALK_SPEED * dt;
-	// } else {
-	// 	velocity = glm::vec3(0.0f);
-	// }
 }
 
 void Character::Update(const float dt)
@@ -173,5 +153,23 @@ void Character::Update(const float dt)
 		} else {
 			animator.update_animation(dt);
 		}
+	}
+}
+
+void Character::turn_left(const float dt)
+{
+	forward = glm::rotateY(forward, ROT_SPEED * dt);
+	rot_rad += ROT_SPEED * dt;
+	if (rot_rad > glm::pi<float>()) {
+		rot_rad -= glm::two_pi<float>();
+	}
+}
+
+void Character::turn_right(const float dt)
+{
+	forward = glm::rotateY(forward, -ROT_SPEED * dt);
+	rot_rad -= ROT_SPEED * dt;
+	if (rot_rad < -glm::pi<float>()) {
+		rot_rad += glm::two_pi<float>();
 	}
 }

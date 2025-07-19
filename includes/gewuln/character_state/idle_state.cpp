@@ -8,6 +8,11 @@ CharacterState* IdleState::process_input(Character& character, bool *Keys, bool 
 	auto w = Keys[GLFW_KEY_W];
 	auto st = new WalkState();
 	auto v = character.velocity;
+
+	bool wasd = Keys[GLFW_KEY_A] || Keys[GLFW_KEY_D] || Keys[GLFW_KEY_W];	
+	if (wasd) {
+		return new WalkState();
+	}
 	
 	return nullptr;
 }

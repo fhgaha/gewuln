@@ -13,6 +13,7 @@ set sources=^
 ../includes/gewuln/character.cpp ^
 ../includes/gewuln/character_state/idle_state.cpp ^
 ../includes/gewuln/character_state/walk_state.cpp ^
+../includes/gewuln/character_state/interact_state.cpp ^
 ../src/game.cpp ^
 ../src/camera/camera_look_at.cpp ^
 ../src/camera/camera_fly.cpp

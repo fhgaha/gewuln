@@ -21,16 +21,17 @@ public:
 	float WALK_SPEED = 1.2f;
 	float ROT_SPEED  = 4.0f;
 
-	Model		*model;
-	Animator	animator;
+	Model*			model;
+	Animator		animator;
 
-	glm::vec3	position;
-	float		rot_rad;
-	glm::vec3	velocity = glm::vec3(0.0f);
-	glm::vec3	forward  = glm::vec3(0.0f, 0.0f, -1.0f);
+	glm::vec3		position;
+	float			rot_rad;
+	glm::vec3		velocity = glm::vec3(0.0f);
+	glm::vec3		forward  = glm::vec3(0.0f, 0.0f, -1.0f);
 
-	Room 		*current_room;
-	bool		controlled_by_player;
+	Room*			current_room;
+	Room::Interactable*	interactable_intersecting;
+	bool			controlled_by_player;
 
 
 	Character(){};
@@ -40,13 +41,13 @@ public:
 		this->model = model;
 		this->animator = animator;
 		this->position = pos;
-		
+
 		float yaw, _pitch;
 		direction_to_yaw_pitch(dir, yaw, _pitch);
 		this->rot_rad = yaw;
 
 		this->animator.PlayAnimation("idle");
-		
+
 		this->state_ = new IdleState();
 	}
 
@@ -54,15 +55,17 @@ public:
 	void Update(const float dt);
 	void turn_left(const float dt);
 	void turn_right(const float dt);
+	Room::Interactable* collider_intersects_an_interactable();
+	void switch_rooms();
 
 private:
 	CharacterState	*state_;
 
-    void direction_to_yaw_pitch(const glm::vec3& direction, float& yaw, float& pitch) 
+    void direction_to_yaw_pitch(const glm::vec3& direction, float& yaw, float& pitch)
 	{
         const float epsilon = 1e-6f;
         glm::vec3 dir = direction;
-        
+
         // Normalize vector to handle non-unit directions
         if (glm::length(dir) > epsilon) {
             dir = glm::normalize(dir);
@@ -83,7 +86,7 @@ private:
             yaw = glm::atan(dir.x, dir.z);
         }
     }
-	
+
 };
 
 #endif

@@ -2,7 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <gewuln/room.h>
 #include <gewuln/geometry_3d.h>
-#include "character.h"
+// #include "character.h"
 
 
 void Character::ProcessInput(bool *Keys, bool *KeysProcessed, const float dt)
@@ -10,67 +10,68 @@ void Character::ProcessInput(bool *Keys, bool *KeysProcessed, const float dt)
 	if (!controlled_by_player) {
 		return;
 	}
-	
-	if (Keys[GLFW_KEY_E] && !KeysProcessed[GLFW_KEY_E]){
 
-		assert(this->model->collider_mesh.has_value() && "Character must have collider mesh!");
+	// if (Keys[GLFW_KEY_E] && !KeysProcessed[GLFW_KEY_E]){
 
-		{//interactables
-			for (auto &[room_name, interactable] : current_room->interactables)
-			{
-				std::vector<Vertex> transformed_verts = this->model->collider_mesh.value().vertices;
-				for (size_t i = 0; i < transformed_verts.size(); i++){
-					transformed_verts[i].Position += this->position;
-				}
+		// assert(this->model->collider_mesh.has_value() && "Character must have collider mesh!");
 
-				bool collider_intersects_an_interactable = Geometry3d::intersect(
-					transformed_verts,
-					interactable.mesh->vertices
-				);
+		// {//interactables
+		// 	for (auto &[room_name, interactable] : current_room->interactables)
+		// 	{
+		// 		std::vector<Vertex> transformed_verts = this->model->collider_mesh.value().vertices;
+		// 		for (size_t i = 0; i < transformed_verts.size(); i++){
+		// 			transformed_verts[i].Position += this->position;
+		// 		}
 
-				std::cout << "collider_intersects_an_interactable: " << collider_intersects_an_interactable << "\n";
-				if (collider_intersects_an_interactable){
-					//TODO should be configurable action
-					interactable.action();
-					// PlayCameraThing();
-				}
+		// 		bool collider_intersects_an_interactable = Geometry3d::intersect(
+		// 			transformed_verts,
+		// 			interactable.mesh->vertices
+		// 		);
 
-			}
+		// 		std::cout << "collider_intersects_an_interactable: " << collider_intersects_an_interactable << "\n";
+		// 		if (collider_intersects_an_interactable){
+		// 			//TODO should be configurable action
+		// 			interactable.action();
+		// 			// PlayCameraThing();
+		// 		}
 
-		}
+		// 	}
 
-		{//switch rooms
+		// }
 
-			for (auto &[room_name, room_exit] : current_room->exits)
-			{
-				std::vector<Vertex> transformed_verts = this->model->collider_mesh.value().vertices;
-				for (size_t i = 0; i < transformed_verts.size(); i++){
-					transformed_verts[i].Position += this->position;
-				}
+		// {//switch rooms
 
-				bool collider_intersects_room_exit = Geometry3d::intersect(
-					transformed_verts,
-					room_exit.mesh->vertices
-				);
+		// 	for (auto &[room_name, room_exit] : current_room->exits)
+		// 	{
+		// 		std::vector<Vertex> transformed_verts = this->model->collider_mesh.value().vertices;
+		// 		for (size_t i = 0; i < transformed_verts.size(); i++){
+		// 			transformed_verts[i].Position += this->position;
+		// 		}
 
-				std::cout << "collider_intersects_room_exit: " << collider_intersects_room_exit <<"\n";
-				if (collider_intersects_room_exit){
-					room_exit.on_room_exit();
-					room_exit.action();
-				}
-			}
-		}
+		// 		bool collider_intersects_room_exit = Geometry3d::intersect(
+		// 			transformed_verts,
+		// 			room_exit.mesh->vertices
+		// 		);
 
-		KeysProcessed[GLFW_KEY_E] = true;
-	}
+		// 		std::cout << "collider_intersects_room_exit: " << collider_intersects_room_exit <<"\n";
+		// 		if (collider_intersects_room_exit){
+		// 			room_exit.on_room_exit();
+		// 			room_exit.action();
+		// 		}
+		// 	}
+		// }
 
+		// KeysProcessed[GLFW_KEY_E] = true;
+	// }
 
 	CharacterState* new_state = state_->process_input(*this, Keys, KeysProcessed, dt);
 	if (new_state){
+		state_->exit(*this);
 		delete state_;
 		state_ = new_state;
+		state_->enter(*this);
 	}
-	
+
 }
 
 void Character::Update(const float dt)
@@ -85,7 +86,7 @@ void Character::Update(const float dt)
 	{ //move
 		assert(current_room && "Should have current room");
 		bool inside = current_room->inside_walkable_area(
-			this->model->collider_mesh.value(), 
+			this->model->collider_mesh.value(),
 			this->position + velocity
 		);
 		if (inside) {
@@ -106,11 +107,11 @@ void Character::Update(const float dt)
 
 			//if one of them not inside after movement, move the other way. if both not inside - dont move.
 			bool eight_right_is_inside = current_room->inside_walkable_area(
-				this->model->collider_mesh.value(), 
+				this->model->collider_mesh.value(),
 				this->position + eight_right
 			);
 			bool eight_left_is_inside  = current_room->inside_walkable_area(
-				this->model->collider_mesh.value(), 
+				this->model->collider_mesh.value(),
 				this->position + eight_left
 			);
 			if (eight_left_is_inside && eight_right_is_inside){
@@ -171,5 +172,58 @@ void Character::turn_right(const float dt)
 	rot_rad -= ROT_SPEED * dt;
 	if (rot_rad < -glm::pi<float>()) {
 		rot_rad += glm::two_pi<float>();
+	}
+}
+
+Room::Interactable* Character::collider_intersects_an_interactable()
+{
+	assert(this->model->collider_mesh.has_value() && "Character must have collider mesh!");
+
+	for (auto &[room_name, interactable] : current_room->interactables)
+	{
+		std::vector<Vertex> transformed_verts = this->model->collider_mesh.value().vertices;
+		for (size_t i = 0; i < transformed_verts.size(); i++){
+			transformed_verts[i].Position += this->position;
+		}
+
+		bool collider_intersects_an_interactable = Geometry3d::intersect(
+			transformed_verts,
+			interactable.mesh->vertices
+		);
+
+		std::cout << "collider_intersects_an_interactable: " << collider_intersects_an_interactable << "\n";
+		if (collider_intersects_an_interactable){
+			//TODO should be configurable action
+			// interactable.action();
+			// PlayCameraThing();
+			return &interactable;
+		}
+
+	}
+
+	return nullptr;
+}
+
+
+void Character::switch_rooms()
+{//switch rooms
+
+	for (auto &[room_name, room_exit] : current_room->exits)
+	{
+		std::vector<Vertex> transformed_verts = this->model->collider_mesh.value().vertices;
+		for (size_t i = 0; i < transformed_verts.size(); i++){
+			transformed_verts[i].Position += this->position;
+		}
+
+		bool collider_intersects_room_exit = Geometry3d::intersect(
+			transformed_verts,
+			room_exit.mesh->vertices
+		);
+
+		std::cout << "collider_intersects_room_exit: " << collider_intersects_room_exit <<"\n";
+		if (collider_intersects_room_exit){
+			room_exit.on_room_exit();
+			room_exit.action();
+		}
 	}
 }

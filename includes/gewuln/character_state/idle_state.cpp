@@ -13,6 +13,7 @@ CharacterState* IdleState::process_input(Character& character, bool *Keys, bool 
 		auto intr = character.collider_intersects_an_interactable();
 		if (intr) {
 			character.interactable_intersecting = intr;
+			KeysProcessed[GLFW_KEY_E] = true;
 			return new InteractState();
 		}
 		KeysProcessed[GLFW_KEY_E] = true;

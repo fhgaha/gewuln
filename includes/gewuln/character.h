@@ -18,20 +18,20 @@ class Room;
 
 class Character {
 public:
-	float WALK_SPEED = 1.2f;
-	float ROT_SPEED  = 4.0f;
+	float 				WALK_SPEED = 1.2f;
+	float 				ROT_SPEED  = 4.0f;
 
-	Model*			model;
-	Animator		animator;
-
-	glm::vec3		position;
-	float			rot_rad;
-	glm::vec3		velocity = glm::vec3(0.0f);
-	glm::vec3		forward  = glm::vec3(0.0f, 0.0f, -1.0f);
-
-	Room*			current_room;
+	Model*				model;
+	Animator			animator;
+	
+	glm::vec3			position;
+	float				rot_rad;
+	glm::vec3			velocity = glm::vec3(0.0f);
+	glm::vec3			forward  = glm::vec3(0.0f, 0.0f, -1.0f);
+	
+	Room*				current_room;
 	Room::Interactable*	interactable_intersecting;
-	bool			controlled_by_player;
+	bool				controlled_by_player;
 
 
 	Character(){};
@@ -47,8 +47,7 @@ public:
 		this->rot_rad = yaw;
 
 		this->animator.PlayAnimation("idle");
-
-		this->state_ = new IdleState();
+		this->state = new IdleState();
 	}
 
 	void ProcessInput(bool *Keys, bool *KeysProcessed, const float dt);
@@ -59,7 +58,7 @@ public:
 	void switch_rooms();
 
 private:
-	CharacterState	*state_;
+	CharacterState*	state;
 
     void direction_to_yaw_pitch(const glm::vec3& direction, float& yaw, float& pitch)
 	{

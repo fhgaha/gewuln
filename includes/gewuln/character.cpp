@@ -11,65 +11,12 @@ void Character::ProcessInput(bool *Keys, bool *KeysProcessed, const float dt)
 		return;
 	}
 
-	// if (Keys[GLFW_KEY_E] && !KeysProcessed[GLFW_KEY_E]){
-
-		// assert(this->model->collider_mesh.has_value() && "Character must have collider mesh!");
-
-		// {//interactables
-		// 	for (auto &[room_name, interactable] : current_room->interactables)
-		// 	{
-		// 		std::vector<Vertex> transformed_verts = this->model->collider_mesh.value().vertices;
-		// 		for (size_t i = 0; i < transformed_verts.size(); i++){
-		// 			transformed_verts[i].Position += this->position;
-		// 		}
-
-		// 		bool collider_intersects_an_interactable = Geometry3d::intersect(
-		// 			transformed_verts,
-		// 			interactable.mesh->vertices
-		// 		);
-
-		// 		std::cout << "collider_intersects_an_interactable: " << collider_intersects_an_interactable << "\n";
-		// 		if (collider_intersects_an_interactable){
-		// 			//TODO should be configurable action
-		// 			interactable.action();
-		// 			// PlayCameraThing();
-		// 		}
-
-		// 	}
-
-		// }
-
-		// {//switch rooms
-
-		// 	for (auto &[room_name, room_exit] : current_room->exits)
-		// 	{
-		// 		std::vector<Vertex> transformed_verts = this->model->collider_mesh.value().vertices;
-		// 		for (size_t i = 0; i < transformed_verts.size(); i++){
-		// 			transformed_verts[i].Position += this->position;
-		// 		}
-
-		// 		bool collider_intersects_room_exit = Geometry3d::intersect(
-		// 			transformed_verts,
-		// 			room_exit.mesh->vertices
-		// 		);
-
-		// 		std::cout << "collider_intersects_room_exit: " << collider_intersects_room_exit <<"\n";
-		// 		if (collider_intersects_room_exit){
-		// 			room_exit.on_room_exit();
-		// 			room_exit.action();
-		// 		}
-		// 	}
-		// }
-
-		// KeysProcessed[GLFW_KEY_E] = true;
-	// }
-
-	CharacterState* new_state = state_->process_input(*this, Keys, KeysProcessed, dt);
+	CharacterState* new_state = state->process_input(*this, Keys, KeysProcessed, dt);
 	if (new_state){
-		state_->exit(*this);
-		delete state_;
-		state_ = new_state;
-		state_->enter(*this);
+		state->exit(*this);
+		delete state;
+		state = new_state;
+		state->enter(*this);
 	}
 
 }

@@ -22,6 +22,8 @@ CharacterState* WalkState::process_input(Character& character, bool *Keys, bool 
 	}
 	if (Keys[GLFW_KEY_W]){
 		character.velocity = character.forward * character.WALK_SPEED * dt;
+	} else {
+		character.velocity = glm::vec3(0.0f);
 	}
 
 	return nullptr;

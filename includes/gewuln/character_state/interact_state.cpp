@@ -15,14 +15,14 @@ CharacterState* InteractState::process_input(Character& character, bool *Keys, b
 {
 	
 
-	return new IdleState();
+	// return new IdleState();
 
 	return nullptr;
 }
 
 void InteractState::update(Character& character, const float dt)
 {
-
+	character.animator.PlayAnimation("interact");
 }
 
 void InteractState::exit(Character& character)

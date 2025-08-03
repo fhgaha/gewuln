@@ -23,54 +23,56 @@ void Character::ProcessInput(bool *Keys, bool *KeysProcessed, const float dt)
 
 void Character::Update(const float dt)
 {
-	if (glm::length2(velocity) > 0) {
-		animator.PlayAnimation("walk");
-	}
-	else {
-		animator.PlayAnimation("idle");
-	}
+	state->update(*this, dt);
+	
+	// if (glm::length2(velocity) > 0) {
+	// 	animator.PlayAnimation("walk");
+	// }
+	// else {
+	// 	animator.PlayAnimation("idle");
+	// }
 
-	{ //move
-		assert(current_room && "Should have current room");
-		bool inside = current_room->inside_walkable_area(
-			this->model->collider_mesh.value(),
-			this->position + velocity
-		);
-		if (inside) {
-			this->position += velocity;
-		} else {
-			// move and slide
-			// https://gamedev.stackexchange.com/questions/200354/how-to-slide-along-a-wall-at-full-speed
+	// { //move
+	// 	assert(current_room && "Should have current room");
+	// 	bool inside = current_room->inside_walkable_area(
+	// 		this->model->collider_mesh.value(),
+	// 		this->position + velocity
+	// 	);
+	// 	if (inside) {
+	// 		this->position += velocity;
+	// 	} else {
+	// 		// move and slide
+	// 		// https://gamedev.stackexchange.com/questions/200354/how-to-slide-along-a-wall-at-full-speed
 
-			glm::vec3 left(velocity.z, velocity.y, -velocity.x);	//rotated 90 deg counter clockwise
-			glm::vec3 right(-velocity.z, velocity.y, velocity.x);	//rotated 90 deg clockwise
+	// 		glm::vec3 left(velocity.z, velocity.y, -velocity.x);	//rotated 90 deg counter clockwise
+	// 		glm::vec3 right(-velocity.z, velocity.y, velocity.x);	//rotated 90 deg clockwise
 
-			glm::vec3 small_left  = glm::normalize(left) * dt;
-			glm::vec3 small_right = glm::normalize(right) * dt;
+	// 		glm::vec3 small_left  = glm::normalize(left) * dt;
+	// 		glm::vec3 small_right = glm::normalize(right) * dt;
 
-			float vel_len = glm::length(velocity);
-			glm::vec3 eight_right = glm::normalize(velocity + right) * vel_len;
-			glm::vec3 eight_left  = glm::normalize(velocity + left)  * vel_len;
+	// 		float vel_len = glm::length(velocity);
+	// 		glm::vec3 eight_right = glm::normalize(velocity + right) * vel_len;
+	// 		glm::vec3 eight_left  = glm::normalize(velocity + left)  * vel_len;
 
-			//if one of them not inside after movement, move the other way. if both not inside - dont move.
-			bool eight_right_is_inside = current_room->inside_walkable_area(
-				this->model->collider_mesh.value(),
-				this->position + eight_right
-			);
-			bool eight_left_is_inside  = current_room->inside_walkable_area(
-				this->model->collider_mesh.value(),
-				this->position + eight_left
-			);
-			if (eight_left_is_inside && eight_right_is_inside){
-			} else if (eight_left_is_inside) {
-				this->position += small_left;
-			} else if (eight_right_is_inside) {
-				this->position += small_right;
-			} else {
-				//cant move anywhere
-			}
-		}
-	}
+	// 		//if one of them not inside after movement, move the other way. if both not inside - dont move.
+	// 		bool eight_right_is_inside = current_room->inside_walkable_area(
+	// 			this->model->collider_mesh.value(),
+	// 			this->position + eight_right
+	// 		);
+	// 		bool eight_left_is_inside  = current_room->inside_walkable_area(
+	// 			this->model->collider_mesh.value(),
+	// 			this->position + eight_left
+	// 		);
+	// 		if (eight_left_is_inside && eight_right_is_inside){
+	// 		} else if (eight_left_is_inside) {
+	// 			this->position += small_left;
+	// 		} else if (eight_right_is_inside) {
+	// 			this->position += small_right;
+	// 		} else {
+	// 			//cant move anywhere
+	// 		}
+	// 	}
+	// }
 
 	{ //look at center of interactable cube
 		//TODO use events like on enter, on exit or something. check a stack of active interactables maybe
@@ -171,6 +173,50 @@ void Character::switch_rooms()
 		if (collider_intersects_room_exit){
 			room_exit.on_room_exit();
 			room_exit.action();
+		}
+	}
+}
+
+void Character::walk_if_possible(const float dt)
+{
+	assert(current_room && "Should have current room");
+	bool inside = current_room->inside_walkable_area(
+		this->model->collider_mesh.value(),
+		this->position + velocity
+	);
+	if (inside) {
+		this->position += velocity;
+	} else {
+		// move and slide
+		// https://gamedev.stackexchange.com/questions/200354/how-to-slide-along-a-wall-at-full-speed
+
+		glm::vec3 left(velocity.z, velocity.y, -velocity.x);	//rotated 90 deg counter clockwise
+		glm::vec3 right(-velocity.z, velocity.y, velocity.x);	//rotated 90 deg clockwise
+
+		glm::vec3 small_left  = glm::normalize(left) * dt;
+		glm::vec3 small_right = glm::normalize(right) * dt;
+
+		float vel_len = glm::length(velocity);
+		glm::vec3 eight_right = glm::normalize(velocity + right) * vel_len;
+		glm::vec3 eight_left  = glm::normalize(velocity + left)  * vel_len;
+
+		//if one of them not inside after movement, move the other way. if both not inside - dont move.
+		bool eight_right_is_inside = current_room->inside_walkable_area(
+			this->model->collider_mesh.value(),
+			this->position + eight_right
+		);
+		bool eight_left_is_inside  = current_room->inside_walkable_area(
+			this->model->collider_mesh.value(),
+			this->position + eight_left
+		);
+
+		if (eight_left_is_inside && eight_right_is_inside){
+		} else if (eight_left_is_inside) {
+			this->position += small_left;
+		} else if (eight_right_is_inside) {
+			this->position += small_right;
+		} else {
+			//cant move anywhere
 		}
 	}
 }

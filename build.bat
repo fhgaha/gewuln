@@ -4,7 +4,6 @@
 
 cls
 
-set third_party_path=D:/MyProjects/cpp/third_party
 set sources=^
 ../includes/gewuln/texture.cpp ^
 ../includes/gewuln/shader.cpp ^
@@ -23,7 +22,7 @@ pushd build
 call "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Auxiliary/Build/vcvars64.bat"
 
 cl -Zi /std:c++20 /EHsc ../src/win64_gewuln.cpp ^
-%third_party_path%/glad-4.6-core/src/glad.c ^
+D:/MyProjects/cpp/third_party/glad-4.6-core/src/glad.c ^
 ../includes/stb/stb_image_impl.cpp ^
 %sources% ^
 /I../includes ^

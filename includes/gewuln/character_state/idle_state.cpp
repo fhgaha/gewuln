@@ -29,7 +29,7 @@ CharacterState* IdleState::process_input(Character& character, bool *Keys, bool 
 
 void IdleState::update(Character& character, const float dt)
 {
-
+	character.animator.PlayAnimation("idle");
 }
 
 void IdleState::exit(Character& character)

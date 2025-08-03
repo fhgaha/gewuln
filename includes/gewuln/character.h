@@ -56,6 +56,7 @@ public:
 	void turn_right(const float dt);
 	Room::Interactable* collider_intersects_an_interactable();
 	void switch_rooms();
+	void walk_if_possible(const float dt);
 
 private:
 	CharacterState*	state;

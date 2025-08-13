@@ -2,50 +2,36 @@
 #define ROOM_H
 
 #include <glm/glm.hpp>
-#include <unordered_map>
+#include <gewuln/room_common.h>
 #include <gewuln/camera/camera.h>
 #include <gewuln/camera/camera_look_at.h>
 #include <gewuln/camera/camera_fly.h>
 #include <gewuln/geometry_3d.h>
 #include <gewuln/geometry_2d.h>
+#include <gewuln/character.h>
+#include <gewuln/model.h>
+#include <unordered_map>
 #include <memory>
 #include <utility>
 #include <array>
 #include <functional>
 
+class Character;
 
 class Room
 {
 public:
-
-	struct Interactable
-	{
-		Mesh 					*mesh;
-		int 					glfw_key;
-		std::function<void()> 	action;
-	};
-
-	struct Exit
-	{
-		Mesh					*mesh;
-		int						glfw_key;
-		std::function<void()> 	action;
-		Room					*this_room;
-		Room					*go_to_room;
-		std::function<void()> 	on_room_enter;
-		std::function<void()> 	on_room_exit;
-	};
-
 	std::unordered_map<std::string, std::unique_ptr<Camera>>	cameras;
 	std::unordered_map<std::string, Interactable>				interactables;
 	std::unordered_map<std::string, Exit>						exits;
-
-
+    
 	Model														*model;
 	Camera														*initial_cam;
 	Camera														*current_cam;
-
 	std::optional<Mesh>											*walkable_area;
+
+    std::unordered_map<std::string, Character>                  characters;
+	Character               									*active_character;
 
 	//TODO
 	//initial_character_position

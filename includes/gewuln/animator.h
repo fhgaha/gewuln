@@ -71,6 +71,9 @@ public:
 		if (currentAnimation)
 		{
 			currentTime += currentAnimation->GetTicksPerSecond() * dt;
+			if (reached_animation_end()){
+				//send notification on reaching animation end
+			}
 			currentTime = fmod(currentTime, currentAnimation->GetDuration());
 			calculate_bone_transform(&currentAnimation->GetRootNode(), glm::mat4(1.0f));
 		}
@@ -205,6 +208,11 @@ private:
 	float angle_around_y_rad = 0.0f;
 	float NECK_ROTATION_SPEED_AROUND_X = 10.0f;
 	float NECK_ROTATION_SPEED_AROUND_Y = 5.0f;
+	
+	bool reached_animation_end(){
+		assert(currentAnimation && "Current animation is not set");
+		return currentTime > currentAnimation->GetDuration();
+	}
 	
 	bool check_has_animations() {
 		if (animations.empty()) {

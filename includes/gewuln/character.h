@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/ext.hpp>
+#include <gewuln/room.h>
 #include <gewuln/animation.h>
 #include <gewuln/animator.h>
 #include <gewuln/model.h>
@@ -12,26 +13,23 @@
 #include <gewuln/character_state/character_state.h>
 #include <iostream>
 #include <map>
-#include <gewuln/room.h>
-
-class Room;
 
 class Character {
 public:
-	float 				WALK_SPEED = 1.2f;
-	float 				ROT_SPEED  = 4.0f;
-
-	Model*				model;
-	Animator			animator;
+	float 					WALK_SPEED = 1.2f;
+	float 					ROT_SPEED  = 4.0f;
 	
-	glm::vec3			position;
-	float				rot_rad;
-	glm::vec3			velocity = glm::vec3(0.0f);
-	glm::vec3			forward  = glm::vec3(0.0f, 0.0f, -1.0f);
-	
-	Room*				current_room;
-	Room::Interactable*	interactable_intersecting;
-	bool				controlled_by_player;
+	Model*					model;
+	Animator				animator;
+		
+	glm::vec3				position;
+	float					rot_rad;
+	glm::vec3				velocity = glm::vec3(0.0f);
+	glm::vec3				forward  = glm::vec3(0.0f, 0.0f, -1.0f);
+		
+	Room*					current_room;
+	Interactable*			interactable_intersecting;
+	bool					controlled_by_player;
 
 
 	Character(){};
@@ -54,7 +52,7 @@ public:
 	void Update(const float dt);
 	void turn_left(const float dt);
 	void turn_right(const float dt);
-	Room::Interactable* collider_intersects_an_interactable();
+	Interactable* collider_intersects_an_interactable();
 	void switch_rooms();
 	void walk_if_possible(const float dt);
 

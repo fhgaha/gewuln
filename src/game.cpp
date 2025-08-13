@@ -26,7 +26,6 @@ Game::~Game()
     delete model_renderer;
     delete text_renderer;
     delete current_room;
-    delete active_character;
 }
 
 void Game::init()
@@ -127,7 +126,7 @@ void Game::init()
 
             kitchen_room->init_interactable(
                 "kitchen_inter",
-                Room::Interactable{
+                Interactable{
                     //TODO hardcoded garbage shit
                     .mesh = &kitchen_room->model->interactiable_meshes[0],
                     .glfw_key = GLFW_KEY_E,
@@ -163,7 +162,7 @@ void Game::init()
             { //interactables
                 test_room->init_interactable(
                     "interactable_with_center_at_hight_half_meter",
-                    Room::Interactable{
+                    Interactable{
                         //TODO hardcoded garbage shit
                         .mesh = &test_room->model->interactiable_meshes[0],
                         .glfw_key = GLFW_KEY_E,
@@ -175,7 +174,7 @@ void Game::init()
 
                 test_room->init_interactable(
                     "interactable_with_center_at_hight_2_meters",
-                    Room::Interactable{
+                    Interactable{
                         //TODO hardcoded garbage shit
                         .mesh = &test_room->model->interactiable_meshes[1],
                         .glfw_key = GLFW_KEY_E,
@@ -188,6 +187,21 @@ void Game::init()
 
             test_room->initial_cam = test_room->cameras["cam_fly"].get();
             test_room->current_cam = test_room->initial_cam;
+            
+            {//mona
+                auto mona_path = "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/export/gltf_3_cube_collider/mona.gltf";
+                ResourceManager::LoadModel(mona_path, true, "mona");
+                
+                test_room->characters["mona"] = Character(
+                    &ResourceManager::GetModel("mona"),
+                    Animator(mona_path, ResourceManager::GetModel("mona")),
+                    glm::vec3(0.0f, 0.0f, 0.0f),
+                    glm::vec3(0, 0, -1)
+                );
+                test_room->characters["mona"].controlled_by_player = true;
+                test_room->characters["mona"].current_room = test_room;
+            }
+            
             current_room = test_room;
         }
 
@@ -195,7 +209,7 @@ void Game::init()
         {//kitchen room exits
             rooms["test_kitchen_room"]->init_exit(
                 "exit",
-                Room::Exit {
+                Exit {
                     //TODO hardcoded garbage code
                     .mesh           = &rooms["test_kitchen_room"].get()->model->room_exit_meshes[0],
                     .glfw_key       = GLFW_KEY_E,
@@ -264,19 +278,7 @@ void Game::init()
     }
     
     {//characters
-        {//mona
-            auto mona_path = "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/export/gltf_3_cube_collider/mona.gltf";
-            ResourceManager::LoadModel(mona_path, true, "mona");
-
-            characters["mona"] = Character(
-                &ResourceManager::GetModel("mona"),
-                Animator(mona_path, ResourceManager::GetModel("mona")),
-                glm::vec3(0.0f, 0.0f, 0.0f),
-                glm::vec3(0, 0, -1)
-            );
-            characters["mona"].controlled_by_player = true;
-            characters["mona"].current_room = current_room;
-        }
+        
 
         // {//hotel owner
         //     // auto ho_path = "D:/MyProjects/cpp/gewuln/assets/models/low_poly_humanoids/hotel_owner/export/gltf_1_no_anim/hotel_owner.gltf";
@@ -296,16 +298,16 @@ void Game::init()
             auto snake_path = "D:/MyProjects/cpp/gewuln/assets/models/low_poly_humanoids/snake/export/gltf_1/snake.gltf";
             ResourceManager::LoadModel(snake_path, true, "snake");
 
-            characters["snake"] = Character(
+            current_room->characters["snake"] = Character(
                 &ResourceManager::GetModel("snake"),
                 Animator(snake_path, ResourceManager::GetModel("snake")),
                 glm::vec3(0, 0, -2),
                 glm::vec3(0, 0, 1)
             );
-            characters["snake"].current_room = current_room;
+            current_room->characters["snake"].current_room = current_room;
         }
 
-        active_character = &characters["mona"];
+        current_room->active_character = &current_room->characters["mona"];
         // active_character = &characters["hotel_owner"];
     }
 
@@ -320,14 +322,14 @@ void Game::update(float dt)
 {
     this->dt = dt;
     
-    for (auto &[ch_name, ch] : characters)
+    for (auto &[ch_name, ch] : current_room->characters)
     {
         ch.Update(dt);
     }
 
-    if (active_character) {
+    if (current_room->active_character) {
         //look at cam looks at character, fly cam does nothing
-        glm::vec3 trg = active_character->position + glm::vec3(0.0f, 1.5f, 0.0f);
+        glm::vec3 trg = current_room->active_character->position + glm::vec3(0.0f, 1.5f, 0.0f);
         current_room->current_cam->LookAt(&trg);
     }
     
@@ -344,9 +346,9 @@ void Game::process_input()
     if (Keys[GLFW_KEY_RIGHT])
         current_room->current_cam->ProcessKeyboard(RIGHT, dt);
 
-    if (active_character) {
-        active_character->current_room = this->current_room;
-        active_character->ProcessInput(Keys, KeysProcessed, dt);
+    if (current_room->active_character) {
+        current_room->active_character->current_room = this->current_room;
+        current_room->active_character->ProcessInput(Keys, KeysProcessed, dt);
     }
 
     if (Keys[GLFW_KEY_GRAVE_ACCENT] && !KeysProcessed[GLFW_KEY_GRAVE_ACCENT]) { /* ` */
@@ -375,7 +377,7 @@ void Game::process_mouse_scroll(float yoffset)
 
 void Game::render()
 {
-    for (auto &[ch_name, ch] : characters)
+    for (auto &[ch_name, ch] : current_room->characters)
     {
         if (ch.current_room == current_room){
             model_renderer->DrawCharacter(

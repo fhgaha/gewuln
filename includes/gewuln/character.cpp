@@ -1,8 +1,8 @@
 #include <gewuln/character.h>
+#include <gewuln/room.h>
 #include <GLFW/glfw3.h>
 #include <gewuln/room.h>
 #include <gewuln/geometry_3d.h>
-// #include "character.h"
 
 
 void Character::ProcessInput(bool *Keys, bool *KeysProcessed, const float dt)
@@ -77,7 +77,7 @@ void Character::Update(const float dt)
 	{ //look at center of interactable cube
 		//TODO use events like on enter, on exit or something. check a stack of active interactables maybe
 		bool collider_intersects_an_interactable = false;
-		Room::Interactable *interacting_with = nullptr;
+		Interactable *interacting_with = nullptr;
 		for (auto &[room_name, interactable] : current_room->interactables)
 		{
 			std::vector<Vertex> transformed_verts = this->model->collider_mesh.value().vertices;
@@ -124,7 +124,7 @@ void Character::turn_right(const float dt)
 	}
 }
 
-Room::Interactable* Character::collider_intersects_an_interactable()
+Interactable* Character::collider_intersects_an_interactable()
 {
 	assert(this->model->collider_mesh.has_value() && "Character must have collider mesh!");
 

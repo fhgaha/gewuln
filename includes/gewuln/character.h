@@ -28,7 +28,7 @@ public:
 	glm::vec3				forward  = glm::vec3(0.0f, 0.0f, -1.0f);
 		
 	Room*					current_room;
-	Interactable*			interactable_intersecting;
+	RoomObjects::Interactable*			interactable_intersecting;
 	bool					controlled_by_player;
 
 
@@ -52,7 +52,7 @@ public:
 	void Update(const float dt);
 	void turn_left(const float dt);
 	void turn_right(const float dt);
-	Interactable* collider_intersects_an_interactable();
+	RoomObjects::Interactable* collider_intersects_an_interactable();
 	void switch_rooms();
 	void walk_if_possible(const float dt);
 

@@ -22,8 +22,8 @@ class Room
 {
 public:
 	std::unordered_map<std::string, std::unique_ptr<Camera>>	cameras;
-	std::unordered_map<std::string, Interactable>				interactables;
-	std::unordered_map<std::string, Exit>						exits;
+	std::unordered_map<std::string, RoomObjects::Interactable>				interactables;
+	std::unordered_map<std::string, RoomObjects::Exit>						exits;
     
 	Model														*model;
 	Camera														*initial_cam;
@@ -51,12 +51,12 @@ public:
 		this->walkable_area = &model->walkable_area;
 	}
 
-	void init_interactable(const char* name, const Interactable interactable)
+	void init_interactable(const char* name, const RoomObjects::Interactable interactable)
 	{
 		interactables[name] = interactable;
 	}
 
-	void init_exit(const char* name, const Exit exit)
+	void init_exit(const char* name, const RoomObjects::Exit exit)
 	{
 		exits[name] = exit;
 	}

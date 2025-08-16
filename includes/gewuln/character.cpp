@@ -77,7 +77,7 @@ void Character::Update(const float dt)
 	{ //look at center of interactable cube
 		//TODO use events like on enter, on exit or something. check a stack of active interactables maybe
 		bool collider_intersects_an_interactable = false;
-		Interactable *interacting_with = nullptr;
+		RoomObjects::Interactable *interacting_with = nullptr;
 		for (auto &[room_name, interactable] : current_room->interactables)
 		{
 			std::vector<Vertex> transformed_verts = this->model->collider_mesh.value().vertices;
@@ -124,7 +124,7 @@ void Character::turn_right(const float dt)
 	}
 }
 
-Interactable* Character::collider_intersects_an_interactable()
+RoomObjects::Interactable* Character::collider_intersects_an_interactable()
 {
 	assert(this->model->collider_mesh.has_value() && "Character must have collider mesh!");
 

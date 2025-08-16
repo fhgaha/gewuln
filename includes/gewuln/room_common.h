@@ -8,22 +8,24 @@
 struct Mesh;
 class Room;
 
-struct Interactable
-{
-	Mesh 					*mesh;
-	int 					glfw_key;
-	std::function<void()> 	action;
-};
+namespace RoomObjects{
+	struct Interactable
+	{
+		Mesh 					*mesh;
+		int 					glfw_key;
+		std::function<void()> 	action;
+	};
 
-struct Exit
-{
-	Mesh					*mesh;
-	int						glfw_key;
-	std::function<void()> 	action;
-	Room					*this_room;
-	Room					*go_to_room;
-	std::function<void()> 	on_room_enter;
-	std::function<void()> 	on_room_exit;
-};
+	struct Exit
+	{
+		Mesh					*mesh;
+		int						glfw_key;
+		std::function<void()> 	action;
+		Room					*this_room;
+		Room					*go_to_room;
+		std::function<void()> 	on_room_enter;
+		std::function<void()> 	on_room_exit;
+	};
+}
 
 #endif

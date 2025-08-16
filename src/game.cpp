@@ -126,7 +126,7 @@ void Game::init()
 
             kitchen_room->init_interactable(
                 "kitchen_inter",
-                Interactable{
+                RoomObjects::Interactable{
                     //TODO hardcoded garbage shit
                     .mesh = &kitchen_room->model->interactiable_meshes[0],
                     .glfw_key = GLFW_KEY_E,
@@ -162,24 +162,24 @@ void Game::init()
             { //interactables
                 test_room->init_interactable(
                     "interactable_with_center_at_hight_half_meter",
-                    Interactable{
+                    RoomObjects::Interactable{
                         //TODO hardcoded garbage shit
                         .mesh = &test_room->model->interactiable_meshes[0],
                         .glfw_key = GLFW_KEY_E,
                         .action = []{
-                            std::cout << "hello action\n";
+                            std::cout << "interacting with interactable_with_center_at_hight_half_meter\n";
                         }
                     }
                 );
 
                 test_room->init_interactable(
                     "interactable_with_center_at_hight_2_meters",
-                    Interactable{
+                    RoomObjects::Interactable{
                         //TODO hardcoded garbage shit
                         .mesh = &test_room->model->interactiable_meshes[1],
                         .glfw_key = GLFW_KEY_E,
                         .action = []{
-                            std::cout << "hello action\n";
+                            std::cout << "interacting with interactable_with_center_at_hight_2_meters\n";
                         }
                     }
                 );
@@ -209,7 +209,7 @@ void Game::init()
         {//kitchen room exits
             rooms["test_kitchen_room"]->init_exit(
                 "exit",
-                Exit {
+                RoomObjects::Exit {
                     //TODO hardcoded garbage code
                     .mesh           = &rooms["test_kitchen_room"].get()->model->room_exit_meshes[0],
                     .glfw_key       = GLFW_KEY_E,

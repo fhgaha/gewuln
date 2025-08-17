@@ -3,7 +3,26 @@
 #include <GLFW/glfw3.h>
 #include <gewuln/room.h>
 #include <gewuln/geometry_3d.h>
+#include "character.h"
 
+Character::Character(Model* model, std::string path, glm::vec3 pos, glm::vec3 dir)
+{
+	this->model = model;
+	this->animator = Animator(path, *model);
+	this->position = pos;
+
+	float yaw, _pitch;
+	direction_to_yaw_pitch(dir, yaw, _pitch);
+	this->rot_rad = yaw;
+
+	this->animator.PlayAnimation("idle");
+	this->state = new IdleState();
+}
+
+Character::~Character() {
+    animator.remove_observer(this);
+    // delete state;
+}
 
 void Character::ProcessInput(bool *Keys, bool *KeysProcessed, const float dt)
 {
@@ -24,60 +43,11 @@ void Character::ProcessInput(bool *Keys, bool *KeysProcessed, const float dt)
 void Character::Update(const float dt)
 {
 	state->update(*this, dt);
-	
-	// if (glm::length2(velocity) > 0) {
-	// 	animator.PlayAnimation("walk");
-	// }
-	// else {
-	// 	animator.PlayAnimation("idle");
-	// }
-
-	// { //move
-	// 	assert(current_room && "Should have current room");
-	// 	bool inside = current_room->inside_walkable_area(
-	// 		this->model->collider_mesh.value(),
-	// 		this->position + velocity
-	// 	);
-	// 	if (inside) {
-	// 		this->position += velocity;
-	// 	} else {
-	// 		// move and slide
-	// 		// https://gamedev.stackexchange.com/questions/200354/how-to-slide-along-a-wall-at-full-speed
-
-	// 		glm::vec3 left(velocity.z, velocity.y, -velocity.x);	//rotated 90 deg counter clockwise
-	// 		glm::vec3 right(-velocity.z, velocity.y, velocity.x);	//rotated 90 deg clockwise
-
-	// 		glm::vec3 small_left  = glm::normalize(left) * dt;
-	// 		glm::vec3 small_right = glm::normalize(right) * dt;
-
-	// 		float vel_len = glm::length(velocity);
-	// 		glm::vec3 eight_right = glm::normalize(velocity + right) * vel_len;
-	// 		glm::vec3 eight_left  = glm::normalize(velocity + left)  * vel_len;
-
-	// 		//if one of them not inside after movement, move the other way. if both not inside - dont move.
-	// 		bool eight_right_is_inside = current_room->inside_walkable_area(
-	// 			this->model->collider_mesh.value(),
-	// 			this->position + eight_right
-	// 		);
-	// 		bool eight_left_is_inside  = current_room->inside_walkable_area(
-	// 			this->model->collider_mesh.value(),
-	// 			this->position + eight_left
-	// 		);
-	// 		if (eight_left_is_inside && eight_right_is_inside){
-	// 		} else if (eight_left_is_inside) {
-	// 			this->position += small_left;
-	// 		} else if (eight_right_is_inside) {
-	// 			this->position += small_right;
-	// 		} else {
-	// 			//cant move anywhere
-	// 		}
-	// 	}
-	// }
 
 	{ //look at center of interactable cube
 		//TODO use events like on enter, on exit or something. check a stack of active interactables maybe
 		bool collider_intersects_an_interactable = false;
-		RoomObjects::Interactable *interacting_with = nullptr;
+		RoomObjects::Interactable* interacting_with = nullptr;
 		for (auto &[room_name, interactable] : current_room->interactables)
 		{
 			std::vector<Vertex> transformed_verts = this->model->collider_mesh.value().vertices;
@@ -218,5 +188,37 @@ void Character::walk_if_possible(const float dt)
 		} else {
 			//cant move anywhere
 		}
+	}
+}
+
+void Character::on_notify(const Animator& sender, AnimatorData data)
+{
+	printf("character recieved event\n");
+	// printf(std::format("character recieved event {0} {1}\n", (int)sender, (int)data));
+}
+
+void Character::direction_to_yaw_pitch(const glm::vec3& direction, float& yaw, float& pitch)
+{
+	const float epsilon = 1e-6f;
+	glm::vec3 dir = direction;
+
+	// Normalize vector to handle non-unit directions
+	if (glm::length(dir) > epsilon) {
+		dir = glm::normalize(dir);
+	} else {
+		yaw = 0.0f;
+		pitch = 0.0f;
+		return;
+	}
+
+	// Calculate pitch (vertical angle)
+	pitch = glm::asin(-dir.y);  // Negative because up is positive Y
+
+	// Calculate yaw (horizontal angle)
+	if (glm::abs(dir.x) < epsilon && glm::abs(dir.z) < epsilon) {
+		yaw = 0.0f;  // Straight up/down case
+	} else {
+		// yaw = glm::atan(dir.x, -dir.z);
+		yaw = glm::atan(dir.x, dir.z);
 	}
 }

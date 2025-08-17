@@ -192,14 +192,27 @@ void Game::init()
                 auto mona_path = "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/export/gltf_3_cube_collider/mona.gltf";
                 ResourceManager::LoadModel(mona_path, true, "mona");
                 
-                test_room->characters["mona"] = Character(
+                Character* mona = test_room->add_character(
+                    "mona",
                     &ResourceManager::GetModel("mona"),
-                    Animator(mona_path, ResourceManager::GetModel("mona")),
-                    glm::vec3(0.0f, 0.0f, 0.0f),
+                    mona_path, 
+                    glm::vec3(0.0f),
                     glm::vec3(0, 0, -1)
                 );
-                test_room->characters["mona"].controlled_by_player = true;
-                test_room->characters["mona"].current_room = test_room;
+                mona->controlled_by_player = true;
+                mona->current_room = test_room;
+                mona->animator.add_observer(mona);
+                
+                // test_room->characters["mona"] = std::move(
+                //     Character(
+                //         &ResourceManager::GetModel("mona"),
+                //         Animator(mona_path, ResourceManager::GetModel("mona")),
+                //         glm::vec3(0.0f),
+                //         glm::vec3(0, 0, -1)
+                //     )
+                // );
+                // test_room->characters["mona"].controlled_by_player = true;
+                // test_room->characters["mona"].current_room = test_room;
             }
             
             current_room = test_room;
@@ -294,18 +307,18 @@ void Game::init()
         //     characters["hotel_owner"].current_room = current_room;
         // }
         
-        {//snake
-            auto snake_path = "D:/MyProjects/cpp/gewuln/assets/models/low_poly_humanoids/snake/export/gltf_1/snake.gltf";
-            ResourceManager::LoadModel(snake_path, true, "snake");
+        // {//snake
+        //     auto snake_path = "D:/MyProjects/cpp/gewuln/assets/models/low_poly_humanoids/snake/export/gltf_1/snake.gltf";
+        //     ResourceManager::LoadModel(snake_path, true, "snake");
 
-            current_room->characters["snake"] = Character(
-                &ResourceManager::GetModel("snake"),
-                Animator(snake_path, ResourceManager::GetModel("snake")),
-                glm::vec3(0, 0, -2),
-                glm::vec3(0, 0, 1)
-            );
-            current_room->characters["snake"].current_room = current_room;
-        }
+        //     current_room->characters["snake"] = Character(
+        //         &ResourceManager::GetModel("snake"),
+        //         Animator(snake_path, ResourceManager::GetModel("snake")),
+        //         glm::vec3(0, 0, -2),
+        //         glm::vec3(0, 0, 1)
+        //     );
+        //     current_room->characters["snake"].current_room = current_room;
+        // }
 
         current_room->active_character = &current_room->characters["mona"];
         // active_character = &characters["hotel_owner"];

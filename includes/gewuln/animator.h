@@ -7,6 +7,7 @@
 #include <assimp/Importer.hpp>
 #include <gewuln/animation.h>
 #include <gewuln/bone.h>
+#include <gewuln/animator_observer.h>
 
 const unsigned int MAX_BONES_AMOUNT = 100;
 
@@ -71,9 +72,6 @@ public:
 		if (currentAnimation)
 		{
 			currentTime += currentAnimation->GetTicksPerSecond() * dt;
-			if (reached_animation_end()){
-				//send notification on reaching animation end
-			}
 			currentTime = fmod(currentTime, currentAnimation->GetDuration());
 			calculate_bone_transform(&currentAnimation->GetRootNode(), glm::mat4(1.0f));
 		}
@@ -113,8 +111,10 @@ public:
 		if (currentAnimation)
 		{
 			currentTime += currentAnimation->GetTicksPerSecond() * dt;
+			if (reached_animation_end()){
+				notify_animation_ended(*this, AnimatorData{});
+			}
 			currentTime = fmod(currentTime, currentAnimation->GetDuration());
-			// calculate_bone_transform(&currentAnimation->GetRootNode(), glm::mat4(1.0f));
 			calculate_bone_transform_with_look_at(&currentAnimation->GetRootNode(), glm::mat4(1.0f));
 		}
 	}
@@ -193,10 +193,35 @@ public:
 			calculate_bone_transform_with_look_at(&node->children[i], globalTransformation);
 		}
 	}
-
+	
+	void add_observer(I_AnimatorObserver* observer)
+	{
+		observers.push_back(observer);
+	}
+	
+	void remove_observer(I_AnimatorObserver* observer)
+	{
+		for (std::vector<I_AnimatorObserver*>::iterator it = observers.begin(); it != observers.end();)
+		{
+			if (*it == observer){
+				it = observers.erase(it);
+			}
+		}
+	}
 
 	std::vector<glm::mat4> 	GetFinalBoneMatrices() const {return finalBoneMatrices;}
 	Animation*				GetCurrentAnimation() const {return currentAnimation;}
+
+
+protected:
+	void notify_animation_ended(const Animator& sender, AnimatorData data)
+	{
+		for (int i = 0; i < observers.size(); i++)
+		{
+			observers[i]->on_notify(sender, data);
+		}
+	}
+
 
 private:
 	std::vector<glm::mat4> finalBoneMatrices;
@@ -208,6 +233,7 @@ private:
 	float angle_around_y_rad = 0.0f;
 	float NECK_ROTATION_SPEED_AROUND_X = 10.0f;
 	float NECK_ROTATION_SPEED_AROUND_Y = 5.0f;
+	std::vector<I_AnimatorObserver*> observers;
 	
 	bool reached_animation_end(){
 		assert(currentAnimation && "Current animation is not set");

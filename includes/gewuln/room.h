@@ -2,7 +2,7 @@
 #define ROOM_H
 
 #include <glm/glm.hpp>
-#include <gewuln/room_common.h>
+#include <gewuln/room_objects.h>
 #include <gewuln/camera/camera.h>
 #include <gewuln/camera/camera_look_at.h>
 #include <gewuln/camera/camera_fly.h>
@@ -17,13 +17,14 @@
 #include <functional>
 
 class Character;
+class Animator;
 
 class Room
 {
 public:
 	std::unordered_map<std::string, std::unique_ptr<Camera>>	cameras;
-	std::unordered_map<std::string, RoomObjects::Interactable>				interactables;
-	std::unordered_map<std::string, RoomObjects::Exit>						exits;
+	std::unordered_map<std::string, RoomObjects::Interactable>	interactables;
+	std::unordered_map<std::string, RoomObjects::Exit>			exits;
     
 	Model														*model;
 	Camera														*initial_cam;
@@ -50,6 +51,8 @@ public:
 		this->model = model;
 		this->walkable_area = &model->walkable_area;
 	}
+	
+	Character* add_character(std::string name, Model *model, std::string path, glm::vec3 pos, glm::vec3 dir = glm::vec3(0.0f, 0.0f, -1.0f));
 
 	void init_interactable(const char* name, const RoomObjects::Interactable interactable)
 	{

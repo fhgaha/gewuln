@@ -32,11 +32,11 @@ CharacterState* WalkState::process_input(Character& character, bool *Keys, bool 
 void WalkState::update(Character& character, const float dt)
 {
 	if (glm::length2(character.velocity) > 0) {
-		character.animator.PlayAnimation("walk");
+		character.animator.play_animation("walk");
 		character.walk_if_possible(dt);
 	} else {
 		//when standing and just rotating dont play walk animation
-		character.animator.PlayAnimation("idle");
+		character.animator.play_animation("idle");
 	}
 }
 

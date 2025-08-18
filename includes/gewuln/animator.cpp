@@ -19,17 +19,17 @@ Animator::Animator(const std::string &animationPath, Model &model): animations()
 		animations[anim_name] = animation;
 	}
 
-	currentTime = 0.0;
-	currentAnimation = &animations["idle"];
+	current_time = 0.0;
+	current_animation = &animations["idle"];
 
-	finalBoneMatrices.reserve(MAX_BONES_AMOUNT);
+	final_bone_matrices.reserve(MAX_BONES_AMOUNT);
 
 	for (int i = 0; i < 100; i++){
-		finalBoneMatrices.push_back(glm::mat4(1.0f));
+		final_bone_matrices.push_back(glm::mat4(1.0f));
 	}
 }
 
-void Animator::PlayAnimation(std::string anim_name)
+void Animator::play_animation(std::string anim_name)
 {
 	Animation* anim_to_play;
 	try{
@@ -40,12 +40,12 @@ void Animator::PlayAnimation(std::string anim_name)
 		return;
 	}
 
-	if (currentAnimation == anim_to_play) {
+	if (current_animation == anim_to_play) {
 		return;
 	}
 
-	currentAnimation = anim_to_play;
-	currentTime = 0.0f;
+	current_animation = anim_to_play;
+	current_time = 0.0f;
 }
 
 
@@ -53,12 +53,12 @@ void Animator::update_animation(float dt)
 {
 	// if (!check_has_animations()) return;
 
-	deltaTime = dt;
-	if (currentAnimation)
+	delta_time = dt;
+	if (current_animation)
 	{
-		currentTime += currentAnimation->GetTicksPerSecond() * dt;
-		currentTime = fmod(currentTime, currentAnimation->GetDuration());
-		calculate_bone_transform(&currentAnimation->GetRootNode(), glm::mat4(1.0f));
+		current_time += current_animation->GetTicksPerSecond() * dt;
+		current_time = fmod(current_time, current_animation->GetDuration());
+		calculate_bone_transform(&current_animation->GetRootNode(), glm::mat4(1.0f));
 	}
 }
 
@@ -66,20 +66,20 @@ void Animator::calculate_bone_transform(const AssimpNodeData* node, glm::mat4 pa
 {
 	std::string nodeName = node->name;
 	glm::mat4 nodeTransform = node->transformation;
-	Bone* bone = currentAnimation->FindBone(nodeName);
+	Bone* bone = current_animation->FindBone(nodeName);
 	if (bone){
-		bone->Update(currentTime);
+		bone->Update(current_time);
 		nodeTransform = bone->GetLocalTransform();
 	}
 
 	glm::mat4 globalTransformation = parentTransform * nodeTransform;
 
-	auto boneInfoMap = currentAnimation->GetBoneIDMap();
+	auto boneInfoMap = current_animation->GetBoneIDMap();
 	if (boneInfoMap.find(nodeName) != boneInfoMap.end())
 	{
 		int index = boneInfoMap[nodeName].id;
 		glm::mat4 offset = boneInfoMap[nodeName].offset;
-		finalBoneMatrices[index] = globalTransformation * offset;
+		final_bone_matrices[index] = globalTransformation * offset;
 	}
 
 	for (int i = 0; i < node->childrenCount; i++){
@@ -92,15 +92,15 @@ void Animator::update_animation_with_look_at(float dt)
 {
 	// if (!check_has_animations()) return;
 
-	deltaTime = dt;
-	if (currentAnimation)
+	delta_time = dt;
+	if (current_animation)
 	{
-		currentTime += currentAnimation->GetTicksPerSecond() * dt;
+		current_time += current_animation->GetTicksPerSecond() * dt;
 		if (reached_animation_end()){
 			notify_animation_ended(*this, AnimatorData{});
 		}
-		currentTime = fmod(currentTime, currentAnimation->GetDuration());
-		calculate_bone_transform_with_look_at(&currentAnimation->GetRootNode(), glm::mat4(1.0f));
+		current_time = fmod(current_time, current_animation->GetDuration());
+		calculate_bone_transform_with_look_at(&current_animation->GetRootNode(), glm::mat4(1.0f));
 	}
 }
 
@@ -111,7 +111,7 @@ void Animator::calculate_bone_transform_with_look_at(const AssimpNodeData* node,
 	glm::mat4 globalTransformation;
 	
 	glm::mat4 nodeTransform = node->transformation;
-	Bone* bone = currentAnimation->FindBone(nodeName);
+	Bone* bone = current_animation->FindBone(nodeName);
 
 	if (bone){
 		if (nodeName == desired_name){
@@ -133,8 +133,8 @@ void Animator::calculate_bone_transform_with_look_at(const AssimpNodeData* node,
 				angle_around_y = 0.0f;
 			}
 			
-			// angle_around_x_rad = glm::lerp(angle_around_x_rad, angle_around_x,  deltaTime);
-			// angle_around_y_rad = glm::lerp(angle_around_y_rad, angle_around_y,  deltaTime);
+			// angle_around_x_rad = glm::lerp(angle_around_x_rad, angle_around_x,  delta_time);
+			// angle_around_y_rad = glm::lerp(angle_around_y_rad, angle_around_y,  delta_time);
 			
 			// angle_around_x_rad = angle_around_x;
 			// angle_around_y_rad = angle_around_y;
@@ -142,8 +142,8 @@ void Animator::calculate_bone_transform_with_look_at(const AssimpNodeData* node,
 			bool big_difference  = glm::length2(angle_around_x_rad - angle_around_x) > 1e-3 
 								|| glm::length2(angle_around_y_rad - angle_around_y) > 1e-3;
 			if (big_difference) {
-				angle_around_x_rad += (angle_around_x_rad > angle_around_x ? -1 : 1) * deltaTime;
-				angle_around_y_rad += (angle_around_y_rad > angle_around_y ? -1 : 1) * deltaTime;
+				angle_around_x_rad += (angle_around_x_rad > angle_around_x ? -1 : 1) * delta_time;
+				angle_around_y_rad += (angle_around_y_rad > angle_around_y ? -1 : 1) * delta_time;
 			}
 			
 			// instead of this should slerp old rotation and new rotation i guess
@@ -151,10 +151,10 @@ void Animator::calculate_bone_transform_with_look_at(const AssimpNodeData* node,
 			rotation = glm::rotate(rotation, angle_around_y_rad, glm::vec3(0.0f, 1.0f, 0.0f));
 			rotation = glm::rotate(rotation, angle_around_x_rad, glm::vec3(1.0f, 0.0f, 0.0f));
 	
-			bone->Update_with_rotation(currentTime, rotation);
-			// bone->Update(currentTime);
+			bone->Update_with_rotation(current_time, rotation);
+			// bone->Update(current_time);
 		} else {
-			bone->Update(currentTime);
+			bone->Update(current_time);
 		}
 		
 		nodeTransform = bone->GetLocalTransform();
@@ -162,12 +162,12 @@ void Animator::calculate_bone_transform_with_look_at(const AssimpNodeData* node,
 	
 	globalTransformation = parentTransform * nodeTransform;
 
-	auto boneInfoMap = currentAnimation->GetBoneIDMap();
+	auto boneInfoMap = current_animation->GetBoneIDMap();
 	if (boneInfoMap.find(nodeName) != boneInfoMap.end())
 	{
 		int index = boneInfoMap[nodeName].id;
 		glm::mat4 offset = boneInfoMap[nodeName].offset;
-		finalBoneMatrices[index] = globalTransformation * offset;
+		final_bone_matrices[index] = globalTransformation * offset;
 	}
 
 	for (int i = 0; i < node->childrenCount; i++){
@@ -190,8 +190,8 @@ void Animator::remove_observer(I_AnimatorObserver* observer)
 	}
 }
 
-std::vector<glm::mat4> 	Animator::GetFinalBoneMatrices() const {return finalBoneMatrices;}
-Animation*				Animator::GetCurrentAnimation() const {return currentAnimation;}
+std::vector<glm::mat4> 	Animator::get_final_bone_matrices() const {return final_bone_matrices;}
+Animation*				Animator::get_current_animation() const {return current_animation;}
 
 void Animator::notify_animation_ended(const Animator& sender, AnimatorData data)
 {
@@ -202,8 +202,8 @@ void Animator::notify_animation_ended(const Animator& sender, AnimatorData data)
 }
 
 bool Animator::reached_animation_end(){
-	assert(currentAnimation && "Current animation is not set");
-	return currentTime > currentAnimation->GetDuration();
+	assert(current_animation && "Current animation is not set");
+	return current_time > current_animation->GetDuration();
 }
 
 bool Animator::check_has_animations() {

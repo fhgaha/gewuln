@@ -57,7 +57,7 @@ public:
 		glm::mat4 view = cam->GetViewMatrix();
         shader.SetMatrix4("view", view);
 
-		auto transforms = animator->GetFinalBoneMatrices();
+		auto transforms = animator->get_final_bone_matrices();
         for (int i = 0; i < transforms.size(); ++i) {
             shader.SetMatrix4(("finalBonesMatrices[" + std::to_string(i) + "]").c_str(), transforms[i]);
         }

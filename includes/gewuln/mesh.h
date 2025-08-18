@@ -37,7 +37,7 @@ struct Texture
 
 struct BoneInfo
 {
-    int 			id; /*id is index in finalBoneMatrices*/
+    int 			id; /*id is index in final_bone_matrices*/
     glm::mat4 		offset; /*offset matrix transforms vertex from model space to bone space*/
 };
 

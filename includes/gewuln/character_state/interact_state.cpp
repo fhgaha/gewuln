@@ -22,7 +22,7 @@ CharacterState* InteractState::process_input(Character& character, bool *Keys, b
 
 void InteractState::update(Character& character, const float dt)
 {
-	character.animator.PlayAnimation("interact");
+	character.animator.play_animation("interact");
 }
 
 void InteractState::exit(Character& character)

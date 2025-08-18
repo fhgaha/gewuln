@@ -15,7 +15,7 @@ Character::Character(Model* model, std::string path, glm::vec3 pos, glm::vec3 di
 	direction_to_yaw_pitch(dir, yaw, _pitch);
 	this->rot_rad = yaw;
 
-	this->animator.PlayAnimation("idle");
+	this->animator.play_animation("idle");
 	this->state = new IdleState();
 }
 

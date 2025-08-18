@@ -12,7 +12,7 @@ public:
 	virtual void on_notify(const Animator& sender, AnimatorData event) = 0;
 };
 
-class Achievements: public I_AnimatorObserver
+class ExampleObserver: public I_AnimatorObserver
 {
 public:
 	//should not modify the list of observers
@@ -22,7 +22,7 @@ public:
 	}
 };
 
-class Subject
+class ExampleSubject
 {
 public:
 	void add_observer(I_AnimatorObserver* observer)
@@ -53,4 +53,16 @@ protected:
 	
 private:
 	std::vector<I_AnimatorObserver*> observers;
+};
+
+
+class ExampleClass
+{
+public:
+	void foo()
+	{
+		auto obs = new ExampleObserver();
+		auto subj = new ExampleSubject();
+		subj->add_observer(obs);
+	}	
 };

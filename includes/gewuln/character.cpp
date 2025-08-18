@@ -193,8 +193,7 @@ void Character::walk_if_possible(const float dt)
 
 void Character::on_notify(const Animator& sender, AnimatorData data)
 {
-	printf("character recieved event\n");
-	// printf(std::format("character recieved event {0} {1}\n", (int)sender, (int)data));
+	printf("character recieved event [%p] [%p]\n", (void*)&sender, &data);
 }
 
 void Character::direction_to_yaw_pitch(const glm::vec3& direction, float& yaw, float& pitch)

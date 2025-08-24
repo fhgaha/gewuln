@@ -122,7 +122,7 @@ void Game::init()
                 kitchen_room->current_cam = kitchen_room->cameras["cam_fly"].get();
             }
 
-            kitchen_room->Init(&ResourceManager::GetModel("test_kitchen_room_model"));
+            kitchen_room->init(&ResourceManager::GetModel("test_kitchen_room_model"));
 
             kitchen_room->init_interactable(
                 "kitchen_inter",
@@ -149,7 +149,7 @@ void Game::init()
 
             rooms["test_room"] = std::make_unique<Room>();
             auto test_room = rooms["test_room"].get();
-            test_room->Init(&ResourceManager::GetModel("test_room_model"));
+            test_room->init(&ResourceManager::GetModel("test_room_model"));
             test_room->cameras["cam_fly"] = std::make_unique<CameraFly>(
                 CameraFly(
                     glm::vec3(1.674590f, 4.121703f, 3.214545f),

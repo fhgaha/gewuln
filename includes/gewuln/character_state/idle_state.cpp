@@ -10,8 +10,11 @@ void IdleState::enter(Character& character)
 CharacterState* IdleState::process_input(Character& character, bool *Keys, bool *KeysProcessed, const float dt)
 {
 	if (Keys[GLFW_KEY_E] && !KeysProcessed[GLFW_KEY_E]){
-		auto intr = character.collider_intersects_an_interactable();
+		RoomObjects::Interactable* intr = character.collider_intersects_an_interactable();
 		if (intr) {
+			
+			//TODO check if character is looking at interactable
+			
 			character.interactable_intersecting = intr;
 			KeysProcessed[GLFW_KEY_E] = true;
 			return new InteractState();

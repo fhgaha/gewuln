@@ -44,7 +44,6 @@ public:
 	void 						walk_if_possible(const float dt);
 	void 						on_notify(const Animator& sender, AnimatorData data);
 
-
 private:
 	CharacterState*	state;
 	

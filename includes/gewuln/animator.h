@@ -21,6 +21,7 @@ public:
 	Animator(const std::string &animationPath, Model &model);
 	
 	void 					play_animation(std::string anim_name);
+	void 					play_animation_once(std::string anim_name);
 	void 					update_animation(float dt);
 	void 					calculate_bone_transform(const AssimpNodeData* node, glm::mat4 parentTransform);
 	void 					update_animation_with_look_at(float dt);
@@ -34,19 +35,23 @@ protected:
 	void notify_animation_ended(const Animator& sender, AnimatorData data);
 
 private:
-	unsigned int MAX_BONES_AMOUNT = 100;
+	unsigned int 								MAX_BONES_AMOUNT = 100;
+	float										NECK_ANGLE_AROUND_X_LIMIT_DEG = 70.0f;
+	float										NECK_ANGLE_AROUND_Y_LIMIT_DEG = 85.0f;
+	float										NECK_ROTATION_SPEED_AROUND_Y = 5.0f;
+	float										NECK_ROTATION_SPEED_AROUND_X = 10.0f;
 	
-	std::vector<glm::mat4> final_bone_matrices;
-	std::unordered_map<std::string, Animation> animations;
-	Animation* current_animation;
-	float current_time;
-	float delta_time;
-	float angle_around_x_rad = 0.0f;
-	float angle_around_y_rad = 0.0f;
-	float NECK_ROTATION_SPEED_AROUND_X = 10.0f;
-	float NECK_ROTATION_SPEED_AROUND_Y = 5.0f;
-	std::vector<I_AnimatorObserver*> observers;
+	std::vector<glm::mat4> 						final_bone_matrices;
+	std::unordered_map<std::string, Animation> 	animations;
+	Animation* 									current_animation;
+	float 										current_time;
+	float 										delta_time;
+	float 										angle_around_x_rad = 0.0f;
+	float 										angle_around_y_rad = 0.0f;
+	bool 										cur_anim_should_be_played_once;
+	std::vector<I_AnimatorObserver*> 			observers;
 	
 	bool reached_animation_end();
 	bool check_has_animations();
+	void play_animation_common(std::string anim_name);
 };

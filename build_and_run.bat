@@ -8,5 +8,4 @@ if %errorlevel% equ 0 (
     .\build\win64_gewuln.exe
 ) else (
     echo Build failed with error level %errorlevel%
-    pause
 )

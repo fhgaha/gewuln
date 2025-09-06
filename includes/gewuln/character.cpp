@@ -62,6 +62,8 @@ void Character::Update(const float dt)
 			if (collider_intersects_an_interactable) {
 				interacting_with = &interactable;
 				break;
+			} else {
+				interacting_with = nullptr;
 			}
 		}
 
@@ -194,6 +196,7 @@ void Character::walk_if_possible(const float dt)
 void Character::on_notify(const Animator& sender, AnimatorData data)
 {
 	printf("character recieved event [%p] [%p]\n", (void*)&sender, &data);
+	this->state = new IdleState();
 }
 
 void Character::direction_to_yaw_pitch(const glm::vec3& direction, float& yaw, float& pitch)

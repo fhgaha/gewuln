@@ -44,7 +44,7 @@ class TextRenderer {
 		// This method is separate from the constructor with the idea that it will allow to change font or font size if needed
 		void Load(std::string font_relative_path, unsigned int font_size)
 		{
-			const char* font_full_path = (Global::working_dir_path / font_relative_path).string().c_str();
+			const char* font_full_path = (Global::working_dir_path / font_relative_path).generic_string().c_str();
 			
 		    // first clear the previously loaded Characters
 			this->Characters.clear();

@@ -33,8 +33,8 @@ void Game::init()
     { //renderers
         model_renderer = new ModelRenderer(
             ResourceManager::LoadShader(
-                "C:/my_projects/gewuln/src/shaders/default/default.vert",
-                "C:/my_projects/gewuln/src/shaders/default/default.frag",
+                "src/shaders/default/default.vert",
+                "src/shaders/default/default.frag",
                 nullptr,
                 "model_shader"
             )
@@ -44,21 +44,21 @@ void Game::init()
 
         text_renderer = new TextRenderer(
             ResourceManager::LoadShader(
-                "C:/my_projects/gewuln/src/shaders/text_shaders/text_2d.vert",
-                "C:/my_projects/gewuln/src/shaders/text_shaders/text_2d.frag",
+                "src/shaders/text_shaders/text_2d.vert",
+                "src/shaders/text_shaders/text_2d.frag",
                 nullptr,
                 "text_shader"
             ),
             this->Width,
             this->Height
         );
-        text_renderer->Load("C:/my_projects/gewuln/assets/fonts/arial/arial.ttf", 24);
+        text_renderer->Load("assets/fonts/arial/arial.ttf", 24);
 
 
         gizmo_renderer = new GizmoRenderer(
             ResourceManager::LoadShader(
-                "C:/my_projects/gewuln/src/shaders/origin_gizmo/origin_gizmo.vert",
-                "C:/my_projects/gewuln/src/shaders/origin_gizmo/origin_gizmo.frag",
+                "src/shaders/origin_gizmo/origin_gizmo.vert",
+                "src/shaders/origin_gizmo/origin_gizmo.frag",
                 nullptr,
                 "gizmo_shader"
             )
@@ -68,7 +68,7 @@ void Game::init()
     {//setting up rooms
         {//kitchen room
             ResourceManager::LoadModel(
-                "C:/my_projects/gewuln/assets/models/room/export/gltf_6_room_exit/room.gltf",
+                "assets/models/room/export/gltf_6_room_exit/room.gltf",
                 false,
                 "test_kitchen_room_model"
             );
@@ -142,7 +142,7 @@ void Game::init()
 
         {//orange room
             ResourceManager::LoadModel(
-                "C:/my_projects/gewuln/assets/models/test_rooms/export/test_floor/gltf_4_two_interactables_one_with_center_below_another_with_center_above/test_rooms.gltf",
+                "assets/models/test_rooms/export/test_floor/gltf_4_two_interactables_one_with_center_below_another_with_center_above/test_rooms.gltf",
                 false,
                 "test_room_model"
             );
@@ -189,7 +189,7 @@ void Game::init()
             test_room->current_cam = test_room->initial_cam;
             
             {//mona
-                auto mona_path = "C:/my_projects/gewuln/assets/models/mona_sax/export/gltf_3_cube_collider/mona.gltf";
+                auto mona_path = "assets/models/mona_sax/export/gltf_3_cube_collider/mona.gltf";
                 ResourceManager::LoadModel(mona_path, true, "mona");
                 
                 Character* mona = test_room->add_character(

@@ -9,6 +9,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <gewuln/global.h>
 
 // Instantiate static variables
 std::map<std::string, Texture2D>    ResourceManager::Textures;
@@ -17,7 +18,9 @@ std::map<std::string, Model>        ResourceManager::Models;
 
 Shader& ResourceManager::LoadShader(const char *vShaderFile, const char *fShaderFile, const char *gShaderFile, std::string name)
 {
-    Shaders[name] = loadShaderFromFile(vShaderFile, fShaderFile, gShaderFile);
+    std::filesystem::path v = (Global::working_dir_path / vShaderFile);
+    std::filesystem::path f = (Global::working_dir_path / fShaderFile);
+    Shaders[name] = loadShaderFromFile(v.generic_string().c_str(), f.generic_string().c_str(), gShaderFile);
     return Shaders[name];
 }
 
@@ -39,7 +42,8 @@ Texture2D ResourceManager::GetTexture(std::string name)
 
 Model ResourceManager::LoadModel(const char *file, bool animated, std::string name)
 {
-    Models[name] = loadModelFromFile(file, animated);
+    std::filesystem::path p = (Global::working_dir_path / file);
+    Models[name] = loadModelFromFile(p.generic_string().c_str(), animated);
     return Models[name];
 }
 

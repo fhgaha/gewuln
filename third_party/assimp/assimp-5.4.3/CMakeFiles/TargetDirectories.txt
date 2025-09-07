@@ -1,0 +1,13 @@
+D:/MyProjects/cpp/third_party/assimp/assimp-5.4.3/CMakeFiles/uninstall.dir
+D:/MyProjects/cpp/third_party/assimp/assimp-5.4.3/CMakeFiles/UpdateAssimpLibsDebugSymbolsAndDLLs.dir
+D:/MyProjects/cpp/third_party/assimp/assimp-5.4.3/CMakeFiles/INSTALL.dir
+D:/MyProjects/cpp/third_party/assimp/assimp-5.4.3/CMakeFiles/ALL_BUILD.dir
+D:/MyProjects/cpp/third_party/assimp/assimp-5.4.3/CMakeFiles/ZERO_CHECK.dir
+D:/MyProjects/cpp/third_party/assimp/assimp-5.4.3/contrib/zlib/CMakeFiles/zlibstatic.dir
+D:/MyProjects/cpp/third_party/assimp/assimp-5.4.3/contrib/zlib/CMakeFiles/INSTALL.dir
+D:/MyProjects/cpp/third_party/assimp/assimp-5.4.3/contrib/zlib/CMakeFiles/ALL_BUILD.dir
+D:/MyProjects/cpp/third_party/assimp/assimp-5.4.3/code/CMakeFiles/assimp.dir
+D:/MyProjects/cpp/third_party/assimp/assimp-5.4.3/code/CMakeFiles/INSTALL.dir
+D:/MyProjects/cpp/third_party/assimp/assimp-5.4.3/test/CMakeFiles/unit.dir
+D:/MyProjects/cpp/third_party/assimp/assimp-5.4.3/test/CMakeFiles/INSTALL.dir
+D:/MyProjects/cpp/third_party/assimp/assimp-5.4.3/test/headercheck/CMakeFiles/INSTALL.dir

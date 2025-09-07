@@ -6,7 +6,7 @@
 #include <gewuln/rendering/gizmo_renderer.h>
 #include <gewuln/rendering/model_renderer.h>
 #include <gewuln/rendering/text_renderer.h>
-#include <gewuln/geometry_2d.h>
+#include <gewuln/geometry/geometry_2d.h>
 
 // settings
 bool show_fps = true;
@@ -33,8 +33,8 @@ void Game::init()
     { //renderers
         model_renderer = new ModelRenderer(
             ResourceManager::LoadShader(
-                "D:/MyProjects/cpp/gewuln/src/shaders/default/default.vert",
-                "D:/MyProjects/cpp/gewuln/src/shaders/default/default.frag",
+                "C:/my_projects/gewuln/src/shaders/default/default.vert",
+                "C:/my_projects/gewuln/src/shaders/default/default.frag",
                 nullptr,
                 "model_shader"
             )
@@ -44,21 +44,21 @@ void Game::init()
 
         text_renderer = new TextRenderer(
             ResourceManager::LoadShader(
-                "D:/MyProjects/cpp/gewuln/src/shaders/text_shaders/text_2d.vert",
-                "D:/MyProjects/cpp/gewuln/src/shaders/text_shaders/text_2d.frag",
+                "C:/my_projects/gewuln/src/shaders/text_shaders/text_2d.vert",
+                "C:/my_projects/gewuln/src/shaders/text_shaders/text_2d.frag",
                 nullptr,
                 "text_shader"
             ),
             this->Width,
             this->Height
         );
-        text_renderer->Load("D:/MyProjects/cpp/gewuln/assets/fonts/arial/arial.ttf", 24);
+        text_renderer->Load("C:/my_projects/gewuln/assets/fonts/arial/arial.ttf", 24);
 
 
         gizmo_renderer = new GizmoRenderer(
             ResourceManager::LoadShader(
-                "D:/MyProjects/cpp/gewuln/src/shaders/origin_gizmo/origin_gizmo.vert",
-                "D:/MyProjects/cpp/gewuln/src/shaders/origin_gizmo/origin_gizmo.frag",
+                "C:/my_projects/gewuln/src/shaders/origin_gizmo/origin_gizmo.vert",
+                "C:/my_projects/gewuln/src/shaders/origin_gizmo/origin_gizmo.frag",
                 nullptr,
                 "gizmo_shader"
             )
@@ -68,7 +68,7 @@ void Game::init()
     {//setting up rooms
         {//kitchen room
             ResourceManager::LoadModel(
-                "D:/MyProjects/cpp/gewuln/assets/models/room/export/gltf_6_room_exit/room.gltf",
+                "C:/my_projects/gewuln/assets/models/room/export/gltf_6_room_exit/room.gltf",
                 false,
                 "test_kitchen_room_model"
             );
@@ -142,7 +142,7 @@ void Game::init()
 
         {//orange room
             ResourceManager::LoadModel(
-                "D:/MyProjects/cpp/gewuln/assets/models/test_rooms/export/test_floor/gltf_4_two_interactables_one_with_center_below_another_with_center_above/test_rooms.gltf",
+                "C:/my_projects/gewuln/assets/models/test_rooms/export/test_floor/gltf_4_two_interactables_one_with_center_below_another_with_center_above/test_rooms.gltf",
                 false,
                 "test_room_model"
             );
@@ -189,7 +189,7 @@ void Game::init()
             test_room->current_cam = test_room->initial_cam;
             
             {//mona
-                auto mona_path = "D:/MyProjects/cpp/gewuln/assets/models/mona_sax/export/gltf_3_cube_collider/mona.gltf";
+                auto mona_path = "C:/my_projects/gewuln/assets/models/mona_sax/export/gltf_3_cube_collider/mona.gltf";
                 ResourceManager::LoadModel(mona_path, true, "mona");
                 
                 Character* mona = test_room->add_character(
@@ -243,7 +243,7 @@ void Game::init()
 
         // { //town
         //     ResourceManager::LoadModel(
-        //         "D:/MyProjects/cpp/gewuln/assets/models/town/export/glfw_5_fixed_faces/town.gltf",
+        //         "C:/my_projects/gewuln/assets/models/town/export/glfw_5_fixed_faces/town.gltf",
         //         false,
         //         "town_model"
         //     );
@@ -267,7 +267,7 @@ void Game::init()
         
         // {//hotel lobby
         //     ResourceManager::LoadModel(
-        //         "D:/MyProjects/cpp/gewuln/assets/models/hotel_interiors/export/gltf_1/hotel_lobby.gltf",
+        //         "C:/my_projects/gewuln/assets/models/hotel_interiors/export/gltf_1/hotel_lobby.gltf",
         //         false,
         //         "hotel_lobby"
         //     );
@@ -294,8 +294,8 @@ void Game::init()
         
 
         // {//hotel owner
-        //     // auto ho_path = "D:/MyProjects/cpp/gewuln/assets/models/low_poly_humanoids/hotel_owner/export/gltf_1_no_anim/hotel_owner.gltf";
-        //     auto ho_path = "D:/MyProjects/cpp/gewuln/assets/models/low_poly_humanoids/hotel_owner/export/gltf_2_anims/hotel_owner.gltf";
+        //     // auto ho_path = "C:/my_projects/gewuln/assets/models/low_poly_humanoids/hotel_owner/export/gltf_1_no_anim/hotel_owner.gltf";
+        //     auto ho_path = "C:/my_projects/gewuln/assets/models/low_poly_humanoids/hotel_owner/export/gltf_2_anims/hotel_owner.gltf";
         //     ResourceManager::LoadModel(ho_path, true, "hotel_owner");
 
         //     characters["hotel_owner"] = Character(
@@ -308,7 +308,7 @@ void Game::init()
         // }
         
         // {//snake
-        //     auto snake_path = "D:/MyProjects/cpp/gewuln/assets/models/low_poly_humanoids/snake/export/gltf_1/snake.gltf";
+        //     auto snake_path = "C:/my_projects/gewuln/assets/models/low_poly_humanoids/snake/export/gltf_1/snake.gltf";
         //     ResourceManager::LoadModel(snake_path, true, "snake");
 
         //     current_room->characters["snake"] = Character(

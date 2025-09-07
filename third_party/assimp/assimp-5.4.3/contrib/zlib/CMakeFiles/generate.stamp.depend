@@ -1,0 +1,10 @@
+# CMake generation dependency list for this directory.
+C:/msys64/mingw64/share/cmake/Modules/CheckCSourceCompiles.cmake
+C:/msys64/mingw64/share/cmake/Modules/CheckFunctionExists.cmake
+C:/msys64/mingw64/share/cmake/Modules/CheckIncludeFile.cmake
+C:/msys64/mingw64/share/cmake/Modules/CheckIncludeFileCXX.cmake
+C:/msys64/mingw64/share/cmake/Modules/CheckTypeSize.cmake
+C:/msys64/mingw64/share/cmake/Modules/Internal/CheckSourceCompiles.cmake
+D:/MyProjects/cpp/third_party/assimp/assimp-5.4.3/contrib/zlib/CMakeLists.txt
+D:/MyProjects/cpp/third_party/assimp/assimp-5.4.3/contrib/zlib/zconf.h.cmakein
+D:/MyProjects/cpp/third_party/assimp/assimp-5.4.3/contrib/zlib/zlib.pc.cmakein

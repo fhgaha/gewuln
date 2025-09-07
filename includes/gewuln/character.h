@@ -8,8 +8,8 @@
 #include <gewuln/animation.h>
 #include <gewuln/animator.h>
 #include <gewuln/model.h>
-#include <gewuln/geometry_3d.h>
-#include <gewuln/geometry_2d.h>
+#include <gewuln/geometry/geometry_3d.h>
+#include <gewuln/geometry/geometry_2d.h>
 #include <gewuln/character_state/character_state.h>
 #include <iostream>
 #include <map>

@@ -2,7 +2,7 @@
 #include <gewuln/room.h>
 #include <GLFW/glfw3.h>
 #include <gewuln/room.h>
-#include <gewuln/geometry_3d.h>
+#include <gewuln/geometry/geometry_3d.h>
 #include "character.h"
 
 Character::Character(Model* model, std::string path, glm::vec3 pos, glm::vec3 dir)

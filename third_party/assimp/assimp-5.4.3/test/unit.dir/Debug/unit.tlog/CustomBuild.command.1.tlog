@@ -1,0 +1,10 @@
+^D:\MYPROJECTS\CPP\THIRD_PARTY\ASSIMP\ASSIMP-5.4.3\TEST\CMAKELISTS.TXT
+setlocal
+C:\msys64\mingw64\bin\cmake.exe -SD:/MyProjects/cpp/third_party/assimp/assimp-5.4.3 -BD:/MyProjects/cpp/third_party/assimp/assimp-5.4.3 --check-stamp-file D:/MyProjects/cpp/third_party/assimp/assimp-5.4.3/test/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

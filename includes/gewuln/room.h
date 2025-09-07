@@ -6,15 +6,11 @@
 #include <gewuln/camera/camera.h>
 #include <gewuln/camera/camera_look_at.h>
 #include <gewuln/camera/camera_fly.h>
-#include <gewuln/geometry_3d.h>
-#include <gewuln/geometry_2d.h>
+#include <gewuln/geometry/geometry_3d.h>
+#include <gewuln/geometry/geometry_2d.h>
 #include <gewuln/character.h>
 #include <gewuln/model.h>
-#include <unordered_map>
-#include <memory>
-#include <utility>
-#include <array>
-#include <functional>
+#include <gewuln/utils/gewuln_std.h>
 
 class Character;
 class Animator;

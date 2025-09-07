@@ -1,7 +1,8 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#include <utility>
+#include <gewuln/utils/gewuln_std.h>
+
 
 struct WindowState {
 	int width, height;
@@ -9,7 +10,8 @@ struct WindowState {
 
 class Global {
 public:
-	inline static bool draw_gizmos = false;
+	inline static bool 						draw_gizmos = false;
+	inline static std::filesystem::path 	working_dir_path = std::filesystem::current_path().parent_path();
 
 	/// returns width and height correspondingly
 	static std::pair<int, int>	get_window_size()						{return std::make_pair(window.width, window.height);}

@@ -9,6 +9,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 #include <gewuln/assimp_glm_helpers.h>
+#include <gewuln/geometry/geometry_3d.h>
 
 struct KeyPosition
 {

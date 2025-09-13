@@ -1,6 +1,11 @@
 #include <gewuln/animator.h>
 #include <glm/gtx/vector_angle.hpp>
 
+const float Animator::NECK_ANGLE_AROUND_X_LIMIT_DEG = 70.0f;
+const float Animator::NECK_ANGLE_AROUND_Y_LIMIT_DEG = 85.0f;
+const float Animator::NECK_ROTATION_SPEED_AROUND_Y = 5.0f;
+const float Animator::NECK_ROTATION_SPEED_AROUND_X = 10.0f;
+
 Animator::Animator(const std::string &animationPath, Model &model): animations()
 {
 	Assimp::Importer importer;
@@ -125,8 +130,10 @@ void Animator::calculate_bone_transform_with_look_at(const AssimpNodeData* node,
 
 	if (bone){
 		if (nodeName == desired_name){
+
+
+
 			glm::vec3 char_to_trg_dir = glm::normalize(target - char_pos);
-			
 			float new_angle_around_x_rad, new_angle_around_y_rad; 
 			
 			{
@@ -149,6 +156,9 @@ void Animator::calculate_bone_transform_with_look_at(const AssimpNodeData* node,
 				new_angle_around_x_rad = 0.0f;
 				new_angle_around_y_rad = 0.0f;
 			}
+			
+			
+			
 
 			bool big_enough_difference  = glm::length2(angle_around_x_rad - new_angle_around_x_rad) > 1e-3
 									   || glm::length2(angle_around_y_rad - new_angle_around_y_rad) > 1e-3;

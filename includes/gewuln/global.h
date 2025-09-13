@@ -11,7 +11,7 @@ struct WindowState {
 class Global {
 public:
 	inline static bool 						draw_gizmos = false;
-	inline static std::filesystem::path 	working_dir_path = std::filesystem::current_path();//.parent_path();
+	inline static std::filesystem::path 	working_dir_path = std::filesystem::current_path();
 
 	/// returns width and height correspondingly
 	static std::pair<int, int>	get_window_size()						{return std::make_pair(window.width, window.height);}

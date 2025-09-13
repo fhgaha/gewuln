@@ -15,6 +15,7 @@ set sources=^
 ../includes/gewuln/character_state/interact_state.cpp ^
 ../includes/gewuln/room.cpp ^
 ../includes/gewuln/animator.cpp ^
+../includes/gewuln/geometry/geometry_3d.cpp ^
 ../src/game.cpp ^
 ../src/camera/camera_look_at.cpp ^
 ../src/camera/camera_fly.cpp

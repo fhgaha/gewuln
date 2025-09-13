@@ -13,10 +13,15 @@
 class Animator
 {
 public:
+	static const float			NECK_ANGLE_AROUND_X_LIMIT_DEG;
+	static const float			NECK_ANGLE_AROUND_Y_LIMIT_DEG;
+	static const float			NECK_ROTATION_SPEED_AROUND_Y;
+	static const float			NECK_ROTATION_SPEED_AROUND_X;
+	
 	glm::vec3 target 		= glm::vec3(1.0f);
 	glm::vec3 char_forward 	= glm::vec3(1.0f);
 	glm::vec3 char_pos 		= glm::vec3(0.0f);
-	
+	 
 	Animator(){};
 	Animator(const std::string &animationPath, Model &model);
 	
@@ -36,11 +41,6 @@ protected:
 
 private:
 	unsigned int 								MAX_BONES_AMOUNT = 100;
-	float										NECK_ANGLE_AROUND_X_LIMIT_DEG = 70.0f;
-	float										NECK_ANGLE_AROUND_Y_LIMIT_DEG = 85.0f;
-	float										NECK_ROTATION_SPEED_AROUND_Y = 5.0f;
-	float										NECK_ROTATION_SPEED_AROUND_X = 10.0f;
-	
 	std::vector<glm::mat4> 						final_bone_matrices;
 	std::unordered_map<std::string, Animation> 	animations;
 	Animation* 									current_animation;

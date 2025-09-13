@@ -7,6 +7,7 @@
 #include <gewuln/rendering/model_renderer.h>
 #include <gewuln/rendering/text_renderer.h>
 #include <gewuln/geometry/geometry_2d.h>
+#include <gewuln/geometry/geometry_3d.h>
 
 // settings
 bool show_fps = true;
@@ -30,6 +31,8 @@ Game::~Game()
 
 void Game::init()
 {
+    Global::draw_gizmos = false;
+    
     { //renderers
         model_renderer = new ModelRenderer(
             ResourceManager::LoadShader(
@@ -39,8 +42,6 @@ void Game::init()
                 "model_shader"
             )
         );
-        Global::draw_gizmos = false;
-
 
         text_renderer = new TextRenderer(
             ResourceManager::LoadShader(
@@ -50,10 +51,10 @@ void Game::init()
                 "text_shader"
             ),
             this->Width,
-            this->Height
+            this->Height,
+            "assets/fonts/arial/arial.ttf", 
+            24
         );
-        text_renderer->Load("assets/fonts/arial/arial.ttf", 24);
-
 
         gizmo_renderer = new GizmoRenderer(
             ResourceManager::LoadShader(

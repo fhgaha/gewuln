@@ -22,12 +22,14 @@ class TextRenderer {
 		std::map<char, CharacterLetter> Characters;
 	    Shader shader;
 
-		TextRenderer(Shader &shader, unsigned int width, unsigned int height)
+		TextRenderer(Shader &shader, unsigned int width, unsigned int height, std::string font_relative_path, unsigned int font_size)
 		{
 			// ResourceManager::GetShader()
 		    this->shader = shader;
 		    this->shader.SetMatrix4("projection", glm::ortho(0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f), true);
 		    this->shader.SetInteger("text", 0);
+			
+			Load(font_relative_path, font_size);
 
 		    // configure VAO/VBO for texture quads
 		    glGenVertexArrays(1, &this->VAO);
@@ -44,7 +46,7 @@ class TextRenderer {
 		// This method is separate from the constructor with the idea that it will allow to change font or font size if needed
 		void Load(std::string font_relative_path, unsigned int font_size)
 		{
-			const char* font_full_path = (Global::working_dir_path / font_relative_path).generic_string().c_str();
+			std::filesystem::path font_full_path = (Global::working_dir_path / font_relative_path);
 			
 		    // first clear the previously loaded Characters
 			this->Characters.clear();
@@ -55,7 +57,7 @@ class TextRenderer {
 			}
 			// load font_path as face
 			FT_Face face;
-			if (FT_New_Face(ft, font_full_path, 0, &face)){
+			if (FT_New_Face(ft, font_full_path.generic_string().c_str(), 0, &face)){
 			    std::cout << "ERROR::FREETYPE: Failed to load font_path" << std::endl;
 			}
 			// set size to load glyphs as

@@ -343,7 +343,7 @@ void Game::update(float dt)
 
     if (current_room->active_character) {
         //look at cam looks at character, fly cam does nothing
-        glm::vec3 trg = current_room->active_character->position + glm::vec3(0.0f, 1.5f, 0.0f);
+        glm::vec3 trg = current_room->active_character->transform->position+ glm::vec3(0.0f, 1.5f, 0.0f);
         current_room->current_cam->LookAt(&trg);
     }
     

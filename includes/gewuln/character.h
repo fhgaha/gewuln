@@ -23,8 +23,7 @@ public:
 	Model*						model;
 	Animator					animator;
 			
-	glm::vec3					position;
-	float						rot_rad;
+	Transform*					transform;
 	glm::vec3					velocity = glm::vec3(0.0f);
 	glm::vec3					forward  = glm::vec3(0.0f, 0.0f, -1.0f);
 			

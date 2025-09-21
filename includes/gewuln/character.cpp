@@ -9,11 +9,12 @@ Character::Character(Model* model, std::string path, glm::vec3 pos, glm::vec3 di
 {
 	this->model = model;
 	this->animator = Animator(path, *model);
-	this->position = pos;
 
 	float yaw, _pitch;
 	direction_to_yaw_pitch(dir, yaw, _pitch);
-	this->rot_rad = yaw;
+	
+	model->transform = Transform{.position = pos, .rot_rad = yaw};
+	this->transform = &model->transform;
 
 	this->animator.play_animation("idle");
 	this->state = new IdleState();
@@ -52,7 +53,7 @@ void Character::Update(const float dt)
 		{
 			std::vector<Vertex> transformed_verts = this->model->collider_mesh.value().vertices;
 			for (size_t i = 0; i < transformed_verts.size(); i++){
-				transformed_verts[i].Position += this->position;
+				transformed_verts[i].Position += this->transform->position;
 			}
 
 			collider_intersects_an_interactable = Geometry3d::intersect(
@@ -69,7 +70,7 @@ void Character::Update(const float dt)
 
 		if (collider_intersects_an_interactable) {
 			animator.target = Geometry3d::compute_box_center(interacting_with->mesh->vertices) /*+ interacting_with->mesh->Position*/;
-			animator.char_pos = this->position;
+			animator.char_pos = this->transform->position;
 			animator.char_forward = this->forward;
 			animator.update_animation_with_look_at(dt);
 		} else {
@@ -81,36 +82,36 @@ void Character::Update(const float dt)
 void Character::turn_left(const float dt)
 {
 	forward = glm::rotateY(forward, ROT_SPEED * dt);
-	rot_rad += ROT_SPEED * dt;
-	if (rot_rad > glm::pi<float>()) {
-		rot_rad -= glm::two_pi<float>();
+	transform->rot_rad += ROT_SPEED * dt;
+	if (transform->rot_rad > glm::pi<float>()) {
+		transform->rot_rad -= glm::two_pi<float>();
 	}
 }
 
 void Character::turn_right(const float dt)
 {
 	forward = glm::rotateY(forward, -ROT_SPEED * dt);
-	rot_rad -= ROT_SPEED * dt;
-	if (rot_rad < -glm::pi<float>()) {
-		rot_rad += glm::two_pi<float>();
+	transform->rot_rad -= ROT_SPEED * dt;
+	if (transform->rot_rad < -glm::pi<float>()) {
+		transform->rot_rad += glm::two_pi<float>();
 	}
 }
 
 void Character::turn_to_target_instantly(glm::vec3 target)
 {
-	glm::vec3 char_to_trg_dir = target - position;
+	glm::vec3 char_to_trg_dir = target - transform->position;
 	glm::vec2 char_to_trg_dir_vec2 = glm::normalize(glm::vec2(char_to_trg_dir.x, char_to_trg_dir.z));
 	glm::vec2 forward_vec2 = glm::normalize(glm::vec2(forward.x, forward.z));
 
 	float angle_rad = glm::orientedAngle(char_to_trg_dir_vec2, forward_vec2);
 	
 	forward = glm::rotateY(forward, angle_rad);
-	rot_rad += angle_rad;
-	if (rot_rad < -glm::pi<float>()) {
-		rot_rad += glm::two_pi<float>();
+	transform->rot_rad += angle_rad;
+	if (transform->rot_rad < -glm::pi<float>()) {
+		transform->rot_rad += glm::two_pi<float>();
 	}
-	if (rot_rad > glm::pi<float>()) {
-		rot_rad -= glm::two_pi<float>();
+	if (transform->rot_rad > glm::pi<float>()) {
+		transform->rot_rad -= glm::two_pi<float>();
 	}
 }
 
@@ -122,7 +123,7 @@ RoomObjects::Interactable* Character::collider_intersects_an_interactable()
 	{
 		std::vector<Vertex> transformed_verts = this->model->collider_mesh.value().vertices;
 		for (size_t i = 0; i < transformed_verts.size(); i++){
-			transformed_verts[i].Position += this->position;
+			transformed_verts[i].Position += this->transform->position;
 		}
 
 		bool collider_intersects_an_interactable = Geometry3d::intersect(
@@ -151,7 +152,7 @@ void Character::switch_rooms()
 	{
 		std::vector<Vertex> transformed_verts = this->model->collider_mesh.value().vertices;
 		for (size_t i = 0; i < transformed_verts.size(); i++){
-			transformed_verts[i].Position += this->position;
+			transformed_verts[i].Position += this->transform->position;
 		}
 
 		bool collider_intersects_room_exit = Geometry3d::intersect(
@@ -172,10 +173,10 @@ void Character::walk_if_possible(const float dt)
 	assert(current_room && "Should have current room");
 	bool inside = current_room->inside_walkable_area(
 		this->model->collider_mesh.value(),
-		this->position + velocity
+		this->transform->position + velocity
 	);
 	if (inside) {
-		this->position += velocity;
+		this->transform->position += velocity;
 	} else {
 		// move and slide
 		// https://gamedev.stackexchange.com/questions/200354/how-to-slide-along-a-wall-at-full-speed
@@ -193,18 +194,18 @@ void Character::walk_if_possible(const float dt)
 		//if one of them not inside after movement, move the other way. if both not inside - dont move.
 		bool eight_right_is_inside = current_room->inside_walkable_area(
 			this->model->collider_mesh.value(),
-			this->position + eight_right
+			this->transform->position + eight_right
 		);
 		bool eight_left_is_inside  = current_room->inside_walkable_area(
 			this->model->collider_mesh.value(),
-			this->position + eight_left
+			this->transform->position + eight_left
 		);
 
 		if (eight_left_is_inside && eight_right_is_inside){
 		} else if (eight_left_is_inside) {
-			this->position += small_left;
+			this->transform->position += small_left;
 		} else if (eight_right_is_inside) {
-			this->position += small_right;
+			this->transform->position += small_right;
 		} else {
 			//cant move anywhere
 		}

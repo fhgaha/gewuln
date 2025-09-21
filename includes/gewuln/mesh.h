@@ -7,7 +7,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <gewuln/shader.h>
-#include <gewuln/transform.h>
 #include <string>
 #include <vector>
 
@@ -50,8 +49,6 @@ public:
 	
 	glm::mat4	transformation;	//transform cmp
 	aiNode		*parent;
-	
-	Transform					  transform;
 	
 	Mesh(){}
 	Mesh(

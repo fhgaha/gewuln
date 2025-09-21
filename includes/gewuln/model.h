@@ -26,6 +26,11 @@
 
 unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma = false);
 
+struct Transform{
+	glm::vec3					position;
+	float						rot_rad;
+};
+
 /*
 For static models all their transformations should be "applied" in Blender, i.e. Location, Rotation and should be reseted to (0, 0, 0)
 and Scale to (1, 1, 1). This is achieved through `Ctrl + A -> All Transforms` in Blender. No position, rotation or scale data is stored
@@ -53,7 +58,7 @@ public:
         return mapping;
     }
 
-	glm::vec3			position;
+	Transform			transform;
 	std::vector<Mesh>	meshes;
 
 	//optional meshes that are imported from blender using custom properties
@@ -66,7 +71,7 @@ public:
 	Model(std::string const &path, bool animated, glm::vec3 pos = glm::vec3(0.0f))
 	{
 		this->animated = animated;
-		this->position = pos;
+		this->transform = Transform{.position = pos, .rot_rad = 0.0f};
 		loadModel(path);
 	}
 

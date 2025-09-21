@@ -29,8 +29,8 @@ public:
 			cam,
 			aspect,
 			&character->animator,
-			character->position,
-			glm::degrees(character->rot_rad),
+			character->transform->position,
+			glm::degrees(character->transform->rot_rad),
 			rot_axis,
 			scale
 		);

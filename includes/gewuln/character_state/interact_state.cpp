@@ -8,10 +8,13 @@ void InteractState::enter(Character& character)
 	character.interactable_intersecting->action();
 	//turn player to the interactable object center
 	
+	bool ok = true;
 
-	character.turn_to_target_instantly(
-		Geometry3d::compute_box_center(character.interactable_intersecting->mesh->vertices)
-	);
+	if (ok){
+		character.turn_to_target_instantly(
+			Geometry3d::compute_box_center(character.interactable_intersecting->mesh->vertices)
+		);
+	}
 	
 	
 	// PlayCameraThing();

@@ -102,7 +102,7 @@ void Character::turn_to_target_instantly(glm::vec3 target)
 	glm::vec2 char_to_trg_dir_vec2 = glm::normalize(glm::vec2(char_to_trg_dir.x, char_to_trg_dir.z));
 	glm::vec2 forward_vec2 = glm::normalize(glm::vec2(forward.x, forward.z));
 
-	float angle_rad = -glm::orientedAngle(forward_vec2, char_to_trg_dir_vec2);
+	float angle_rad = glm::orientedAngle(char_to_trg_dir_vec2, forward_vec2);
 	
 	forward = glm::rotateY(forward, angle_rad);
 	rot_rad += angle_rad;

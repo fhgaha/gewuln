@@ -30,9 +30,9 @@ glm::vec2 Geometry3d::calc_angles_around_x_y_rad(glm::mat4 neck_pos_mat_local, g
     }
 
     glm::vec3 char_to_trg_dir = glm::normalize(target - char_pos);
-    angle_around_y_rad = -glm::orientedAngle(
-        glm::normalize(glm::vec2(char_forward.x, char_forward.z)),
-        glm::normalize(glm::vec2(char_to_trg_dir.x, char_to_trg_dir.z))
+    angle_around_y_rad = glm::orientedAngle(
+        glm::normalize(glm::vec2(char_to_trg_dir.x, char_to_trg_dir.z)),
+        glm::normalize(glm::vec2(char_forward.x, char_forward.z))
     );
     
     bool too_large_angle_around_x = glm::degrees(angle_around_x_rad) >  Animator::NECK_ANGLE_AROUND_X_LIMIT_DEG 

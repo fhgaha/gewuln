@@ -3,6 +3,7 @@
 
 #include <glm/glm.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/vector_angle.hpp>
 #include <glm/ext.hpp>
 #include <gewuln/room.h>
 #include <gewuln/animation.h>
@@ -39,6 +40,7 @@ public:
 	void 						Update(const float dt);
 	void 						turn_left(const float dt);
 	void 						turn_right(const float dt);
+	void 						turn_to_target_instantly(glm::vec3 target);
 	RoomObjects::Interactable* 	collider_intersects_an_interactable();
 	void 						switch_rooms();
 	void 						walk_if_possible(const float dt);

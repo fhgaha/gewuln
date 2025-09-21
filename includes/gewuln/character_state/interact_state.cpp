@@ -6,6 +6,14 @@ void InteractState::enter(Character& character)
 	printf("entered interact state\n");
 
 	character.interactable_intersecting->action();
+	//turn player to the interactable object center
+	
+
+	character.turn_to_target_instantly(
+		Geometry3d::compute_box_center(character.interactable_intersecting->mesh->vertices)
+	);
+	
+	
 	// PlayCameraThing();
 
 }

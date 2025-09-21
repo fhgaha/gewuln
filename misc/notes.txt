@@ -4,6 +4,8 @@ Mesh generator: https://huggingface.co/tencent/Hunyuan3D-2
 Mixamo to blender tutorial: https://www.youtube.com/shorts/uxPJbwXLqJs
 MGS 1 models: https://sketchfab.com/bioandrew91/collections/metal-gear-solid-1-7cbb3f7eea33408794e06285262d0991
 
+- up direction in this engine is ...
+
 
 1. just walk forward on the solid grouhnd. That's it. This is the end. Or is it? Edning 1/4.
 2. walk on a jelly ground. you are able to jump now. jump with ability of jumping downwards to boost you height jump. That's it. This is the end. Or is it? Edning 2/4.

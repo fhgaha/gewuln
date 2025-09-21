@@ -10,6 +10,11 @@
 #include <gewuln/global.h>
 #include "game.h"
 
+/*----------------------------------------------------------------
+1. Up dierection is Y, Forward is -Z, X is right
+
+----------------------------------------------------------------*/
+
 // Use NVIDIA Gpu for NVIDIA Optimus laptops/GPUs
 extern "C" {
     __declspec(dllexport) unsigned long NvOptimusEnablement = 0x00000001;

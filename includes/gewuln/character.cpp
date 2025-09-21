@@ -96,6 +96,24 @@ void Character::turn_right(const float dt)
 	}
 }
 
+void Character::turn_to_target_instantly(glm::vec3 target)
+{
+	glm::vec3 char_to_trg_dir = target - position;
+	glm::vec2 char_to_trg_dir_vec2 = glm::normalize(glm::vec2(char_to_trg_dir.x, char_to_trg_dir.z));
+	glm::vec2 forward_vec2 = glm::normalize(glm::vec2(forward.x, forward.z));
+
+	float angle_rad = -glm::orientedAngle(forward_vec2, char_to_trg_dir_vec2);
+	
+	forward = glm::rotateY(forward, angle_rad);
+	rot_rad += angle_rad;
+	if (rot_rad < -glm::pi<float>()) {
+		rot_rad += glm::two_pi<float>();
+	}
+	if (rot_rad > glm::pi<float>()) {
+		rot_rad -= glm::two_pi<float>();
+	}
+}
+
 RoomObjects::Interactable* Character::collider_intersects_an_interactable()
 {
 	assert(this->model->collider_mesh.has_value() && "Character must have collider mesh!");

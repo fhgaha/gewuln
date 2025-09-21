@@ -121,8 +121,8 @@ void Animator::update_animation_with_look_at(float dt)
 
 void Animator::calculate_bone_transform_with_look_at(const AssimpNodeData* node, glm::mat4 parentTransform)
 {
-	std::string desired_name = "mixamorig:Neck";
-	std::string nodeName = node->name;
+	const std::string desired_name = "mixamorig:Neck";
+	const std::string nodeName = node->name;
 	glm::mat4 globalTransformation;
 
 	glm::mat4 nodeTransform = node->transformation;
@@ -131,42 +131,22 @@ void Animator::calculate_bone_transform_with_look_at(const AssimpNodeData* node,
 	if (bone){
 		if (nodeName == desired_name){
 
-
-
-			glm::vec3 char_to_trg_dir = glm::normalize(target - char_pos);
-			float new_angle_around_x_rad, new_angle_around_y_rad; 
-			
-			{
-				glm::mat4 neck_pos_mat = parentTransform * bone->GetLocalTransform();
-				glm::vec3 neck_pos = glm::vec3(neck_pos_mat[3]) + char_pos;
-				glm::vec3 neck_to_trg_dir = glm::normalize(target - neck_pos);
-				new_angle_around_x_rad = glm::acos(neck_to_trg_dir.y) - glm::half_pi<float>();	//-П/2 to get the direction of the face
-			}
-
-			new_angle_around_y_rad = -glm::orientedAngle(
-				glm::normalize(glm::vec2(char_forward.x, char_forward.z)),
-				glm::normalize(glm::vec2(char_to_trg_dir.x, char_to_trg_dir.z))
+			glm::vec2 values = Geometry3d::calc_angles_around_x_y_rad(
+				parentTransform * bone->GetLocalTransform(), 
+				char_pos, 
+				char_forward, 
+				target
 			);
+			float new_angle_around_x_rad = values.x; 
+			float new_angle_around_y_rad = values.y;
 			
-			bool too_large_angle_around_x = glm::degrees(new_angle_around_x_rad) > NECK_ANGLE_AROUND_X_LIMIT_DEG 
-										|| 	glm::degrees(new_angle_around_x_rad) < -NECK_ANGLE_AROUND_X_LIMIT_DEG;
-			bool too_large_angle_around_y = glm::degrees(new_angle_around_y_rad) > NECK_ANGLE_AROUND_Y_LIMIT_DEG 
-										||	glm::degrees(new_angle_around_y_rad) < -NECK_ANGLE_AROUND_Y_LIMIT_DEG;
-			if (too_large_angle_around_x || too_large_angle_around_y){
-				new_angle_around_x_rad = 0.0f;
-				new_angle_around_y_rad = 0.0f;
-			}
-			
-			
-			
-
 			bool big_enough_difference  = glm::length2(angle_around_x_rad - new_angle_around_x_rad) > 1e-3
 									   || glm::length2(angle_around_y_rad - new_angle_around_y_rad) > 1e-3;
 			if (big_enough_difference) {
 				angle_around_x_rad += (angle_around_x_rad > new_angle_around_x_rad ? -1 : 1) * delta_time;
 				angle_around_y_rad += (angle_around_y_rad > new_angle_around_y_rad ? -1 : 1) * delta_time;
 			}
-
+			
 			// instead of this should slerp old rotation and new rotation i guess
 			glm::mat4 rotation = glm::mat4(1.0f);
 			rotation = glm::rotate(rotation, angle_around_y_rad, glm::vec3(0.0f, 1.0f, 0.0f));

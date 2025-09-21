@@ -18,9 +18,9 @@ public:
 	static const float			NECK_ROTATION_SPEED_AROUND_Y;
 	static const float			NECK_ROTATION_SPEED_AROUND_X;
 	
-	glm::vec3 target 		= glm::vec3(1.0f);
-	glm::vec3 char_forward 	= glm::vec3(1.0f);
-	glm::vec3 char_pos 		= glm::vec3(0.0f);
+	glm::vec3 target 			= glm::vec3(1.0f);
+	glm::vec3 char_forward 		= glm::vec3(1.0f);
+	glm::vec3 char_pos 			= glm::vec3(0.0f);
 	 
 	Animator(){};
 	Animator(const std::string &animationPath, Model &model);
